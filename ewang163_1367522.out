@@ -1,0 +1,83 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1367522
+##  Job Name : ewang163_ptsd_train_structured.sh
+##  Nodelist : node2302
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 09:13:10 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP Project — Structured Features Baseline
+=================================================================
+
+[1/6] Loading admissions extract and splits ...
+  Admissions extract: 67,725 rows
+  Train: 9,649 patients, Val: 1,206 patients
+  Patients with prior admissions: 714
+  Prior admission rows: 1,079
+
+[2/6] Building demographic features from index admission ...
+  Demographic features: 10,855 patients, 11 features
+
+[3/6] Streaming diagnoses for prior-admission comorbidity flags ...
+  Scanned 4,592 diagnosis rows from prior admissions
+    dx_MDD: 232 patients
+    dx_anxiety: 145 patients
+    dx_SUD: 259 patients
+    dx_TBI: 3 patients
+    dx_pain: 29 patients
+    dx_suicidal: 320 patients
+
+[4/6] Streaming prescriptions for prior-admission medication flags ...
+  Scanned 2,184 prescription rows from prior admissions
+    rx_ssri_snri: 40 patients
+    rx_prazosin: 1 patients
+    rx_SGA: 17 patients
+
+[5/6] Merging features and training model ...
+  Feature columns (20): ['age_at_admission', 'sex_female', 'los_days', 'emergency_admission', 'medicaid_selfpay', 'n_prior_admissions', 'race_Asian', 'race_Black', 'race_Hispanic', 'race_Other/Unknown', 'race_White', 'dx_MDD', 'dx_anxiety', 'dx_SUD', 'dx_TBI', 'dx_pain', 'dx_suicidal', 'rx_ssri_snri', 'rx_prazosin', 'rx_SGA']
+  Train: 9,649 patients, Val: 1,206 patients
+  Train pos: 2,522, unl: 7,127
+  Val   pos: 315, unl: 891
+
+  Tuning C on validation AUPRC ... C grid: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    C=0.001     AUPRC=0.5134  AUROC=0.6679 <-- best
+    C=0.01      AUPRC=0.5619  AUROC=0.6859 <-- best
+    C=0.1       AUPRC=0.5665  AUROC=0.6904 <-- best
+    C=1.0       AUPRC=0.5673  AUROC=0.6914 <-- best
+    C=10.0      AUPRC=0.5674  AUROC=0.6914 <-- best
+    C=100.0     AUPRC=0.5673  AUROC=0.6914
+
+[6/6] Best C=10.0 — final metrics and saving ...
+  Validation AUPRC:            0.5674
+  Validation AUROC:            0.6914
+  Precision @ recall>=0.85:    0.2869  (threshold=0.1619)
+
+  Feature coefficients (ranked by |coef|):
+    n_prior_admissions        +6.5124
+    dx_suicidal               +1.8219
+    dx_SUD                    +1.4676
+    dx_MDD                    +1.2434
+    dx_anxiety                +0.8820
+    medicaid_selfpay          +0.8586
+    race_Asian                -0.6720
+    rx_ssri_snri              +0.2866
+    race_White                +0.2745
+    dx_pain                   +0.1805
+    sex_female                +0.1393
+    rx_SGA                    +0.1229
+    race_Black                -0.1109
+    race_Hispanic             -0.1107
+    race_Other/Unknown        -0.0245
+    dx_TBI                    +0.0219
+    emergency_admission       +0.0177
+    los_days                  +0.0136
+    rx_prazosin               +0.0080
+    age_at_admission          -0.0041
+
+  Saved: /oscar/data/class/biol1595_2595/students/ewang163/ewang163_structured_logreg.pkl
+  Saved: /oscar/data/class/biol1595_2595/students/ewang163/ewang163_structured_features.json
+  Saved: /oscar/data/class/biol1595_2595/students/ewang163/ewang163_structured_val_results.txt
+
+Done.

@@ -1,0 +1,39 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1382993
+##  Job Name : ptsd_attr_v2
+##  Nodelist : gpu2104
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 12:53:53 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Integrated Gradients Attribution v2
+=================================================================
+
+Device: cuda
+  GPU: NVIDIA GeForce RTX 3090
+
+[1/5] Loading model and tokenizer ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 23355.40it/s]
+Initializing global attention on CLS token...
+  IntegratedGradients initialized on embedding inputs
+
+[2/5] Selecting high-confidence true positive patients ...
+  Running inference on positive test patients ...
+  Positive test patients: 660
+  Top decile threshold: 0.9991
+  Patients in top decile: 66
+  Selected for attribution: 50
+
+[3/5] Loading raw discharge notes for section boundaries ...
+  Loaded 50 raw notes
+
+[4/5] Computing Integrated Gradients (this may take a while) ...
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_attribution_v2.py", line 438, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_attribution_v2.py", line 320, in main
+    attr_scores = attributions.squeeze(0).sum(dim=-1).abs().cpu().numpy()
+RuntimeError: Can't call numpy() on Tensor that requires grad. Use tensor.detach().numpy() instead.

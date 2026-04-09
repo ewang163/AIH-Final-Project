@@ -1,0 +1,4 @@
+# Large model weights — tracked locally, not in git
+*.safetensors
+CLAUDE.md
+.claude/

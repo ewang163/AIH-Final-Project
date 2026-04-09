@@ -1,0 +1,21 @@
+{
+  "model": "BioClinicalBERT (PU)",
+  "max_length": 512,
+  "best_val_auprc": 0.8345,
+  "test_AUPRC": 0.855,
+  "test_AUROC": 0.8648,
+  "threshold_recall_85": 0.967,
+  "sensitivity": 0.8545,
+  "specificity": 0.6779,
+  "precision": 0.6627,
+  "F1": 0.7465,
+  "tp": 564,
+  "fp": 287,
+  "tn": 604,
+  "fn": 96,
+  "n_samples": 1551,
+  "n_pos": 660,
+  "mcnemar_p_vs_longformer": 0.000182,
+  "mcnemar_b": 159,
+  "mcnemar_c": 98
+}

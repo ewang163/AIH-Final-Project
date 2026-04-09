@@ -1,0 +1,4 @@
+group,n,median_score,mean_score,q25,q75,frac_above_threshold,n_above_threshold
+Proxy,102.0,0.4486,0.4943,0.209,0.7996,0.5686,58.0
+Unlabeled sample,500.0,0.1138,0.1905,0.0535,0.2784,0.148,74.0
+"Mann-Whitney U=40072, p=4.43e-20, AUC=0.7857, threshold=0.3800",,,,,,,

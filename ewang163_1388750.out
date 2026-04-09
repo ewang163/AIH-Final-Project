@@ -1,0 +1,198 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1388750
+##  Job Name : ptsd_errors
+##  Nodelist : gpu2002
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 03:58:42 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Error Analysis (FP/FN Inspection)
+=================================================================
+
+[1/5] Loading data ...
+  Test set: 1,551 patients
+  Threshold: 0.38
+
+[2/5] Identifying false positives and false negatives ...
+  TP: 561  FP: 227  FN: 99  TN: 664
+
+[3/5] Sampling 25 FPs and 25 FNs ...
+  FP sample: 25 patients
+  FN sample: 25 patients
+
+[4/5] Writing sample note files ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_fp_notes_sample.txt
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_fn_notes_sample.txt
+
+[5/5] Computing aggregate statistics ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_error_analysis_summary.csv
+
+=================================================================
+ERROR ANALYSIS SUMMARY
+=================================================================
+
+  Confusion matrix (threshold=0.38):
+    TP=561  FP=227
+    FN=99  TN=664
+
+  FALSE POSITIVES (n=227):
+    Mean predicted prob: 0.6622
+    Mean note length:    3,239 chars (overall: 3,108)
+    Sex: {'F': 137, 'M': 90}
+    Age: {'40s': 55, '50s': 54, '30s': 45, 'Other': 39, '20s': 34}
+    Race: {'White': 153, 'Black': 34, 'Other/Unknown': 16, 'Hispanic': 15, 'Asian': 9}
+    Emergency admissions: 96/227 (42.3%)
+
+  FALSE NEGATIVES (n=99):
+    Mean predicted prob: 0.1803
+    Mean note length:    2,932 chars (overall: 3,108)
+    Sex: {'M': 50, 'F': 49}
+    Age: {'Other': 36, '40s': 22, '30s': 18, '50s': 13, '20s': 10}
+    Race: {'White': 74, 'Black': 10, 'Other/Unknown': 7, 'Hispanic': 7, 'Asian': 1}
+    Emergency admissions: 27/99 (27.3%)
+
+  TF-IDF top-20 terms (mean weight):
+
+    FALSE POSITIVES:
+      ___                       0.033191
+      and                       0.032789
+      was                       0.030321
+      to                        0.030016
+      the                       0.029464
+      she                       0.028428
+      with                      0.027630
+      of                        0.027497
+      for                       0.024588
+      in                        0.024139
+      on                        0.023452
+      her                       0.022143
+      pain                      0.021895
+      he                        0.021220
+      patient                   0.021149
+      at                        0.017934
+      has                       0.017633
+      she was                   0.017458
+      no                        0.017239
+      had                       0.016696
+
+    FALSE NEGATIVES:
+      ___                       0.033484
+      and                       0.033005
+      was                       0.031746
+      the                       0.031075
+      to                        0.030545
+      he                        0.028256
+      of                        0.028215
+      with                      0.027746
+      on                        0.025694
+      for                       0.024787
+      in                        0.024382
+      patient                   0.022665
+      she                       0.022627
+      his                       0.021101
+      pain                      0.020535
+      the patient               0.019340
+      he was                    0.018033
+      her                       0.017073
+      at                        0.016954
+      had                       0.016795
+
+    OVERALL TEST SET:
+      and                       0.033518
+      ___                       0.033118
+      was                       0.031254
+      the                       0.030872
+      to                        0.030210
+      she                       0.028684
+      of                        0.027803
+      with                      0.027758
+      for                       0.024539
+      on                        0.024404
+      in                        0.023878
+      her                       0.023172
+      patient                   0.021943
+      he                        0.021343
+      pain                      0.021101
+      she was                   0.017994
+      the patient               0.017719
+      is                        0.017251
+      at                        0.017209
+      no                        0.016874
+
+  DISTINCTIVE FP terms (most over-represented vs overall):
+      has                       0.017633  (176.3x overall)
+      had                       0.016696  (167.0x overall)
+      at                        0.017934  (1.0x overall)
+      pain                      0.021895  (1.0x overall)
+      no                        0.017239  (1.0x overall)
+      in                        0.024139  (1.0x overall)
+      ___                       0.033191  (1.0x overall)
+      for                       0.024588  (1.0x overall)
+      with                      0.027630  (1.0x overall)
+      he                        0.021220  (1.0x overall)
+      to                        0.030016  (1.0x overall)
+      she                       0.028428  (1.0x overall)
+      of                        0.027497  (1.0x overall)
+      and                       0.032789  (1.0x overall)
+      she was                   0.017458  (1.0x overall)
+
+  DISTINCTIVE FN terms (most over-represented vs overall):
+      his                       0.021101  (211.0x overall)
+      he was                    0.018033  (180.3x overall)
+      had                       0.016795  (167.9x overall)
+      he                        0.028256  (1.3x overall)
+      the patient               0.019340  (1.1x overall)
+      on                        0.025694  (1.1x overall)
+      patient                   0.022665  (1.0x overall)
+      in                        0.024382  (1.0x overall)
+      was                       0.031746  (1.0x overall)
+      of                        0.028215  (1.0x overall)
+      to                        0.030545  (1.0x overall)
+      ___                       0.033484  (1.0x overall)
+      for                       0.024787  (1.0x overall)
+      the                       0.031075  (1.0x overall)
+      with                      0.027746  (1.0x overall)
+
+=================================================================
+QUALITATIVE QUESTIONS TO ADDRESS
+=================================================================
+
+  1. Do FP notes contain trauma-related language?
+     YES — trauma terms found in FP notes:
+       "anxiety": 53/227 (23%)
+       "abuse": 47/227 (21%)
+       "trauma": 28/227 (12%)
+       "sexual": 13/227 (6%)
+       "ptsd": 5/227 (2%)
+       "panic": 3/227 (1%)
+       "assault": 2/227 (1%)
+       "violence": 2/227 (1%)
+       "domestic": 2/227 (1%)
+       "combat": 1/227 (0%)
+       "avoidance": 1/227 (0%)
+     NOTE: These may be genuine undercoded PTSD cases.
+
+  2. Are FN notes clinically sparse?
+     FN notes below Q1 length: 25/99 (25%)
+     FN notes < 500 chars: 7/99 (7%)
+     Mean FN length: 2,932 (overall: 3,108)
+     Trauma terms in FN notes:
+       "anxiety": 19/99 (19%)
+       "trauma": 13/99 (13%)
+       "abuse": 7/99 (7%)
+       "panic": 5/99 (5%)
+       "sexual": 3/99 (3%)
+       "assault": 1/99 (1%)
+       "combat": 1/99 (1%)
+       "violence": 1/99 (1%)
+       "domestic": 1/99 (1%)
+
+  3. Subgroup clustering of FNs:
+     Female: FN=49.5% vs overall=60.6%
+     Age 20s: FN=10.1% vs overall=17.2% (under-represented)
+     Age 50s: FN=13.1% vs overall=18.2% (under-represented)
+     Age Other: FN=36.4% vs overall=23.0% (over-represented)
+
+Done.

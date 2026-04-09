@@ -1,0 +1,45 @@
+=================================================================
+Structured Features + Logistic Regression — Validation Results
+=================================================================
+
+LogReg: class_weight=balanced, solver=lbfgs, max_iter=1000
+Best C: 10.0
+
+C tuning results:
+  C=0.001     AUPRC=0.5134  AUROC=0.6679
+  C=0.01      AUPRC=0.5619  AUROC=0.6859
+  C=0.1       AUPRC=0.5665  AUROC=0.6904
+  C=1.0       AUPRC=0.5673  AUROC=0.6914
+  C=10.0      AUPRC=0.5674  AUROC=0.6914
+  C=100.0     AUPRC=0.5673  AUROC=0.6914
+
+Final validation metrics (C=10.0):
+  AUPRC:                    0.5674
+  AUROC:                    0.6914
+  Precision @ recall>=0.85: 0.2869  (threshold=0.1619)
+
+Feature coefficients (ranked by |coef|):
+  n_prior_admissions        +6.5124
+  dx_suicidal               +1.8219
+  dx_SUD                    +1.4676
+  dx_MDD                    +1.2434
+  dx_anxiety                +0.8820
+  medicaid_selfpay          +0.8586
+  race_Asian                -0.6720
+  rx_ssri_snri              +0.2866
+  race_White                +0.2745
+  dx_pain                   +0.1805
+  sex_female                +0.1393
+  rx_SGA                    +0.1229
+  race_Black                -0.1109
+  race_Hispanic             -0.1107
+  race_Other/Unknown        -0.0245
+  dx_TBI                    +0.0219
+  emergency_admission       +0.0177
+  los_days                  +0.0136
+  rx_prazosin               +0.0080
+  age_at_admission          -0.0041
+
+Train: 9,649 patients (2,522 pos, 7,127 unl)
+Val:   1,206 patients (315 pos, 891 unl)
+Features: 20

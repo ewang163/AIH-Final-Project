@@ -1,0 +1,47 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1366432
+##  Job Name : ewang163_ptsd_train_structured.sh
+##  Nodelist : node2339
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 09:01:43 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP Project — Structured Features Baseline
+=================================================================
+
+[1/6] Loading admissions extract and splits ...
+  Admissions extract: 67,725 rows
+  Train: 9,649 patients, Val: 1,206 patients
+  Patients with prior admissions: 714
+  Prior admission rows: 1,079
+
+[2/6] Building demographic features from index admission ...
+  Demographic features: 10,855 patients, 12 features
+
+[3/6] Streaming diagnoses for prior-admission comorbidity flags ...
+  Scanned 4,592 diagnosis rows from prior admissions
+    dx_MDD: 232 patients
+    dx_anxiety: 145 patients
+    dx_SUD: 259 patients
+    dx_TBI: 3 patients
+    dx_pain: 29 patients
+    dx_suicidal: 320 patients
+
+[4/6] Streaming prescriptions for prior-admission medication flags ...
+  Scanned 2,184 prescription rows from prior admissions
+    rx_ssri_snri: 40 patients
+    rx_prazosin: 1 patients
+    rx_SGA: 17 patients
+
+[5/6] Merging features and training model ...
+  Feature columns (21): ['age_at_admission', 'sex_female', 'los_days', 'emergency_admission', 'medicaid_selfpay', 'n_prior_admissions', 'race_Asian', 'race_Black', 'race_Hispanic', 'race_Other/Unknown', 'race_White', 'race_cat', 'dx_MDD', 'dx_anxiety', 'dx_SUD', 'dx_TBI', 'dx_pain', 'dx_suicidal', 'rx_ssri_snri', 'rx_prazosin', 'rx_SGA']
+  Train: 9,649 patients, Val: 1,206 patients
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_structured.py", line 370, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_structured.py", line 256, in main
+    X_train = train_feat[feature_cols].values.astype(np.float32)
+ValueError: could not convert string to float: 'Other/Unknown'

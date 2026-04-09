@@ -1,0 +1,92 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1380824
+##  Job Name : ptsd_attrib
+##  Nodelist : gpu2002
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 11:26:21 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Integrated Gradients Attribution Analysis
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+
+[1/5] Loading model and tokenizer ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 21098.65it/s]
+Initializing global attention on CLS token...
+  LayerIntegratedGradients initialized on word_embeddings layer
+
+[2/5] Selecting high-confidence true positive patients ...
+  Running inference on positive test patients ...
+  Positive test patients: 660
+  Top decile threshold: 0.9991
+  Patients in top decile: 67
+  Selected for attribution: 50
+
+[3/5] Loading raw discharge notes for section boundaries ...
+  Loaded 50 raw notes
+
+[4/5] Computing Integrated Gradients (this may take a while) ...
+  [10/50] 32s elapsed
+  [20/50] 66s elapsed
+  [30/50] 101s elapsed
+  [40/50] 136s elapsed
+  [50/50] 171s elapsed
+  Completed 50 patients in 174s
+
+[5/5] Aggregating results ...
+
+  Section-level attribution:
+  Section                             Total  % Total   Tokens   Mean/Token
+  ------------------------------ ---------- -------- -------- ------------
+  history of present illness       216.6447   51.09%    25150     0.008614
+  brief hospital course            115.5325   27.24%    10982     0.010520
+  past medical history              81.4501   19.21%     4459     0.018266
+  social history                     7.8274    1.85%     1406     0.005567
+  unknown                            2.5972    0.61%      279     0.009309
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_attribution_by_section.csv
+
+  Top 50 tokens by mean |attribution| (min 3 occurrences):
+  Token                 Mean |Attr|        Std      N
+  -------------------- ------------ ---------- ------
+  details                  0.373232   0.907275      7
+  ts                       0.302766   0.373267     89
+  mr                       0.096281   0.377623     31
+  violence                 0.093414   0.068132      3
+  psychiatric              0.087381   0.081103     25
+  counseling               0.084704   0.034491      3
+  schizophrenia            0.079876   0.080858      9
+  trauma                   0.072260   0.083910     11
+  falls                    0.067281   0.063509      3
+  bipolar                  0.067220   0.063348     13
+  suicidal                 0.062132   0.061406     33
+  disorder                 0.061878   0.051397     48
+  abusive                  0.061225   0.020218      4
+  personality              0.060876   0.059343      5
+  program                  0.060480   0.114154      6
+  presented                0.057658   0.189595     22
+  dysfunction              0.055481   0.051709      3
+  psychiatrist             0.054937   0.036654     12
+  received                 0.053010   0.199067     19
+  suicide                  0.050946   0.042193     18
+  bid                      0.050488   0.027689      6
+  flashbacks               0.049840   0.016708      6
+  psychiatry               0.047106   0.040515     11
+  counselor                0.046621   0.055664      4
+  xiety                    0.046458   0.057830     13
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_top_attributed_tokens.csv
+
+=================================================================
+INTERPRETATION
+=================================================================
+  Highest-attribution section: history of present illness (51.1% of total)
+  Top 3 attributed tokens: details, ts, mr
+
+  Expected: social history and HPI sections should drive
+  predictions if the model learns genuine clinical signal.
+  High PMH attribution may indicate residual label leakage.
+
+Done.

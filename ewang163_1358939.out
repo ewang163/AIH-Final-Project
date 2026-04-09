@@ -1,0 +1,62 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1358939
+##  Job Name : ptsd_longformer
+##  Nodelist : gpu2005
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 05:40:18 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Clinical Longformer + PU Loss Training
+=================================================================
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/cuda/__init__.py:180: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 12090). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Device: cpu
+
+[1/4] Loading data ...
+  Train: 11,837 rows  (pos=4,710, unl=7,127)
+  Val:   1,471 rows
+  Estimated class prior pi_p = 0.3979
+
+[2/4] Loading Clinical Longformer ...
+Loading weights:   0%|          | 0/269 [00:00<?, ?it/s]Loading weights: 100%|██████████| 269/269 [00:00<00:00, 21352.94it/s]
+[1mLongformerForSequenceClassification LOAD REPORT[0m from: yikuan8/Clinical-Longformer
+Key                                | Status     | 
+-----------------------------------+------------+-
+lm_head.bias                       | UNEXPECTED | 
+lm_head.layer_norm.weight          | UNEXPECTED | 
+lm_head.dense.bias                 | UNEXPECTED | 
+longformer.embeddings.position_ids | UNEXPECTED | 
+lm_head.layer_norm.bias            | UNEXPECTED | 
+lm_head.dense.weight               | UNEXPECTED | 
+lm_head.decoder.bias               | UNEXPECTED | 
+lm_head.decoder.weight             | UNEXPECTED | 
+classifier.out_proj.weight         | MISSING    | 
+classifier.out_proj.bias           | MISSING    | 
+classifier.dense.bias              | MISSING    | 
+classifier.dense.weight            | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:424: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+  Parameters: 148,660,994 total, 148,660,994 trainable
+
+[3/4] Preparing datasets ...
+  Total optimizer steps: 1,850
+  Warmup steps: 185
+
+[4/4] Training ...
+
+--- Epoch 1/5 ---
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:432: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  self.check_worker_number_rationality()
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:1118: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  super().__init__(loader)
+Initializing global attention on CLS token...
+/var/spool/slurmd/job1358939/slurm_script: line 11: 3407132 Killed                  python ewang163_ptsd_train_longformer.py
+[2026-04-07T17:42:53.360] error: Detected 1 oom_kill event in StepId=1358939.batch. Some of the step tasks have been OOM Killed.

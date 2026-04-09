@@ -1,0 +1,6 @@
+section,total_attribution,pct_of_total,n_tokens,mean_attribution_per_token
+history of present illness,216.6447,51.09,25150,0.008614
+brief hospital course,115.5325,27.24,10982,0.01052
+past medical history,81.4501,19.21,4459,0.018266
+social history,7.8274,1.85,1406,0.005567
+unknown,2.5972,0.61,279,0.009309

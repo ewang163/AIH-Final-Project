@@ -1,0 +1,4 @@
+condition,AUPRC,AUROC,threshold,sensitivity,specificity,precision,F1,n_samples,n_pos
+Baseline (unmasked),0.8827,0.8913,0.38,0.85,0.7464,0.7128,0.7754,1551,660
+Ablation 1: PTSD masking,0.8749,0.8898,0.38,0.85,0.7464,0.7128,0.7754,1551,660
+Ablation 2: PMH removed,0.8218,0.8382,0.182,0.85,0.6207,0.624,0.7197,1551,660

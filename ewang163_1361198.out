@@ -1,0 +1,142 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1361198
+##  Job Name : ptsd_longformer
+##  Nodelist : gpu2009
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 06:15:38 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Clinical Longformer + PU Loss Training
+=================================================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Device: cuda
+  GPU: Quadro RTX 6000
+  Memory: 25.2 GB
+
+[1/4] Loading data ...
+  Train: 11,837 rows  (pos=4,710, unl=7,127)
+  Val:   1,471 rows
+  Estimated class prior pi_p = 0.3979
+
+[2/4] Loading Clinical Longformer ...
+Loading weights:   0%|          | 0/269 [00:00<?, ?it/s]Loading weights: 100%|██████████| 269/269 [00:00<00:00, 23362.48it/s]
+[1mLongformerForSequenceClassification LOAD REPORT[0m from: yikuan8/Clinical-Longformer
+Key                                | Status     | 
+-----------------------------------+------------+-
+lm_head.bias                       | UNEXPECTED | 
+longformer.embeddings.position_ids | UNEXPECTED | 
+lm_head.decoder.weight             | UNEXPECTED | 
+lm_head.decoder.bias               | UNEXPECTED | 
+lm_head.dense.weight               | UNEXPECTED | 
+lm_head.layer_norm.bias            | UNEXPECTED | 
+lm_head.dense.bias                 | UNEXPECTED | 
+lm_head.layer_norm.weight          | UNEXPECTED | 
+classifier.out_proj.weight         | MISSING    | 
+classifier.dense.weight            | MISSING    | 
+classifier.out_proj.bias           | MISSING    | 
+classifier.dense.bias              | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  Parameters: 148,660,994 total, 148,660,994 trainable
+
+[3/4] Preparing datasets ...
+  Total optimizer steps: 1,850
+  Warmup steps: 185
+
+[4/4] Training ...
+
+--- Epoch 1/5 ---
+Initializing global attention on CLS token...
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 301, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 257, in main
+    train_loss = train_one_epoch(
+        model, train_loader, optimizer, scheduler,
+        pi_p, device, GRAD_ACCUM_STEPS
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 136, in train_one_epoch
+    outputs = model(input_ids=input_ids, attention_mask=attention_mask)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 1707, in forward
+    outputs = self.longformer(
+        input_ids,
+    ...<7 lines>...
+        return_dict=return_dict,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 1511, in forward
+    encoder_outputs = self.encoder(
+        embedding_output,
+    ...<4 lines>...
+        return_dict=return_dict,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 1204, in forward
+    layer_outputs = layer_module(
+        hidden_states,
+    ...<4 lines>...
+        output_attentions=output_attentions,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/modeling_layers.py", line 93, in __call__
+    return super().__call__(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 1151, in forward
+    self_attn_outputs = self.attention(
+        hidden_states,
+    ...<4 lines>...
+        output_attentions=output_attentions,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 1089, in forward
+    self_outputs = self.self(
+        hidden_states,
+    ...<4 lines>...
+        output_attentions=output_attentions,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 518, in forward
+    attn_scores = self._sliding_chunks_query_key_matmul(
+        query_vectors, key_vectors, self.one_sided_attn_window_size
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/longformer/modeling_longformer.py", line 783, in _sliding_chunks_query_key_matmul
+    diagonal_chunked_attention_scores = torch.einsum("bcxd,bcyd->bcxy", (query, key))  # multiply
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/functional.py", line 402, in einsum
+    return einsum(equation, *_operands)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/functional.py", line 407, in einsum
+    return _VF.einsum(equation, operands)  # type: ignore[attr-defined]
+           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 720.00 MiB. GPU 0 has a total capacity of 23.46 GiB of which 157.50 MiB is free. Including non-PyTorch memory, this process has 23.29 GiB memory in use. Of the allocated memory 22.06 GiB is allocated by PyTorch, and 1.04 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

@@ -1,0 +1,63 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1376780
+##  Job Name : ptsd_ablations
+##  Nodelist : gpu2002
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 09:19:04 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Ablation Experiments
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+
+[1/5] Loading best Longformer checkpoint ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 20608.42it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  Model loaded.
+
+[2/5] Loading test split ...
+  1,551 test notes (pos=660, unl=891)
+
+[3/5] Baseline inference (unmasked) ...
+Initializing global attention on CLS token...
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  AUPRC=0.8827  AUROC=0.8913  (217s)
+
+[4/5] Ablation 1 — PTSD string masking ...
+  Notes with substitutions: 161 / 1,551
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  AUPRC=0.8749  AUROC=0.8898  (217s)
+  AUPRC delta: -0.0078
+
+[5/5] Ablation 2 — PMH section removal ...
+  Re-extracting test notes without PMH from discharge.csv ...
+  Re-extracted 1,551 / 1,551 test notes without PMH
+  AUPRC=0.8218  AUROC=0.8382  (216s)
+  AUPRC delta: -0.0609
+
+Results saved → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_ablation_results.csv
+
+=================================================================
+ABLATION RESULTS SUMMARY
+=================================================================
+
+  Condition                        AUPRC   AUROC   Sens   Spec   Prec     F1
+  ------------------------------ ------- ------- ------ ------ ------ ------
+  Baseline (unmasked)             0.8827  0.8913 0.8500 0.7464 0.7128 0.7754
+  Ablation 1: PTSD masking        0.8749  0.8898 0.8500 0.7464 0.7128 0.7754
+  Ablation 2: PMH removed         0.8218  0.8382 0.8500 0.6207 0.6240 0.7197
+
+  Interpretation:
+    Ablation 1 (PTSD masking) AUPRC delta: -0.0078
+    Ablation 2 (PMH removal)  AUPRC delta: -0.0609
+    → Ablation 1: minimal drop — model does NOT rely on PTSD keyword leakage.
+    → Ablation 2: notable drop — model relies meaningfully on PMH section content.
+
+Done.

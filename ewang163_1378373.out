@@ -1,0 +1,84 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1378373
+##  Job Name : ptsd_evaluate
+##  Nodelist : gpu2008
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 10:20:24 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Full Model Evaluation on Test Set
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+
+[1/7] Loading test data ...
+  1,551 test notes (pos=660, unl=891)
+
+[2/7] Clinical Longformer inference ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 21082.34it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Initializing global attention on CLS token...
+  AUPRC=0.8827  AUROC=0.8913  (222s)
+
+[3/7] BioClinicalBERT ...
+  Checkpoint not found — skipping.
+
+[4/7] TF-IDF + Logistic Regression ...
+  AUPRC=0.8328  AUROC=0.8530  (2s)
+
+[5/7] Structured Features + Logistic Regression ...
+  AUPRC=0.6833  AUROC=0.7310  (51s)
+
+[6/7] McNemar's tests vs. Longformer ...
+  Longformer vs TF-IDF + LogReg: p=0.000000 (***)  b=194, c=101
+  Longformer vs Structured + LogReg: p=0.000000 (***)  b=437, c=139
+
+  Prevalence recalibration (Longformer):
+      Prevalence      PPV      NNS
+             1%   0.0327     30.5
+             2%   0.0640     15.6
+             5%   0.1500      6.7
+
+[7/7] Subgroup analysis (Longformer) ...
+  Sex:
+    F: n=940, pos=433, AUPRC=0.9109
+    M: n=611, pos=227, AUPRC=0.8219
+  Age group:
+    20s: n=293, pos=140, AUPRC=0.9359
+    30s: n=359, pos=194, AUPRC=0.9168
+    40s: n=308, pos=131, AUPRC=0.8797
+    50s: n=277, pos=81, AUPRC=0.8417
+    Other: n=314, pos=114, AUPRC=0.8168
+  Race/ethnicity:
+    Asian: n=48, pos=5, AUPRC=0.8435
+    Black: n=209, pos=91, AUPRC=0.9092
+    Hispanic: n=93, pos=44, AUPRC=0.8586
+    Other/Unknown: n=118, pos=35, AUPRC=0.8686
+    White: n=1083, pos=485, AUPRC=0.8834
+  Emergency admission:
+    Non-emergency: n=696, pos=210, AUPRC=0.808
+    Emergency: n=855, pos=450, AUPRC=0.9225
+
+Full results → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_evaluation_results.json
+Summary CSV  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_evaluation_summary.csv
+
+=================================================================
+TEST SET EVALUATION SUMMARY
+=================================================================
+
+  Model                            AUPRC   AUROC   Sens   Spec   Prec     F1  McNemar p
+  ------------------------------ ------- ------- ------ ------ ------ ------ ----------
+  Clinical Longformer (PU)        0.8827  0.8913 0.8500 0.7464 0.7128 0.7754          —
+  TF-IDF + LogReg                 0.8328  0.8530 0.8500 0.6420 0.6375 0.7286   0.000000
+  Structured + LogReg             0.6833  0.7310 0.8500 0.4119 0.5171 0.6430   0.000000
+
+  Prevalence recalibration (Longformer, sens=0.8500, spec=0.7464):
+    prev=1%: PPV=0.0327, NNS=30.5
+    prev=2%: PPV=0.0640, NNS=15.6
+    prev=5%: PPV=0.1500, NNS=6.7
+
+Done.

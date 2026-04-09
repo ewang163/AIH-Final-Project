@@ -1,0 +1,101 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1360849
+##  Job Name : ptsd_longformer
+##  Nodelist : gpu2003
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 06:02:30 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Clinical Longformer + PU Loss Training
+=================================================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Device: cuda
+  GPU: Quadro RTX 6000
+  Memory: 25.2 GB
+
+[1/4] Loading data ...
+  Train: 11,837 rows  (pos=4,710, unl=7,127)
+  Val:   1,471 rows
+  Estimated class prior pi_p = 0.3979
+
+[2/4] Loading Clinical Longformer ...
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 301, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 211, in main
+    model = AutoModelForSequenceClassification.from_pretrained(
+        MODEL_NAME, num_labels=2
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/models/auto/auto_factory.py", line 387, in from_pretrained
+    return model_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, *model_args, config=config, **hub_kwargs, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/modeling_utils.py", line 4132, in from_pretrained
+    loading_info, disk_offload_index = cls._load_pretrained_model(model, state_dict, checkpoint_files, load_config)
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/modeling_utils.py", line 4248, in _load_pretrained_model
+    merged_state_dict.update(load_state_dict(ckpt_file))
+                             ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/modeling_utils.py", line 316, in load_state_dict
+    check_torch_load_is_safe()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/utils/import_utils.py", line 1357, in check_torch_load_is_safe
+    raise ValueError(
+    ...<4 lines>...
+    )
+ValueError: Due to a serious vulnerability issue in `torch.load`, even with `weights_only=True`, we now require users to upgrade torch to at least v2.6 in order to use the function. This version restriction does not apply when loading files with safetensors.
+See the vulnerability report here https://nvd.nist.gov/vuln/detail/CVE-2025-32434
+Exception in thread Thread-auto_conversion:
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/huggingface_hub/utils/_http.py", line 761, in hf_raise_for_status
+    response.raise_for_status()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Server error '504 Gateway Time-out' for url 'https://huggingface.co/api/models/yikuan8/Clinical-Longformer/commits/refs%2Fpr%2F1'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/oscar/rt/9.6/25/spack/x86_64_v3/python-3.13.5-dz6tni4uhljueyq5uhxuhlrvjovmlu4v/lib/python3.13/threading.py", line 1043, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "/oscar/rt/9.6/25/spack/x86_64_v3/python-3.13.5-dz6tni4uhljueyq5uhxuhlrvjovmlu4v/lib/python3.13/threading.py", line 994, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/safetensors_conversion.py", line 117, in auto_conversion
+    raise e
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/safetensors_conversion.py", line 96, in auto_conversion
+    sha = get_conversion_pr_reference(api, pretrained_model_name_or_path, **cached_file_kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/safetensors_conversion.py", line 69, in get_conversion_pr_reference
+    pr = previous_pr(api, model_id, pr_title, token=token)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/transformers/safetensors_conversion.py", line 16, in previous_pr
+    commits = api.list_repo_commits(model_id, revision=discussion.git_reference, token=token)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3832, in list_repo_commits
+    for item in paginate(
+                ~~~~~~~~^
+        f"{self.endpoint}/api/{repo_type}s/{repo_id}/commits/{revision}",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        headers=self._build_hf_headers(token=token),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        params={"expand[]": "formatted"} if formatted else {},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/huggingface_hub/utils/_pagination.py", line 36, in paginate
+    hf_raise_for_status(r)
+    ~~~~~~~~~~~~~~~~~~~^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/huggingface_hub/utils/_http.py", line 889, in hf_raise_for_status
+    raise _format(HfHubHTTPError, str(e), response) from e
+huggingface_hub.errors.HfHubHTTPError: Server error '504 Gateway Time-out' for url 'https://huggingface.co/api/models/yikuan8/Clinical-Longformer/commits/refs%2Fpr%2F1' (Amz CF ID: lEGTqO-bXK50Lq6tSvyOkHSTkKLFDs85TOLBi9s2ef-kIxXgb_dL6Q==)
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504

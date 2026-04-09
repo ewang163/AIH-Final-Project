@@ -1,0 +1,31 @@
+{
+  "model": "Specificity Longformer (BCE, psych controls)",
+  "specificity_test": {
+    "AUPRC": 0.9109,
+    "AUROC": 0.8145,
+    "threshold_recall_85": 0.324,
+    "sensitivity": 0.8523,
+    "specificity": 0.581,
+    "precision": 0.8211,
+    "F1": 0.8364,
+    "tp": 606,
+    "fp": 132,
+    "tn": 183,
+    "fn": 105,
+    "n_samples": 1026,
+    "n_pos": 711
+  },
+  "proxy_validation": {
+    "n_patients": 102,
+    "mean_predicted_prob": 0.3445
+  },
+  "psych_controls": {
+    "n_matched": 5711,
+    "n_notes_extracted": 3148
+  },
+  "comparison_to_pu_model": {
+    "pu_model_AUPRC": 0.8827,
+    "specificity_model_AUPRC": 0.9109,
+    "delta_AUPRC": 0.0282
+  }
+}

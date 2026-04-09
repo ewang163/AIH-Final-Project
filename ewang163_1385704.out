@@ -1,0 +1,159 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1385704
+##  Job Name : ptsd_bioclinbert
+##  Nodelist : gpu2105
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 02:13:15 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — BioClinicalBERT + PU Loss Training
+=================================================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+Device: cuda
+  GPU: NVIDIA GeForce RTX 3090
+  Memory: 25.3 GB
+
+[1/5] Loading data ...
+  Train: 11,837 rows  (pos=4,710, unl=7,127)
+  Val:   1,471 rows
+  Test:  1,551 rows
+  Estimated class prior pi_p = 0.3979
+
+[2/5] Loading BioClinicalBERT ...
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 17592.30it/s]
+[1mBertForSequenceClassification LOAD REPORT[0m from: emilyalsentzer/Bio_ClinicalBERT
+Key                                        | Status     | 
+-------------------------------------------+------------+-
+cls.predictions.transform.dense.weight     | UNEXPECTED | 
+cls.predictions.decoder.weight             | UNEXPECTED | 
+cls.predictions.bias                       | UNEXPECTED | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED | 
+cls.predictions.transform.dense.bias       | UNEXPECTED | 
+cls.seq_relationship.bias                  | UNEXPECTED | 
+cls.seq_relationship.weight                | UNEXPECTED | 
+classifier.weight                          | MISSING    | 
+classifier.bias                            | MISSING    | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+- MISSING:	those params were newly initialized because missing from the checkpoint. Consider training on your downstream task.
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  Parameters: 108,311,810 total, 108,311,810 trainable
+  Max sequence length: 512 (vs. Longformer 4096)
+  Gradient checkpointing: enabled
+
+[3/5] Preparing datasets ...
+  Batch size: 16 × 2 accum = 32 effective
+  Total optimizer steps: 1,850
+  Warmup steps: 185
+
+[4/5] Training ...
+
+--- Epoch 1/5 ---
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+    step 100/740  avg_loss=0.7116
+    step 200/740  avg_loss=0.6342
+    step 300/740  avg_loss=0.5735
+    step 400/740  avg_loss=0.5118
+    step 500/740  avg_loss=0.4651
+    step 600/740  avg_loss=0.4244
+    step 700/740  avg_loss=0.3948
+  Train loss: 0.3892  (142s)
+  Val AUPRC:  0.7799  (6s)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.83it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.82it/s]
+  >> New best model saved (AUPRC=0.7799)
+
+--- Epoch 2/5 ---
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+    step 100/740  avg_loss=0.2212
+    step 200/740  avg_loss=0.2339
+    step 300/740  avg_loss=0.2096
+    step 400/740  avg_loss=0.2141
+    step 500/740  avg_loss=0.2062
+    step 600/740  avg_loss=0.2001
+    step 700/740  avg_loss=0.1995
+  Train loss: 0.2015  (139s)
+  Val AUPRC:  0.8300  (6s)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.86it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.85it/s]
+  >> New best model saved (AUPRC=0.8300)
+
+--- Epoch 3/5 ---
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+    step 100/740  avg_loss=0.1796
+    step 200/740  avg_loss=0.1516
+    step 300/740  avg_loss=0.1595
+    step 400/740  avg_loss=0.1675
+    step 500/740  avg_loss=0.1617
+    step 600/740  avg_loss=0.1553
+    step 700/740  avg_loss=0.1487
+  Train loss: 0.1457  (139s)
+  Val AUPRC:  0.8267  (6s)
+
+--- Epoch 4/5 ---
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+    step 100/740  avg_loss=0.0789
+    step 200/740  avg_loss=0.0801
+    step 300/740  avg_loss=0.1049
+    step 400/740  avg_loss=0.1022
+    step 500/740  avg_loss=0.0973
+    step 600/740  avg_loss=0.1054
+    step 700/740  avg_loss=0.1011
+  Train loss: 0.0970  (139s)
+  Val AUPRC:  0.8305  (6s)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.77it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.77it/s]
+  >> New best model saved (AUPRC=0.8305)
+
+--- Epoch 5/5 ---
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+    step 100/740  avg_loss=0.0895
+    step 200/740  avg_loss=0.0827
+    step 300/740  avg_loss=0.0976
+    step 400/740  avg_loss=0.0836
+    step 500/740  avg_loss=0.0947
+    step 600/740  avg_loss=0.0899
+    step 700/740  avg_loss=0.0822
+  Train loss: 0.0811  (139s)
+  Val AUPRC:  0.8345  (6s)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.81it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.81it/s]
+  >> New best model saved (AUPRC=0.8345)
+
+Training log → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_bioclinbert_training_log.csv
+
+[5/5] Evaluating best checkpoint on test set ...
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 22162.33it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_bioclinbert_eval_results.json
+  → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_bioclinbert_test_predictions.csv
+
+=================================================================
+SIDE-BY-SIDE COMPARISON: Longformer vs BioClinicalBERT
+=================================================================
+
+  Metric            Longformer  BioClinBERT       Diff
+  --------------- ------------ ------------ ----------
+  AUPRC                 0.8827       0.8550   -0.0277
+  AUROC                 0.8913       0.8648   -0.0265
+  sensitivity           0.8500       0.8545 +   0.0045
+  specificity           0.7464       0.6779   -0.0685
+  precision             0.7128       0.6627   -0.0501
+  F1                    0.7754       0.7465   -0.0289
+  max_length              4096          512
+  threshold             0.3800       0.9670
+
+  McNemar's test: p = 0.000182 (***)
+    b (LF correct, BERT wrong) = 159
+    c (LF wrong, BERT correct) = 98
+
+  AUPRC difference: -0.0277 — statistically significant
+
+Done.

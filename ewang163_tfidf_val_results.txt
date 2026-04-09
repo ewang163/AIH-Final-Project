@@ -1,0 +1,23 @@
+=================================================================
+TF-IDF + Logistic Regression — Validation Results
+=================================================================
+
+TF-IDF: max_features=50000, ngram_range=(1, 2), sublinear_tf=True
+LogReg: class_weight=balanced, solver=lbfgs, max_iter=1000
+Best C: 10.0
+
+C tuning results:
+  C=0.001     AUPRC=0.7212  AUROC=0.7725
+  C=0.01      AUPRC=0.7313  AUROC=0.7834
+  C=0.1       AUPRC=0.7750  AUROC=0.8300
+  C=1.0       AUPRC=0.8297  AUROC=0.8757
+  C=10.0      AUPRC=0.8408  AUROC=0.8781
+  C=100.0     AUPRC=0.8367  AUROC=0.8713
+
+Final validation metrics (C=10.0):
+  AUPRC:                    0.8408
+  AUROC:                    0.8781
+  Precision @ recall>=0.85: 0.6735  (threshold=0.0015)
+
+Train: 11,837 rows (4,710 pos, 7,127 unl)
+Val:   1,471 rows (580 pos, 891 unl)

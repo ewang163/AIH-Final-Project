@@ -1,0 +1,4 @@
+group,n,mean_predicted_prob,median_predicted_prob,mean_note_length,median_note_length,pct_female,pct_male,pct_age_20s,pct_age_30s,pct_age_40s,pct_age_50s,pct_age_Other,pct_race_White,pct_race_Black,pct_race_Hispanic,pct_race_Asian,pct_race_Other/Unknown,pct_emergency
+false_positive,227,0.6622,0.6627,3239.0,2785.0,60.4,39.6,15.0,19.8,24.2,23.8,17.2,67.4,15.0,6.6,4.0,7.0,42.3
+false_negative,99,0.1803,0.1644,2932.0,2500.0,49.5,50.5,10.1,18.2,22.2,13.1,36.4,74.7,10.1,7.1,1.0,7.1,27.3
+overall_test,1551,0.4772,0.4031,3108.0,2663.0,60.6,39.4,17.2,21.5,20.1,18.2,23.0,70.2,13.5,6.1,3.1,7.1,37.9

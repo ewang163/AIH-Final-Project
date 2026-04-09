@@ -1,0 +1,62 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1378644
+##  Job Name : ptsd_proxy_val
+##  Nodelist : gpu2001
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 10:42:47 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Proxy Group Validation
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+
+[1/5] Loading evaluation threshold ...
+  Threshold (recall>=0.85 from test set): 0.3800
+
+[2/5] Loading proxy and unlabeled notes ...
+  Proxy patients: 102, notes: 102
+  Unlabeled in train pool: 7,127
+  Unlabeled sample: 500 patients
+
+[3/5] Loading Longformer and running inference ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 20559.21it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Initializing global attention on CLS token...
+  Proxy inference: 102 notes (16s)
+/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_proxy_validation.py:246: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  bp = ax.boxplot([proxy_probs, unlab_probs],
+  Unlabeled inference: 500 notes (70s)
+
+[4/5] Computing statistics ...
+  Proxy scores:     median=0.4486, mean=0.4943, IQR=[0.2090, 0.7996]
+  Unlabeled scores: median=0.1138, mean=0.1905, IQR=[0.0535, 0.2784]
+
+  Mann-Whitney U: U=40072, p=4.43e-20
+  AUC (proxy vs unlabeled): 0.7857
+
+  Threshold = 0.3800
+  Proxy above threshold:     58/102 (56.9%)
+  Unlabeled above threshold: 74/500 (14.8%)
+
+  Results → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_proxy_validation_results.csv
+
+[5/5] Generating plots ...
+  Plot → /oscar/data/class/biol1595_2595/students/ewang163/ewang163_proxy_validation.png
+
+=================================================================
+INTERPRETATION
+=================================================================
+  The proxy group scores significantly higher than unlabeled
+  patients (AUC=0.786, p=4.43e-20). This provides non-circular
+  evidence that the model detects real PTSD clinical signal,
+  not just ICD-coding artifacts.
+
+  57% of proxy patients exceed the recall=0.85 threshold
+  vs. 15% of unlabeled patients.
+
+Done.

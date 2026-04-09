@@ -1,0 +1,23 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1359300
+##  Job Name : ptsd_longformer
+##  Nodelist : gpu2003
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Tue Apr  7 05:56:53 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Clinical Longformer + PU Loss Training
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 301, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_train_longformer.py", line 193, in main
+    print(f'  Memory: {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'torch._C._CudaDeviceProperties' object has no attribute 'total_mem'. Did you mean: 'total_memory'?

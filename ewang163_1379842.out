@@ -1,0 +1,101 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1379842
+##  Job Name : ptsd_attrib
+##  Nodelist : gpu2008
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Wed Apr  8 11:07:22 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Integrated Gradients Attribution Analysis
+=================================================================
+
+Device: cuda
+  GPU: Quadro RTX 6000
+
+[1/5] Loading model and tokenizer ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 20933.18it/s]
+Initializing global attention on CLS token...
+  LayerIntegratedGradients initialized on word_embeddings layer
+
+[2/5] Selecting high-confidence true positive patients ...
+  Running inference on positive test patients ...
+  Positive test patients: 660
+  Top decile threshold: 0.9991
+  Patients in top decile: 67
+  Selected for attribution: 50
+
+[3/5] Loading raw discharge notes for section boundaries ...
+  Loaded 50 raw notes
+
+[4/5] Computing Integrated Gradients (this may take a while) ...
+    WARNING: IG failed for hadm_id=21241417: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26169216: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21223015: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21642062: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=27853232: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23064749: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23131360: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=20560902: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21720585: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  [10/50] 0s elapsed
+    WARNING: IG failed for hadm_id=24221879: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=27288686: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26122815: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=27781806: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=20936196: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21146916: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23947456: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=29504030: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=28568795: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=28734310: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  [20/50] 1s elapsed
+    WARNING: IG failed for hadm_id=28750743: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=27083287: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=24012597: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23196931: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26860295: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23870406: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=24590854: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23390983: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26322832: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23303992: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  [30/50] 1s elapsed
+    WARNING: IG failed for hadm_id=24771418: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26939357: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=20145406: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26170853: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26567194: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=29948087: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21290970: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=29757315: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=29726221: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=25427648: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  [40/50] 1s elapsed
+    WARNING: IG failed for hadm_id=23877054: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=26623533: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21015618: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=24627806: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=23355539: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=27666471: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=21538845: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=22264964: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=25190152: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+    WARNING: IG failed for hadm_id=20456232: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  [50/50] 1s elapsed
+    WARNING: IG failed for hadm_id=21086726: zeros_like(): argument 'input' (position 1) must be Tensor, not NoneType
+  Completed 50 patients in 1s
+
+[5/5] Aggregating results ...
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_attribution.py", line 391, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ewang163_ptsd_attribution.py", line 335, in main
+    section_df = section_df.sort_values('total_attribution', ascending=False)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/frame.py", line 8347, in sort_values
+    k = self._get_label_or_level_values(by[0], axis=axis)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/generic.py", line 1776, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'total_attribution'

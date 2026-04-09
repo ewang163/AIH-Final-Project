@@ -1,0 +1,346 @@
+{
+  "longformer": {
+    "model": "Clinical Longformer (PU)",
+    "AUPRC": 0.8827,
+    "AUROC": 0.8913,
+    "threshold_recall_85": 0.38,
+    "sensitivity": 0.85,
+    "specificity": 0.7464,
+    "precision": 0.7128,
+    "F1": 0.7754,
+    "tp": 561,
+    "fp": 226,
+    "tn": 665,
+    "fn": 99,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 400,
+        "mean_predicted": 0.0529,
+        "observed_rate": 0.07
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 204,
+        "mean_predicted": 0.1454,
+        "observed_rate": 0.1471
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 105,
+        "mean_predicted": 0.2444,
+        "observed_rate": 0.2095
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 65,
+        "mean_predicted": 0.3491,
+        "observed_rate": 0.3538
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 77,
+        "mean_predicted": 0.4528,
+        "observed_rate": 0.3636
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 61,
+        "mean_predicted": 0.5442,
+        "observed_rate": 0.3934
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 66,
+        "mean_predicted": 0.6587,
+        "observed_rate": 0.4545
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 80,
+        "mean_predicted": 0.7516,
+        "observed_rate": 0.525
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 98,
+        "mean_predicted": 0.8537,
+        "observed_rate": 0.6531
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 395,
+        "mean_predicted": 0.9764,
+        "observed_rate": 0.9342
+      }
+    ]
+  },
+  "bioclinbert": null,
+  "tfidf": {
+    "model": "TF-IDF + LogReg",
+    "AUPRC": 0.8328,
+    "AUROC": 0.853,
+    "threshold_recall_85": 0.228,
+    "sensitivity": 0.85,
+    "specificity": 0.642,
+    "precision": 0.6375,
+    "F1": 0.7286,
+    "tp": 561,
+    "fp": 319,
+    "tn": 572,
+    "fn": 99,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 385,
+        "mean_predicted": 0.0502,
+        "observed_rate": 0.0961
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 246,
+        "mean_predicted": 0.148,
+        "observed_rate": 0.2073
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 137,
+        "mean_predicted": 0.2475,
+        "observed_rate": 0.2774
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 98,
+        "mean_predicted": 0.3502,
+        "observed_rate": 0.398
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 98,
+        "mean_predicted": 0.4445,
+        "observed_rate": 0.4184
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 75,
+        "mean_predicted": 0.5509,
+        "observed_rate": 0.5467
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 70,
+        "mean_predicted": 0.6529,
+        "observed_rate": 0.5714
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 88,
+        "mean_predicted": 0.7508,
+        "observed_rate": 0.625
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 123,
+        "mean_predicted": 0.8485,
+        "observed_rate": 0.7967
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 231,
+        "mean_predicted": 0.9601,
+        "observed_rate": 0.9524
+      }
+    ]
+  },
+  "structured": {
+    "model": "Structured + LogReg",
+    "AUPRC": 0.6833,
+    "AUROC": 0.731,
+    "threshold_recall_85": 0.377,
+    "sensitivity": 0.85,
+    "specificity": 0.4119,
+    "precision": 0.5171,
+    "F1": 0.643,
+    "tp": 561,
+    "fp": 524,
+    "tn": 367,
+    "fn": 99,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 8,
+        "mean_predicted": 0.1892,
+        "observed_rate": 0.125
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 79,
+        "mean_predicted": 0.2662,
+        "observed_rate": 0.1899
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 569,
+        "mean_predicted": 0.359,
+        "observed_rate": 0.2109
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 456,
+        "mean_predicted": 0.4279,
+        "observed_rate": 0.5461
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 219,
+        "mean_predicted": 0.5568,
+        "observed_rate": 0.5525
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 126,
+        "mean_predicted": 0.6265,
+        "observed_rate": 0.5159
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 6,
+        "mean_predicted": 0.752,
+        "observed_rate": 0.1667
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 88,
+        "mean_predicted": 0.9993,
+        "observed_rate": 1.0
+      }
+    ]
+  },
+  "mcnemar_vs_longformer": {
+    "tfidf": {
+      "p_value": 0.0,
+      "b_lf_correct_comp_wrong": 194,
+      "c_lf_wrong_comp_correct": 101
+    },
+    "structured": {
+      "p_value": 0.0,
+      "b_lf_correct_comp_wrong": 437,
+      "c_lf_wrong_comp_correct": 139
+    }
+  },
+  "prevalence_recalibration": [
+    {
+      "prevalence": 0.01,
+      "PPV": 0.0327,
+      "NNS": 30.5
+    },
+    {
+      "prevalence": 0.02,
+      "PPV": 0.064,
+      "NNS": 15.6
+    },
+    {
+      "prevalence": 0.05,
+      "PPV": 0.15,
+      "NNS": 6.7
+    }
+  ],
+  "subgroup_analysis": {
+    "sex": {
+      "F": {
+        "n": 940,
+        "n_pos": 433,
+        "AUPRC": 0.9109
+      },
+      "M": {
+        "n": 611,
+        "n_pos": 227,
+        "AUPRC": 0.8219
+      }
+    },
+    "age_group": {
+      "20s": {
+        "n": 293,
+        "n_pos": 140,
+        "AUPRC": 0.9359
+      },
+      "30s": {
+        "n": 359,
+        "n_pos": 194,
+        "AUPRC": 0.9168
+      },
+      "40s": {
+        "n": 308,
+        "n_pos": 131,
+        "AUPRC": 0.8797
+      },
+      "50s": {
+        "n": 277,
+        "n_pos": 81,
+        "AUPRC": 0.8417
+      },
+      "Other": {
+        "n": 314,
+        "n_pos": 114,
+        "AUPRC": 0.8168
+      }
+    },
+    "race": {
+      "Asian": {
+        "n": 48,
+        "n_pos": 5,
+        "AUPRC": 0.8435
+      },
+      "Black": {
+        "n": 209,
+        "n_pos": 91,
+        "AUPRC": 0.9092
+      },
+      "Hispanic": {
+        "n": 93,
+        "n_pos": 44,
+        "AUPRC": 0.8586
+      },
+      "Other/Unknown": {
+        "n": 118,
+        "n_pos": 35,
+        "AUPRC": 0.8686
+      },
+      "White": {
+        "n": 1083,
+        "n_pos": 485,
+        "AUPRC": 0.8834
+      }
+    },
+    "emergency": {
+      "False": {
+        "n": 696,
+        "n_pos": 210,
+        "AUPRC": 0.808
+      },
+      "True": {
+        "n": 855,
+        "n_pos": 450,
+        "AUPRC": 0.9225
+      }
+    }
+  }
+}

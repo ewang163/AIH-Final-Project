@@ -1,0 +1,56 @@
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+TABLE 1: Study Population Characteristics
+PTSD NLP Project — AIH 2025 (Spring 2026)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Characteristic                                      ICD-coded PTSD+ (Training Positives)  Pharmacological Proxy (External Validation)  Matched Unlabeled Pool (PU Pool)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+── DEMOGRAPHICS ──────────────────────────────────────
+N                                                   5711                            163                             17133                         
+Sex: Female — n (%)                                 3513 / 61.5                     91 / 55.8                       10539 / 61.5                  
+Sex: Male — n (%)                                   2198 / 38.5                     72 / 44.2                       6594 / 38.5                   
+Sex: Other/Unknown — n (%)                          0 / 0.0                         0 / 0.0                         0 / 0.0                       
+Age, years — mean ± SD                              43.0 / 15.9                     46.8 / 17.3                     45.5 / 18.0                   
+  Age 20s — n (%)                                   1209 / 21.2                     31 / 19.0                       3627 / 21.2                   
+  Age 30s — n (%)                                   1256 / 22.0                     27 / 16.6                       3768 / 22.0                   
+  Age 40s — n (%)                                   1048 / 18.4                     34 / 20.9                       3144 / 18.4                   
+  Age 50s — n (%)                                   1043 / 18.3                     35 / 21.5                       3129 / 18.3                   
+  Age other decades — n (%)                         1155 / 20.2                     36 / 22.1                       3465 / 20.2                   
+Race: White/Non-Hispanic — n (%)                    3745 / 65.6                     101 / 62.0                      10319 / 60.2                  
+Race: Black/African American — n (%)                895 / 15.7                      16 / 9.8                        2629 / 15.3                   
+Race: Hispanic/Latino — n (%)                       371 / 6.5                       19 / 11.7                       1187 / 6.9                    
+Race: Asian — n (%)                                 139 / 2.4                       3 / 1.8                         835 / 4.9                     
+Race: Other/Unknown — n (%)                         561 / 9.8                       24 / 14.7                       2163 / 12.6                   
+
+── HOSPITALIZATION ───────────────────────────────────
+Single admission — n (%)                            1600 / 28.0                     64 / 39.3                       9916 / 57.9                   
+Multi-admission — n (%)                             4111 / 72.0                     99 / 60.7                       7217 / 42.1                   
+Pre-dx notes available (ICD+ only) — n (%)          2492 / 43.6                     N/A / N/A                       N/A / N/A                     
+Total admissions — median [Q1, Q3]                  2.0 / 1.0 / 5.0                 2.0 / 1.0 / 4.0                 1.0 / 1.0 / 2.0               
+LOS index admission (days) — median [Q1, Q3]        2.7 / 0.8 / 5.8                 2.6 / 0.8 / 5.4                 2.2 / 0.9 / 4.5               
+Emergency admission — n (%)                         1607 / 28.1                     64 / 39.3                       5353 / 31.2                   
+Medicaid or self-pay — n (%)                        2334 / 40.9                     52 / 31.9                       3739 / 21.8                   
+
+── PRIOR-ADMISSION COMORBIDITIES ─────────────────────
+Major depressive disorder (F32-33 / ICD-9: 296) — n (%)  1040 / 18.2                     0 / 0.0                         0 / 0.0                       
+Anxiety disorder (F41 / ICD-9: 300) — n (%)         976 / 17.1                      0 / 0.0                         0 / 0.0                       
+Substance use disorder (F10-19 / ICD-9: 303-305) — n (%)  1201 / 21.0                     0 / 0.0                         0 / 0.0                       
+Traumatic brain injury (S06 / ICD-9: 800-804,850-854) — n (%)  39 / 0.7                        0 / 0.0                         0 / 0.0                       
+Chronic pain (G89 / ICD-9: 338) — n (%)             447 / 7.8                       0 / 0.0                         0 / 0.0                       
+Suicidal ideation/attempt (R458/V6284/E95) — n (%)  776 / 13.6                      0 / 0.0                         0 / 0.0                       
+
+── PRIOR-ADMISSION MEDICATIONS ───────────────────────
+SSRI or SNRI — n (%)                                803 / 14.1                      0 / 0.0                         0 / 0.0                       
+Prazosin — n (%)                                    66 / 1.2                        0 / 0.0                         0 / 0.0                       
+Second-generation antipsychotic — n (%)             572 / 10.0                      0 / 0.0                         0 / 0.0                       
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Notes:
+  - Demographics are at the index admission (first PTSD-coded for PTSD+ group;
+    first admission overall for proxy and unlabeled groups).
+  - Comorbidities and medications are from admissions BEFORE the index admission.
+    Patients with only one admission have 0 prior admissions (all flags = 0).
+  - Unlabeled pool is matched 3:1 on age decade x sex to the PTSD+ group.
+  - Proxy exclusions applied at ANY diagnosis position (not only primary dx).
+  - Prazosin + SSRI/SNRI window defined as starttime difference ≤ 180 days.
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
