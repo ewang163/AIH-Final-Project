@@ -4,3 +4,5 @@ CLAUDE.md
 .claude/
 PULSNAR/
 data/
+results/error_analysis/ewang163_fn_notes_sample.txt
+results/error_analysis/ewang163_fp_notes_sample.txt
