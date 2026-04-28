@@ -1,0 +1,78 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1923224
+##  Job Name : ewang163_unified_bench
+##  Nodelist : gpu2708
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 03:44:44 PM EDT 2026
+###############################################################################
+=== JOB START ===
+Job ID:   1923224
+Node:     gpu2708
+GPUs:     0
+NVIDIA L40S, 46068 MiB
+
+======================================================================
+PTSD NLP — UNIFIED INFERENCE BENCHMARK (single GPU)
+======================================================================
+Device: cuda
+  GPU: NVIDIA L40S  (47.67 GB)
+Val:  1,471 | Test: 1,551
+
+[1/5] Clinical Longformer (PULSNAR) ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 32406.32it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Initializing global attention on CLS token...
+  [BENCH] unified_bench/val_inference: 119.8s wall, 110.6s cpu, 1.37 GB peak, 0.0333 GPU-h
+  -> Longformer-PULSNAR/val_inference: 119.77s (81.42 ms/patient, peak 2.034 GB)
+  [BENCH] unified_bench/test_inference: 124.6s wall, 116.0s cpu, 1.37 GB peak, 0.0346 GPU-h
+  -> Longformer-PULSNAR/test_inference: 124.64s (80.36 ms/patient, peak 2.034 GB)
+
+[2/5] BioClinicalBERT (truncated 512) ...
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 32573.03it/s]
+  [BENCH] unified_bench/val_inference: 4.5s wall, 1.3s cpu, 1.52 GB peak, 0.0012 GPU-h
+  -> BERT-truncated-512/val_inference: 4.49s (3.05 ms/patient, peak 0.827 GB)
+  [BENCH] unified_bench/test_inference: 4.6s wall, 1.3s cpu, 1.52 GB peak, 0.0013 GPU-h
+  -> BERT-truncated-512/test_inference: 4.61s (2.97 ms/patient, peak 0.827 GB)
+
+[3/5] BioClinicalBERT (chunk-pool 512x256) ...
+  [BENCH] unified_bench/val_inference: 33.1s wall, 32.9s cpu, 1.52 GB peak, 0.0092 GPU-h
+  -> BERT-chunk-pool-512x256/val_inference: 33.15s (22.53 ms/patient, peak 0.65 GB)
+  [BENCH] unified_bench/test_inference: 35.1s wall, 34.9s cpu, 1.52 GB peak, 0.0098 GPU-h
+  -> BERT-chunk-pool-512x256/test_inference: 35.14s (22.66 ms/patient, peak 0.65 GB)
+
+[4/5] Keyword baseline ...
+  Loaded 60 compiled phrases.
+  [BENCH] unified_bench/val_inference: 5.4s wall, 5.3s cpu, 1.52 GB peak
+  -> Keyword-DSM5/PCL5/val_inference: 5.35s (3.64 ms/patient, peak 0.009 GB)
+  [BENCH] unified_bench/test_inference: 5.7s wall, 5.7s cpu, 1.52 GB peak
+  -> Keyword-DSM5/PCL5/test_inference: 5.71s (3.68 ms/patient, peak 0.009 GB)
+
+[5/5] Structured + LogReg ...
+  [BENCH] unified_bench/val_inference: 45.1s wall, 25.6s cpu, 1.52 GB peak
+  -> Structured-LogReg/val_inference: 45.15s (30.69 ms/patient, peak 0.009 GB)
+  [BENCH] unified_bench/test_inference: 23.9s wall, 23.8s cpu, 1.52 GB peak
+  -> Structured-LogReg/test_inference: 23.94s (15.43 ms/patient, peak 0.009 GB)
+
+=== WRITING RESULTS ===
+Wrote: /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_unified_inference_bench.csv
+
+=== FINAL TABLE ===
+model                        stage               wall(s)      n      ms/pt   peak GB
+------------------------------------------------------------------------------------
+Longformer-PULSNAR           val_inference        119.77   1471      81.42      2.03
+Longformer-PULSNAR           test_inference       124.64   1551      80.36      2.03
+BERT-truncated-512           val_inference          4.49   1471       3.05      0.83
+BERT-truncated-512           test_inference         4.61   1551       2.97      0.83
+BERT-chunk-pool-512x256      val_inference         33.15   1471      22.53      0.65
+BERT-chunk-pool-512x256      test_inference        35.14   1551      22.66      0.65
+Keyword-DSM5/PCL5            val_inference          5.35   1471       3.64      0.01
+Keyword-DSM5/PCL5            test_inference         5.71   1551       3.68      0.01
+Structured-LogReg            val_inference         45.15   1471      30.69      0.01
+Structured-LogReg            test_inference        23.94   1551      15.43      0.01
+
+GPU: NVIDIA L40S  (47.67 GB)
+Done.
+=== JOB END ===

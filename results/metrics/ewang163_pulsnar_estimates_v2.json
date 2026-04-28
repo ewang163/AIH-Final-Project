@@ -1,0 +1,22 @@
+{
+  "alpha_estimate": 0.0006,
+  "alpha_method": "PULSNAR (SAR)",
+  "empirical_labeled_fraction": 0.397905,
+  "features_used": [
+    "sex_female",
+    "age",
+    "emergency",
+    "medicaid",
+    "n_prior_admissions",
+    "prior_MDD",
+    "prior_anxiety",
+    "prior_SUD",
+    "prior_suicidal",
+    "prior_SSRI",
+    "prior_prazosin",
+    "prior_SGA",
+    "prior_psych_any"
+  ],
+  "n_features": 13,
+  "n_patients": 9649
+}

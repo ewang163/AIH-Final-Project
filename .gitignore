@@ -2,3 +2,5 @@
 *.safetensors
 CLAUDE.md
 .claude/
+data/
+PULSNAR/

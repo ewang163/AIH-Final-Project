@@ -16,7 +16,10 @@ Outputs:
     ewang163_longformer_training_log.csv — epoch-level metrics
 """
 
+import argparse
+import json
 import os
+import sys
 import time
 import numpy as np
 import pandas as pd
@@ -29,6 +32,9 @@ from transformers import (
     get_linear_schedule_with_warmup,
 )
 from sklearn.metrics import average_precision_score
+
+sys.path.insert(0, '/oscar/data/class/biol1595_2595/students/ewang163')
+from scripts.common.ewang163_bench_utils import BenchmarkLogger
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 STUDENT_DIR     = '/oscar/data/class/biol1595_2595/students/ewang163'
@@ -189,28 +195,50 @@ def evaluate(model, loader, device):
 
 # ── Main ──────────────────────────────────────────────────────────────────
 def main():
+    parser = argparse.ArgumentParser(description='Train Clinical Longformer with PU loss')
+    parser.add_argument('--pi_p', type=float, default=None,
+                        help='Override class prior pi_p (default: compute from data)')
+    parser.add_argument('--output_suffix', type=str, default='',
+                        help='Suffix for output dirs (e.g., "_pip05" for sweep)')
+    parser.add_argument('--splits_suffix', type=str, default='',
+                        help='Suffix for split files (e.g., "_temporal" for Fix 7)')
+    args = parser.parse_args()
+
     print('=' * 65)
     print('PTSD NLP — Clinical Longformer + PU Loss Training')
     print('=' * 65, flush=True)
 
+    bench = BenchmarkLogger()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'\nDevice: {device}')
     if device.type == 'cuda':
         print(f'  GPU: {torch.cuda.get_device_name(0)}')
         print(f'  Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB')
 
+    best_dir = BEST_DIR + args.output_suffix if args.output_suffix else BEST_DIR
+    log_csv = LOG_CSV.replace('.csv', f'{args.output_suffix}.csv') if args.output_suffix else LOG_CSV
+
+    train_parquet = TRAIN_PARQUET.replace('.parquet', f'{args.splits_suffix}.parquet') if args.splits_suffix else TRAIN_PARQUET
+    val_parquet = VAL_PARQUET.replace('.parquet', f'{args.splits_suffix}.parquet') if args.splits_suffix else VAL_PARQUET
+
     # ── Load data ─────────────────────────────────────────────────────────
     print('\n[1/4] Loading data ...')
-    train_df = pd.read_parquet(TRAIN_PARQUET)
-    val_df   = pd.read_parquet(VAL_PARQUET)
+    train_df = pd.read_parquet(train_parquet)
+    val_df   = pd.read_parquet(val_parquet)
+    print(f'  Splits: {train_parquet}')
 
     n_pos = (train_df['ptsd_label'] == 1).sum()
     n_unl = (train_df['ptsd_label'] == 0).sum()
-    pi_p  = n_pos / (n_pos + n_unl)
+
+    if args.pi_p is not None:
+        pi_p = args.pi_p
+        print(f'  Using CLI-specified pi_p = {pi_p:.4f}')
+    else:
+        pi_p = n_pos / (n_pos + n_unl)
+        print(f'  Computed class prior pi_p = {pi_p:.4f} (from training data)')
 
     print(f'  Train: {len(train_df):,} rows  (pos={n_pos:,}, unl={n_unl:,})')
     print(f'  Val:   {len(val_df):,} rows')
-    print(f'  Estimated class prior pi_p = {pi_p:.4f}')
 
     # ── Tokenizer & model ────────────────────────────────────────────────
     print('\n[2/4] Loading Clinical Longformer ...')
@@ -256,54 +284,84 @@ def main():
 
     # ── Training loop ────────────────────────────────────────────────────
     print('\n[4/4] Training ...')
-    os.makedirs(BEST_DIR, exist_ok=True)
+    os.makedirs(best_dir, exist_ok=True)
     scaler = torch.amp.GradScaler('cuda', enabled=(device.type == 'cuda'))
     best_auprc = -1.0
     log_rows = []
 
-    for epoch in range(1, EPOCHS + 1):
-        t0 = time.time()
-        print(f'\n--- Epoch {epoch}/{EPOCHS} ---', flush=True)
+    with bench.track('train_longformer', stage='full_training',
+                     device='gpu' if device.type == 'cuda' else 'cpu',
+                     n_samples=len(train_df),
+                     notes=f'pi_p={pi_p:.4f}'):
+        for epoch in range(1, EPOCHS + 1):
+            t0 = time.time()
+            print(f'\n--- Epoch {epoch}/{EPOCHS} ---', flush=True)
 
-        train_loss = train_one_epoch(
-            model, train_loader, optimizer, scheduler, scaler,
-            pi_p, device, GRAD_ACCUM_STEPS
-        )
-        train_time = time.time() - t0
+            train_loss = train_one_epoch(
+                model, train_loader, optimizer, scheduler, scaler,
+                pi_p, device, GRAD_ACCUM_STEPS
+            )
+            train_time = time.time() - t0
 
-        t1 = time.time()
-        val_auprc, _, _ = evaluate(model, val_loader, device)
-        val_time = time.time() - t1
+            t1 = time.time()
+            val_auprc, _, _ = evaluate(model, val_loader, device)
+            val_time = time.time() - t1
 
-        print(f'  Train loss: {train_loss:.4f}  ({train_time:.0f}s)')
-        print(f'  Val AUPRC:  {val_auprc:.4f}  ({val_time:.0f}s)', flush=True)
+            print(f'  Train loss: {train_loss:.4f}  ({train_time:.0f}s)')
+            print(f'  Val AUPRC:  {val_auprc:.4f}  ({val_time:.0f}s)', flush=True)
 
-        log_rows.append({
-            'epoch': epoch,
-            'train_loss': round(train_loss, 6),
-            'val_auprc': round(val_auprc, 6),
-            'train_time_s': round(train_time, 1),
-            'val_time_s': round(val_time, 1),
-        })
+            log_rows.append({
+                'epoch': epoch,
+                'train_loss': round(train_loss, 6),
+                'val_auprc': round(val_auprc, 6),
+                'train_time_s': round(train_time, 1),
+                'val_time_s': round(val_time, 1),
+            })
 
-        if val_auprc > best_auprc:
-            best_auprc = val_auprc
-            model.save_pretrained(BEST_DIR)
-            tokenizer.save_pretrained(BEST_DIR)
-            print(f'  >> New best model saved (AUPRC={best_auprc:.4f})',
-                  flush=True)
+            if val_auprc > best_auprc:
+                best_auprc = val_auprc
+                model.save_pretrained(best_dir)
+                tokenizer.save_pretrained(best_dir)
+                print(f'  >> New best model saved (AUPRC={best_auprc:.4f})',
+                      flush=True)
+
+    # ── Save training config ─────────────────────────────────────────────
+    config = {
+        'model_name': MODEL_NAME,
+        'pi_p': round(pi_p, 6),
+        'pi_p_source': 'cli' if args.pi_p is not None else 'empirical',
+        'max_len': MAX_LEN,
+        'batch_size': BATCH_SIZE,
+        'grad_accum_steps': GRAD_ACCUM_STEPS,
+        'effective_batch_size': BATCH_SIZE * GRAD_ACCUM_STEPS,
+        'lr': LR,
+        'epochs': EPOCHS,
+        'warmup_frac': WARMUP_FRAC,
+        'weight_decay': WEIGHT_DECAY,
+        'best_val_auprc': round(best_auprc, 6),
+        'n_train': len(train_df),
+        'n_val': len(val_df),
+        'n_pos_train': int(n_pos),
+        'n_unl_train': int(n_unl),
+    }
+    config_path = os.path.join(best_dir, 'training_config.json')
+    with open(config_path, 'w') as f:
+        json.dump(config, f, indent=2)
+    print(f'\nTraining config saved → {config_path}')
 
     # ── Save training log ─────────────────────────────────────────────────
     log_df = pd.DataFrame(log_rows)
-    log_df.to_csv(LOG_CSV, index=False)
-    print(f'\nTraining log saved → {LOG_CSV}')
+    os.makedirs(os.path.dirname(log_csv), exist_ok=True)
+    log_df.to_csv(log_csv, index=False)
+    print(f'Training log saved → {log_csv}')
 
     # ── Summary ───────────────────────────────────────────────────────────
     print('\n' + '=' * 65)
     print('TRAINING COMPLETE')
     print('=' * 65)
     print(f'  Best validation AUPRC: {best_auprc:.4f}')
-    print(f'  Best checkpoint: {BEST_DIR}')
+    print(f'  Best checkpoint: {best_dir}')
+    print(f'  Class prior pi_p: {pi_p:.4f}')
     print(log_df.to_string(index=False))
     print('\nDone.')
 

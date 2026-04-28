@@ -1,0 +1,11 @@
+model,stage,wall_clock_s,n_samples,ms_per_patient,gpu_name,gpu_total_mem_gb,peak_mem_gb
+Longformer-PULSNAR,val_inference,119.767,1471,81.42,NVIDIA L40S,47.67,2.034
+Longformer-PULSNAR,test_inference,124.638,1551,80.36,NVIDIA L40S,47.67,2.034
+BERT-truncated-512,val_inference,4.494,1471,3.05,NVIDIA L40S,47.67,0.827
+BERT-truncated-512,test_inference,4.609,1551,2.97,NVIDIA L40S,47.67,0.827
+BERT-chunk-pool-512x256,val_inference,33.149,1471,22.53,NVIDIA L40S,47.67,0.65
+BERT-chunk-pool-512x256,test_inference,35.14,1551,22.66,NVIDIA L40S,47.67,0.65
+Keyword-DSM5/PCL5,val_inference,5.354,1471,3.64,NVIDIA L40S,47.67,0.009
+Keyword-DSM5/PCL5,test_inference,5.714,1551,3.68,NVIDIA L40S,47.67,0.009
+Structured-LogReg,val_inference,45.145,1471,30.69,NVIDIA L40S,47.67,0.009
+Structured-LogReg,test_inference,23.939,1551,15.43,NVIDIA L40S,47.67,0.009

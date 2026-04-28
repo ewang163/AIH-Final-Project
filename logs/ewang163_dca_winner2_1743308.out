@@ -1,0 +1,59 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1743308
+##  Job Name : dca_win2
+##  Nodelist : gpu2107
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 10:18:42 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Decision Curve Analysis
+=================================================================
+
+Device: cuda
+  GPU: NVIDIA GeForce RTX 3090
+
+[1/5] Running Longformer inference on val + test sets ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 22204.13it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  Inference on validation set ...
+Initializing global attention on CLS token...
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  Saved val predictions → /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_val_predictions.csv
+  Inference on test set ...
+  Saved test predictions → /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_test_predictions.csv
+  Inference completed in 313s
+  Test set: 1,551 patients (660 pos, 891 unlabeled)
+
+[2/5] Platt scaling (fit on validation set) ...
+  Platt coef: 4.3287, intercept: -2.5403
+  Raw  test probs: mean=0.4480, median=0.2937
+  Calibrated test: mean=0.4036, median=0.2194
+  Updated /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_test_predictions.csv with calibrated_prob column
+
+[3/5] Prevalence recalibration ...
+  Study prevalence (test set): 0.4255
+  2pct: mean recalibrated prob = 0.0468
+  5pct: mean recalibrated prob = 0.1025
+
+[4/5] Computing decision curves ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_dca_results.csv
+
+[5/5] Generating DCA plots ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_dca_2pct.png
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_dca_5pct.png
+
+=================================================================
+DECISION CURVE ANALYSIS SUMMARY
+=================================================================
+
+  2% prevalence:
+    Model does not beat treat-all in [0.01, 0.40]
+
+  5% prevalence:
+    Model does not beat treat-all in [0.01, 0.40]
+
+Done.

@@ -1,0 +1,307 @@
+{
+  "best_variant": "raw",
+  "val_threshold_recall_85": 0.0,
+  "n_phrases": 60,
+  "phrases": [
+    {
+      "pattern": "\\bptsd\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bpost[- ]?traumatic\\s+stress\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bposttraumatic\\s+stress\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\btrauma\\b",
+      "weight": 2.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\btraumatic\\b",
+      "weight": 2.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bcombat\\s+(veteran|exposure|related)",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bsexual\\s+assault\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bphysical\\s+assault\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bassault(?:ed)?\\b",
+      "weight": 2.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\brape[d]?\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bdomestic\\s+violence\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bintimate\\s+partner\\s+violence\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bipv\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\babuse[d]?\\b",
+      "weight": 1.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\babusive\\b",
+      "weight": 1.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bchild(?:hood)?\\s+abuse\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bmva\\b",
+      "weight": 2.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bmotor\\s+vehicle\\s+accident\\b",
+      "weight": 2.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bgunshot\\b",
+      "weight": 1.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bstab(?:bing|bed)\\b",
+      "weight": 1.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bviolence\\b",
+      "weight": 1.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bwitness(?:ed|ing)?\\s+(?:death|violence|shooting|accident)",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bwar\\s+zone\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bmilitary\\s+sexual\\s+trauma\\b",
+      "weight": 3.0,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bmst\\b",
+      "weight": 2.5,
+      "criterion": "A"
+    },
+    {
+      "pattern": "\\bflashback[s]?\\b",
+      "weight": 3.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bnightmare[s]?\\b",
+      "weight": 2.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bre-?experienc(?:e|ing)\\b",
+      "weight": 3.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bintrusive\\s+(?:thought|memor|image|recollection)",
+      "weight": 3.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bdistressing\\s+(?:dream|memor|recollection)",
+      "weight": 2.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\brecurrent\\s+(?:dream|nightmare|thought|image)",
+      "weight": 2.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bdissociative\\s+(?:reaction|episode|flashback)",
+      "weight": 3.0,
+      "criterion": "B"
+    },
+    {
+      "pattern": "\\bavoidance\\b",
+      "weight": 1.5,
+      "criterion": "C"
+    },
+    {
+      "pattern": "\\bavoid(?:s|ing|ed)?\\s+(?:trigger|reminder|thought|feeling|place)",
+      "weight": 2.5,
+      "criterion": "C"
+    },
+    {
+      "pattern": "\\bemotional(?:ly)?\\s+numb(?:ing|ness)?\\b",
+      "weight": 2.0,
+      "criterion": "C"
+    },
+    {
+      "pattern": "\\bdetach(?:ed|ment)\\b",
+      "weight": 1.5,
+      "criterion": "C"
+    },
+    {
+      "pattern": "\\bguilt\\b",
+      "weight": 0.5,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bself[- ]?blame\\b",
+      "weight": 1.0,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bdiminished\\s+interest\\b",
+      "weight": 1.0,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bestrange(?:d|ment)\\b",
+      "weight": 1.5,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bpersistent\\s+negative\\b",
+      "weight": 1.0,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bunable\\s+to\\s+(?:feel|experience)\\s+positive",
+      "weight": 1.5,
+      "criterion": "D"
+    },
+    {
+      "pattern": "\\bhypervigilance\\b",
+      "weight": 3.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bhypervigilant\\b",
+      "weight": 3.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bexaggerated\\s+startle\\b",
+      "weight": 3.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bstartle\\s+(?:response|reflex|reaction)",
+      "weight": 3.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bhyperarous(?:al|ed)\\b",
+      "weight": 2.5,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\binsomnia\\b",
+      "weight": 1.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bsleep\\s+disturbance\\b",
+      "weight": 1.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\birritab(?:le|ility)\\b",
+      "weight": 0.5,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\banger\\s+outburst\\b",
+      "weight": 1.5,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\breckless\\s+behavior\\b",
+      "weight": 1.0,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bconcentration\\s+difficult\\b",
+      "weight": 0.5,
+      "criterion": "E"
+    },
+    {
+      "pattern": "\\bprazosin\\b",
+      "weight": 2.0,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\bprolonged\\s+exposure\\s+therapy\\b",
+      "weight": 3.0,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\bcpe\\b",
+      "weight": 1.5,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\bemdr\\b",
+      "weight": 3.0,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\btrauma[- ]?focused\\b",
+      "weight": 2.5,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\bpcl[- ]?5\\b",
+      "weight": 3.0,
+      "criterion": "tx"
+    },
+    {
+      "pattern": "\\bcaps[- ]?5\\b",
+      "weight": 3.0,
+      "criterion": "tx"
+    }
+  ]
+}

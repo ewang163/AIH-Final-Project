@@ -1,0 +1,78 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1732275
+##  Job Name : temp_eval
+##  Nodelist : gpu3102
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 02:42:31 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Temporal Generalization Evaluation (Fix 3)
+=================================================================
+
+Device: cuda
+
+--- Temporal model, temporal test ---
+  Model:     /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best_temporal
+  Val split: /oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val_temporal.parquet
+  Test split:/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test_temporal.parquet
+  Val: n=1270 pos_rate=0.439
+  Test: n=2455 pos_rate=0.269
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 44814.10it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Initializing global attention on CLS token...
+  [BENCH] temporal_eval/Temporal model, temporal test_val: 100.0s wall, 93.5s cpu, 1.47 GB peak, 0.0278 GPU-h
+  [BENCH] temporal_eval/Temporal model, temporal test_test: 191.2s wall, 180.6s cpu, 1.47 GB peak, 0.0531 GPU-h
+  Val-derived threshold (recall>=0.85): 0.3060
+  Val  AUPRC=0.9050 AUROC=0.9047
+  Test AUPRC=0.8417 AUROC=0.9025 (sens=0.832, spec=0.805)
+
+--- Random model, temporal test ---
+  Model:     /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best
+  Val split: /oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val.parquet
+  Test split:/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test_temporal.parquet
+  Val: n=1471 pos_rate=0.394
+  Test: n=2455 pos_rate=0.269
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 4150.40it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] temporal_eval/Random model, temporal test_val: 115.0s wall, 108.0s cpu, 1.82 GB peak, 0.0319 GPU-h
+  [BENCH] temporal_eval/Random model, temporal test_test: 191.8s wall, 180.1s cpu, 1.82 GB peak, 0.0533 GPU-h
+  Val-derived threshold (recall>=0.85): 0.3070
+  Val  AUPRC=0.8745 AUROC=0.8963
+  Test AUPRC=0.8861 AUROC=0.9273 (sens=0.861, spec=0.833)
+
+--- Random model, random test ---
+  Model:     /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best
+  Val split: /oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val.parquet
+  Test split:/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test.parquet
+  Val: n=1471 pos_rate=0.394
+  Test: n=1551 pos_rate=0.426
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 47698.28it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] temporal_eval/Random model, random test_val: 114.9s wall, 108.0s cpu, 1.82 GB peak, 0.0319 GPU-h
+  [BENCH] temporal_eval/Random model, random test_test: 121.2s wall, 113.8s cpu, 1.82 GB peak, 0.0337 GPU-h
+  Val-derived threshold (recall>=0.85): 0.3070
+  Val  AUPRC=0.8745 AUROC=0.8963
+  Test AUPRC=0.8881 AUROC=0.8926 (sens=0.841, spec=0.750)
+
+=================================================================
+TEMPORAL GENERALIZATION SUMMARY
+=================================================================
+
+  On temporal test (2017-2019):
+    Temporal model: AUPRC=0.8417  AUROC=0.9025
+    Random model:   AUPRC=0.8861  AUROC=0.9273
+    Delta (temp-random): AUPRC=-0.0444  AUROC=-0.0248
+
+  Random model — random vs. temporal test:
+    Random test:   AUPRC=0.8881
+    Temporal test: AUPRC=0.8861
+    Generalization penalty: +0.0020
+
+Results → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_temporal_eval_results.json
+
+Done.

@@ -110,12 +110,17 @@ def main():
         print(f'  GPU: {torch.cuda.get_device_name(0)}')
 
     # ── Load recall-0.85 threshold from evaluation results ────────────────
+    # Fix 4: use the val-derived threshold, not the test-derived one
     print('\n[1/5] Loading evaluation threshold ...')
     try:
         with open(EVAL_JSON) as f:
             eval_results = json.load(f)
-        threshold = eval_results['longformer']['threshold_recall_85']
-        print(f'  Threshold (recall>=0.85 from test set): {threshold:.4f}')
+        if 'val_thresholds' in eval_results:
+            threshold = eval_results['val_thresholds']['longformer']
+            print(f'  Threshold (recall>=0.85 from val set, Fix 4): {threshold:.4f}')
+        else:
+            threshold = eval_results['longformer']['threshold_recall_85']
+            print(f'  Threshold (recall>=0.85, pre-Fix 4): {threshold:.4f}')
     except (FileNotFoundError, KeyError):
         threshold = 0.5
         print(f'  WARNING: evaluation results not found, using default threshold=0.5')

@@ -1,0 +1,41 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1923698
+##  Job Name : wrap
+##  Nodelist : node2303
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 04:16:56 PM EDT 2026
+###############################################################################
+======================================================================
+PTSD NLP — CPU INFERENCE BENCHMARK (Keyword + Structured)
+======================================================================
+SLURM_JOB_ID=1923698  node=node2303  n_cpus=16
+Val: 1,471 | Test: 1,551
+
+[1/2] Keyword DSM-5 / PCL-5 (parallel) ...
+  Loaded 60 phrases. n_jobs=16
+  [BENCH] cpu_bench/val_inference: 0.5s wall, 0.0s cpu, 0.17 GB peak
+  -> Keyword-DSM5/PCL5/val_inference: 0.47s (0.32 ms/patient, n_cpus=16)
+  [BENCH] cpu_bench/test_inference: 0.5s wall, 0.0s cpu, 0.17 GB peak
+  -> Keyword-DSM5/PCL5/test_inference: 0.52s (0.34 ms/patient, n_cpus=16)
+
+[2/2] Structured + LogReg ...
+  [BENCH] cpu_bench/val_inference: 63.1s wall, 45.4s cpu, 0.30 GB peak
+  -> Structured-LogReg/val_inference: 63.06s (42.87 ms/patient, n_cpus=16)
+  [BENCH] cpu_bench/test_inference: 27.7s wall, 27.7s cpu, 0.30 GB peak
+  -> Structured-LogReg/test_inference: 27.73s (17.88 ms/patient, n_cpus=16)
+
+=== WRITING RESULTS ===
+Wrote: /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_cpu_inference_bench.csv
+
+=== FINAL TABLE ===
+model                  stage               wall(s)      n      ms/pt  cpus
+--------------------------------------------------------------------------
+Keyword-DSM5/PCL5      val_inference          0.47   1471       0.32    16
+Keyword-DSM5/PCL5      test_inference         0.52   1551       0.34    16
+Structured-LogReg      val_inference         63.06   1471      42.87    16
+Structured-LogReg      test_inference        27.73   1551      17.88    16
+
+Node: node2303  Job: 1923698  CPUs: 16
+Done.

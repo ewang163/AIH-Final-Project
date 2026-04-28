@@ -4,10 +4,17 @@ ewang163_ptsd_calibration.py
 Fit and evaluate probability calibration for the Clinical Longformer.
 
 Kiryo PU loss does not produce calibrated probabilities. This script:
-1. Loads val + test predictions (from ewang163_ptsd_decision_curves.py)
+1. Loads val + test predictions
 2. Fits Platt scaling on validation set, saves calibrator
-3. Produces calibration curves (raw vs. Platt-scaled) with 95% CI
-4. Computes Expected Calibration Error (ECE) before and after
+3. Applies Elkan-Noto PU correction (Fix 5): divides calibrated probabilities
+   by c = P(s=1|y=1), estimated as mean model probability on known positives,
+   so predicted probabilities approximate P(PTSD=1) rather than P(coded=1)
+4. Produces calibration curves (raw vs. Platt-scaled vs. Elkan-Noto) with 95% CI
+5. Computes Expected Calibration Error (ECE) for all three variants
+
+Fix 5 reference: Elkan & Noto (2008), "Learning classifiers from only positive
+and unlabeled data". The constant c = P(s=1|y=1) is the probability that a true
+positive is observed (coded) — the labeling frequency.
 
 Outputs:
     ewang163_platt_calibrator.pkl
@@ -131,24 +138,42 @@ def main():
     print(f'  Platt test: mean={test_cal.mean():.4f}, '
           f'median={np.median(test_cal):.4f}')
 
+    # ── Step 2b: Elkan-Noto PU correction (Fix 5) ───────────────────────
+    print('\n[2b/5] Applying Elkan-Noto correction (Fix 5) ...')
+    # Estimate c = P(s=1|y=1) = mean predicted probability on known positives
+    # in the validation set (held-out from training)
+    val_pos_mask = val_labels == 1
+    c_estimate = float(val_probs[val_pos_mask].mean())
+    print(f'  Elkan-Noto c = P(s=1|y=1) estimate: {c_estimate:.4f}')
+    print(f'    (mean raw prob on {val_pos_mask.sum()} val positives)')
+
+    # Corrected probabilities: P(y=1|x) = P(s=1|x) / c, clipped to [0,1]
+    test_en = np.clip(test_cal / c_estimate, 0, 1)
+    print(f'  Elkan-Noto test: mean={test_en.mean():.4f}, '
+          f'median={np.median(test_en):.4f}')
+
     # ── Step 3: Calibration curves ───────────────────────────────────────
-    print('\n[3/4] Computing calibration bins ...')
+    print('\n[3/5] Computing calibration bins ...')
     bins_raw = equal_frequency_bins(test_probs, test_labels, N_BINS)
     bins_cal = equal_frequency_bins(test_cal, test_labels, N_BINS)
+    bins_en = equal_frequency_bins(test_en, test_labels, N_BINS)
 
     ece_raw = compute_ece(bins_raw)
     ece_cal = compute_ece(bins_cal)
+    ece_en = compute_ece(bins_en)
 
     print(f'  ECE (raw):          {ece_raw:.4f}')
     print(f'  ECE (Platt-scaled): {ece_cal:.4f}')
+    print(f'  ECE (Elkan-Noto):   {ece_en:.4f}')
 
     # Plot
-    print('\n[4/4] Generating calibration plot ...')
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    print('\n[4/5] Generating calibration plot ...')
+    fig, axes = plt.subplots(1, 3, figsize=(17, 5))
 
     for ax, bins, title, ece_val in [
         (axes[0], bins_raw, 'Raw Longformer', ece_raw),
         (axes[1], bins_cal, 'Platt-scaled', ece_cal),
+        (axes[2], bins_en, f'Elkan-Noto (c={c_estimate:.3f})', ece_en),
     ]:
         mean_preds = [b['mean_predicted'] for b in bins]
         obs_fracs  = [b['observed_fraction'] for b in bins]
@@ -179,35 +204,30 @@ def main():
     print(f'  → {CURVE_PNG}')
 
     # ── Save results CSV ─────────────────────────────────────────────────
+    print('\n[5/5] Saving results ...')
     rows = []
-    for b in bins_raw:
+    for btype, bins in [('raw', bins_raw), ('platt_scaled', bins_cal),
+                         ('elkan_noto', bins_en)]:
+        for b in bins:
+            rows.append({
+                'type': btype,
+                'bin': b['bin'],
+                'n': b['n'],
+                'mean_predicted': b['mean_predicted'],
+                'observed_fraction': b['observed_fraction'],
+                'ci_lower': b['ci_lower'],
+                'ci_upper': b['ci_upper'],
+            })
+    for label, ece_val in [('raw', ece_raw), ('platt_scaled', ece_cal),
+                            ('elkan_noto', ece_en)]:
         rows.append({
-            'type': 'raw',
-            'bin': b['bin'],
-            'n': b['n'],
-            'mean_predicted': b['mean_predicted'],
-            'observed_fraction': b['observed_fraction'],
-            'ci_lower': b['ci_lower'],
-            'ci_upper': b['ci_upper'],
-        })
-    for b in bins_cal:
-        rows.append({
-            'type': 'platt_scaled',
-            'bin': b['bin'],
-            'n': b['n'],
-            'mean_predicted': b['mean_predicted'],
-            'observed_fraction': b['observed_fraction'],
-            'ci_lower': b['ci_lower'],
-            'ci_upper': b['ci_upper'],
+            'type': 'ece_summary', 'bin': label,
+            'n': len(test_labels), 'mean_predicted': round(ece_val, 4),
+            'observed_fraction': None, 'ci_lower': None, 'ci_upper': None,
         })
     rows.append({
-        'type': 'ece_summary', 'bin': 'raw',
-        'n': len(test_labels), 'mean_predicted': round(ece_raw, 4),
-        'observed_fraction': None, 'ci_lower': None, 'ci_upper': None,
-    })
-    rows.append({
-        'type': 'ece_summary', 'bin': 'platt_scaled',
-        'n': len(test_labels), 'mean_predicted': round(ece_cal, 4),
+        'type': 'elkan_noto_c', 'bin': 'c_estimate',
+        'n': int(val_pos_mask.sum()), 'mean_predicted': round(c_estimate, 4),
         'observed_fraction': None, 'ci_lower': None, 'ci_upper': None,
     })
 
@@ -219,14 +239,20 @@ def main():
     print('\n' + '=' * 65)
     print('CALIBRATION SUMMARY')
     print('=' * 65)
-    print(f'\n  ECE before Platt scaling: {ece_raw:.4f}')
-    print(f'  ECE after  Platt scaling: {ece_cal:.4f}')
-    improvement = ece_raw - ece_cal
+    print(f'\n  ECE before Platt scaling:  {ece_raw:.4f}')
+    print(f'  ECE after Platt scaling:   {ece_cal:.4f}')
+    print(f'  ECE after Elkan-Noto:      {ece_en:.4f}')
+    print(f'  Elkan-Noto c estimate:     {c_estimate:.4f}')
+    improvement = ece_raw - ece_en
     if improvement > 0:
-        print(f'  Improvement: {improvement:.4f} ({improvement / ece_raw * 100:.1f}% reduction)')
+        print(f'  Total improvement (raw→EN): {improvement:.4f} '
+              f'({improvement / ece_raw * 100:.1f}% reduction)')
     else:
-        print(f'  Note: Platt scaling did not improve ECE '
+        print(f'  Note: Elkan-Noto correction did not improve ECE '
               f'(delta = {improvement:.4f})')
+    print(f'\n  Interpretation: Elkan-Noto-corrected probabilities approximate '
+          f'P(PTSD=1|text)\n  rather than P(coded=1|text). Use these for '
+          f'clinical decision support.')
 
     print(f'\n  Raw calibration (10 equal-frequency bins):')
     print(f'  {"Bin":>4} {"N":>6} {"Mean pred":>10} {"Obs frac":>10} {"95% CI":>16}')

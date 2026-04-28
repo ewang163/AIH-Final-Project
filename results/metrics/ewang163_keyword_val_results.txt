@@ -1,0 +1,34 @@
+Keyword Baseline — Validation Results
+==================================================
+
+Lexicon: 60 phrases (DSM-5/PCL-5 derived)
+Best variant: raw
+
+Raw weighted:
+  model: Keyword (raw weighted)
+  AUPRC: 0.5289
+  AUROC: 0.6246
+  threshold_recall_85: 0.0
+  sensitivity: 1.0
+  specificity: 0.0
+  precision: 0.3943
+  F1: 0.5656
+  tp: 580
+  fp: 891
+  tn: 0
+  fn: 0
+
+TF-normalized:
+  model: Keyword (TF-normalized)
+  AUPRC: 0.5031
+  AUROC: 0.6208
+  threshold_recall_85: 0.0
+  sensitivity: 1.0
+  specificity: 0.0
+  precision: 0.3943
+  F1: 0.5656
+  tp: 580
+  fp: 891
+  tn: 0
+  fn: 0
+

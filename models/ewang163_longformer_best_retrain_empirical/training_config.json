@@ -1,0 +1,18 @@
+{
+  "model_name": "yikuan8/Clinical-Longformer",
+  "pi_p": 0.397905,
+  "pi_p_source": "empirical",
+  "max_len": 4096,
+  "batch_size": 2,
+  "grad_accum_steps": 16,
+  "effective_batch_size": 32,
+  "lr": 2e-05,
+  "epochs": 5,
+  "warmup_frac": 0.1,
+  "weight_decay": 0.01,
+  "best_val_auprc": 0.874494,
+  "n_train": 11837,
+  "n_val": 1471,
+  "n_pos_train": 4710,
+  "n_unl_train": 7127
+}

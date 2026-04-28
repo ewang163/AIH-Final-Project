@@ -1,0 +1,16 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1923070
+##  Job Name : wrap
+##  Nodelist : node2340
+##      CPUs : 
+##  Mem/Node : 8192 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 03:29:06 PM EDT 2026
+###############################################################################
+Loading splits ...
+  Val: 1,471   Test: 1,551
+  [BENCH] runtime_audit/keyword_val_inference: 2.5s wall, 2.5s cpu, 0.65 GB peak
+  [BENCH] runtime_audit/keyword_test_inference: 2.6s wall, 2.6s cpu, 0.65 GB peak
+  [BENCH] runtime_audit/structured_val_inference: 49.6s wall, 35.8s cpu, 0.66 GB peak
+  [BENCH] runtime_audit/structured_test_inference: 31.3s wall, 31.1s cpu, 0.66 GB peak
+Done.

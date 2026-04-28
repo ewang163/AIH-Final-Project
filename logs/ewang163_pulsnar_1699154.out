@@ -1,0 +1,424 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1699154
+##  Job Name : pulsnar
+##  Nodelist : gpu2708
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Thu Apr 16 09:43:07 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — PULSNAR SAR-PU Training (Fix 3)
+=================================================================
+2026-04-16 21:43:27,424 INFO:cffi mode is CFFI_MODE.ANY
+2026-04-16 21:43:27,441 ERROR:Unable to determine R home: [Errno 2] No such file or directory: 'R'
+2026-04-16 21:43:27,441 INFO:R home found: None
+2026-04-16 21:43:27,462 WARNING:Error importing in API mode: ImportError('libicuuc.so.74: cannot open shared object file: No such file or directory')
+2026-04-16 21:43:27,475 WARNING:Trying to import in ABI mode.
+2026-04-16 21:43:27,475 WARNING:rpy2 not available (r_home is None. Try python -m rpy2.situation); R bandwidth methods disabled, hist method still works
+
+Device: cuda
+  GPU: NVIDIA L40S
+
+[1/5] Loading data ...
+  Train: 11,837 (pos=4,710, unl=7,127)
+  Empirical labeled fraction: 0.3979
+
+[2/5] Estimating propensities ...
+  Fitting propensity model ...
+    Propensity range: [0.126, 0.497]
+    Propensity mean (pos): 0.287
+    Propensity mean (unl): 0.250
+
+[3/5] Estimating class prior with PULSNAR ...
+  PULSNAR input: 9649 patients, 4 features
+Number of clusters in the positive set:  5
+  Alpha estimate: 0.1957 (method: PULSNAR (SAR))
+  Empirical labeled fraction: 0.3979
+
+[4/5] Training with propensity-weighted nnPU (pi_p=0.1957) ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 37385.56it/s]
+
+--- Epoch 1/3 ---
+Initializing global attention on CLS token...
+    step 50/5919  avg_loss=0.2228
+    step 100/5919  avg_loss=0.2071
+    step 150/5919  avg_loss=0.2372
+    step 200/5919  avg_loss=0.2315
+    step 250/5919  avg_loss=0.2358
+    step 300/5919  avg_loss=0.2331
+    step 350/5919  avg_loss=0.2309
+    step 400/5919  avg_loss=0.2252
+    step 450/5919  avg_loss=0.2211
+    step 500/5919  avg_loss=0.2200
+    step 550/5919  avg_loss=0.2212
+    step 600/5919  avg_loss=0.2209
+    step 650/5919  avg_loss=0.2241
+    step 700/5919  avg_loss=0.2193
+    step 750/5919  avg_loss=0.2172
+    step 800/5919  avg_loss=0.2136
+    step 850/5919  avg_loss=0.2134
+    step 900/5919  avg_loss=0.2150
+    step 950/5919  avg_loss=0.2100
+    step 1000/5919  avg_loss=0.2111
+    step 1050/5919  avg_loss=0.2082
+    step 1100/5919  avg_loss=0.2062
+    step 1150/5919  avg_loss=0.2083
+    step 1200/5919  avg_loss=0.2094
+    step 1250/5919  avg_loss=0.2040
+    step 1300/5919  avg_loss=0.2037
+    step 1350/5919  avg_loss=0.2078
+    step 1400/5919  avg_loss=0.2127
+    step 1450/5919  avg_loss=0.2130
+    step 1500/5919  avg_loss=0.2161
+    step 1550/5919  avg_loss=0.2205
+    step 1600/5919  avg_loss=0.2167
+    step 1650/5919  avg_loss=0.2161
+    step 1700/5919  avg_loss=0.2157
+    step 1750/5919  avg_loss=0.2157
+    step 1800/5919  avg_loss=0.2129
+    step 1850/5919  avg_loss=0.2136
+    step 1900/5919  avg_loss=0.2133
+    step 1950/5919  avg_loss=0.2134
+    step 2000/5919  avg_loss=0.2156
+    step 2050/5919  avg_loss=0.2152
+    step 2100/5919  avg_loss=0.2174
+    step 2150/5919  avg_loss=0.2162
+    step 2200/5919  avg_loss=0.2171
+    step 2250/5919  avg_loss=0.2174
+    step 2300/5919  avg_loss=0.2172
+    step 2350/5919  avg_loss=0.2168
+    step 2400/5919  avg_loss=0.2176
+    step 2450/5919  avg_loss=0.2173
+    step 2500/5919  avg_loss=0.2153
+    step 2550/5919  avg_loss=0.2163
+    step 2600/5919  avg_loss=0.2183
+    step 2650/5919  avg_loss=0.2172
+    step 2700/5919  avg_loss=0.2157
+    step 2750/5919  avg_loss=0.2146
+    step 2800/5919  avg_loss=0.2161
+    step 2850/5919  avg_loss=0.2164
+    step 2900/5919  avg_loss=0.2165
+    step 2950/5919  avg_loss=0.2171
+    step 3000/5919  avg_loss=0.2174
+    step 3050/5919  avg_loss=0.2186
+    step 3100/5919  avg_loss=0.2175
+    step 3150/5919  avg_loss=0.2184
+    step 3200/5919  avg_loss=0.2188
+    step 3250/5919  avg_loss=0.2175
+    step 3300/5919  avg_loss=0.2170
+    step 3350/5919  avg_loss=0.2160
+    step 3400/5919  avg_loss=0.2157
+    step 3450/5919  avg_loss=0.2155
+    step 3500/5919  avg_loss=0.2161
+    step 3550/5919  avg_loss=0.2160
+    step 3600/5919  avg_loss=0.2171
+    step 3650/5919  avg_loss=0.2160
+    step 3700/5919  avg_loss=0.2157
+    step 3750/5919  avg_loss=0.2157
+    step 3800/5919  avg_loss=0.2161
+    step 3850/5919  avg_loss=0.2158
+    step 3900/5919  avg_loss=0.2154
+    step 3950/5919  avg_loss=0.2153
+    step 4000/5919  avg_loss=0.2153
+    step 4050/5919  avg_loss=0.2154
+    step 4100/5919  avg_loss=0.2147
+    step 4150/5919  avg_loss=0.2164
+    step 4200/5919  avg_loss=0.2167
+    step 4250/5919  avg_loss=0.2169
+    step 4300/5919  avg_loss=0.2174
+    step 4350/5919  avg_loss=0.2182
+    step 4400/5919  avg_loss=0.2190
+    step 4450/5919  avg_loss=0.2191
+    step 4500/5919  avg_loss=0.2189
+    step 4550/5919  avg_loss=0.2189
+    step 4600/5919  avg_loss=0.2191
+    step 4650/5919  avg_loss=0.2191
+    step 4700/5919  avg_loss=0.2188
+    step 4750/5919  avg_loss=0.2187
+    step 4800/5919  avg_loss=0.2184
+    step 4850/5919  avg_loss=0.2189
+    step 4900/5919  avg_loss=0.2191
+    step 4950/5919  avg_loss=0.2185
+    step 5000/5919  avg_loss=0.2182
+    step 5050/5919  avg_loss=0.2187
+    step 5100/5919  avg_loss=0.2189
+    step 5150/5919  avg_loss=0.2185
+    step 5200/5919  avg_loss=0.2179
+    step 5250/5919  avg_loss=0.2174
+    step 5300/5919  avg_loss=0.2176
+    step 5350/5919  avg_loss=0.2176
+    step 5400/5919  avg_loss=0.2181
+    step 5450/5919  avg_loss=0.2185
+    step 5500/5919  avg_loss=0.2189
+    step 5550/5919  avg_loss=0.2194
+    step 5600/5919  avg_loss=0.2196
+    step 5650/5919  avg_loss=0.2198
+    step 5700/5919  avg_loss=0.2206
+    step 5750/5919  avg_loss=0.2203
+    step 5800/5919  avg_loss=0.2197
+    step 5850/5919  avg_loss=0.2200
+    step 5900/5919  avg_loss=0.2199
+  Train loss: 0.2203  (4044s)
+  Val AUPRC:  0.8725
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.49it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.48it/s]
+  >> New best (AUPRC=0.8725)
+
+--- Epoch 2/3 ---
+    step 50/5919  avg_loss=0.1925
+    step 100/5919  avg_loss=0.2066
+    step 150/5919  avg_loss=0.2268
+    step 200/5919  avg_loss=0.2158
+    step 250/5919  avg_loss=0.2142
+    step 300/5919  avg_loss=0.2018
+    step 350/5919  avg_loss=0.1939
+    step 400/5919  avg_loss=0.1966
+    step 450/5919  avg_loss=0.1982
+    step 500/5919  avg_loss=0.1882
+    step 550/5919  avg_loss=0.1850
+    step 600/5919  avg_loss=0.1918
+    step 650/5919  avg_loss=0.1953
+    step 700/5919  avg_loss=0.1961
+    step 750/5919  avg_loss=0.1955
+    step 800/5919  avg_loss=0.1958
+    step 850/5919  avg_loss=0.1961
+    step 900/5919  avg_loss=0.1918
+    step 950/5919  avg_loss=0.1935
+    step 1000/5919  avg_loss=0.1888
+    step 1050/5919  avg_loss=0.1905
+    step 1100/5919  avg_loss=0.1897
+    step 1150/5919  avg_loss=0.1909
+    step 1200/5919  avg_loss=0.1920
+    step 1250/5919  avg_loss=0.1892
+    step 1300/5919  avg_loss=0.1898
+    step 1350/5919  avg_loss=0.1902
+    step 1400/5919  avg_loss=0.1924
+    step 1450/5919  avg_loss=0.1912
+    step 1500/5919  avg_loss=0.1915
+    step 1550/5919  avg_loss=0.1913
+    step 1600/5919  avg_loss=0.1904
+    step 1650/5919  avg_loss=0.1931
+    step 1700/5919  avg_loss=0.1933
+    step 1750/5919  avg_loss=0.1939
+    step 1800/5919  avg_loss=0.1938
+    step 1850/5919  avg_loss=0.1926
+    step 1900/5919  avg_loss=0.1927
+    step 1950/5919  avg_loss=0.1917
+    step 2000/5919  avg_loss=0.1902
+    step 2050/5919  avg_loss=0.1892
+    step 2100/5919  avg_loss=0.1902
+    step 2150/5919  avg_loss=0.1899
+    step 2200/5919  avg_loss=0.1895
+    step 2250/5919  avg_loss=0.1897
+    step 2300/5919  avg_loss=0.1884
+    step 2350/5919  avg_loss=0.1884
+    step 2400/5919  avg_loss=0.1868
+    step 2450/5919  avg_loss=0.1893
+    step 2500/5919  avg_loss=0.1919
+    step 2550/5919  avg_loss=0.1929
+    step 2600/5919  avg_loss=0.1927
+    step 2650/5919  avg_loss=0.1911
+    step 2700/5919  avg_loss=0.1911
+    step 2750/5919  avg_loss=0.1909
+    step 2800/5919  avg_loss=0.1906
+    step 2850/5919  avg_loss=0.1901
+    step 2900/5919  avg_loss=0.1897
+    step 2950/5919  avg_loss=0.1899
+    step 3000/5919  avg_loss=0.1885
+    step 3050/5919  avg_loss=0.1888
+    step 3100/5919  avg_loss=0.1885
+    step 3150/5919  avg_loss=0.1888
+    step 3200/5919  avg_loss=0.1876
+    step 3250/5919  avg_loss=0.1869
+    step 3300/5919  avg_loss=0.1868
+    step 3350/5919  avg_loss=0.1864
+    step 3400/5919  avg_loss=0.1855
+    step 3450/5919  avg_loss=0.1844
+    step 3500/5919  avg_loss=0.1830
+    step 3550/5919  avg_loss=0.1821
+    step 3600/5919  avg_loss=0.1814
+    step 3650/5919  avg_loss=0.1806
+    step 3700/5919  avg_loss=0.1819
+    step 3750/5919  avg_loss=0.1829
+    step 3800/5919  avg_loss=0.1830
+    step 3850/5919  avg_loss=0.1839
+    step 3900/5919  avg_loss=0.1841
+    step 3950/5919  avg_loss=0.1834
+    step 4000/5919  avg_loss=0.1837
+    step 4050/5919  avg_loss=0.1832
+    step 4100/5919  avg_loss=0.1826
+    step 4150/5919  avg_loss=0.1839
+    step 4200/5919  avg_loss=0.1851
+    step 4250/5919  avg_loss=0.1851
+    step 4300/5919  avg_loss=0.1852
+    step 4350/5919  avg_loss=0.1847
+    step 4400/5919  avg_loss=0.1844
+    step 4450/5919  avg_loss=0.1842
+    step 4500/5919  avg_loss=0.1835
+    step 4550/5919  avg_loss=0.1841
+    step 4600/5919  avg_loss=0.1843
+    step 4650/5919  avg_loss=0.1839
+    step 4700/5919  avg_loss=0.1839
+    step 4750/5919  avg_loss=0.1834
+    step 4800/5919  avg_loss=0.1828
+    step 4850/5919  avg_loss=0.1818
+    step 4900/5919  avg_loss=0.1823
+    step 4950/5919  avg_loss=0.1825
+    step 5000/5919  avg_loss=0.1822
+    step 5050/5919  avg_loss=0.1821
+    step 5100/5919  avg_loss=0.1816
+    step 5150/5919  avg_loss=0.1833
+    step 5200/5919  avg_loss=0.1831
+    step 5250/5919  avg_loss=0.1832
+    step 5300/5919  avg_loss=0.1829
+    step 5350/5919  avg_loss=0.1829
+    step 5400/5919  avg_loss=0.1830
+    step 5450/5919  avg_loss=0.1837
+    step 5500/5919  avg_loss=0.1847
+    step 5550/5919  avg_loss=0.1849
+    step 5600/5919  avg_loss=0.1844
+    step 5650/5919  avg_loss=0.1845
+    step 5700/5919  avg_loss=0.1846
+    step 5750/5919  avg_loss=0.1846
+    step 5800/5919  avg_loss=0.1839
+    step 5850/5919  avg_loss=0.1835
+    step 5900/5919  avg_loss=0.1833
+  Train loss: 0.1833  (4044s)
+  Val AUPRC:  0.8725
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.27it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00,  1.27it/s]
+  >> New best (AUPRC=0.8725)
+
+--- Epoch 3/3 ---
+    step 50/5919  avg_loss=0.1518
+    step 100/5919  avg_loss=0.1364
+    step 150/5919  avg_loss=0.1570
+    step 200/5919  avg_loss=0.1533
+    step 250/5919  avg_loss=0.1484
+    step 300/5919  avg_loss=0.1454
+    step 350/5919  avg_loss=0.1351
+    step 400/5919  avg_loss=0.1402
+    step 450/5919  avg_loss=0.1431
+    step 500/5919  avg_loss=0.1502
+    step 550/5919  avg_loss=0.1482
+    step 600/5919  avg_loss=0.1532
+    step 650/5919  avg_loss=0.1562
+    step 700/5919  avg_loss=0.1564
+    step 750/5919  avg_loss=0.1564
+    step 800/5919  avg_loss=0.1543
+    step 850/5919  avg_loss=0.1535
+    step 900/5919  avg_loss=0.1541
+    step 950/5919  avg_loss=0.1597
+    step 1000/5919  avg_loss=0.1586
+    step 1050/5919  avg_loss=0.1598
+    step 1100/5919  avg_loss=0.1588
+    step 1150/5919  avg_loss=0.1600
+    step 1200/5919  avg_loss=0.1585
+    step 1250/5919  avg_loss=0.1594
+    step 1300/5919  avg_loss=0.1580
+    step 1350/5919  avg_loss=0.1596
+    step 1400/5919  avg_loss=0.1618
+    step 1450/5919  avg_loss=0.1654
+    step 1500/5919  avg_loss=0.1683
+    step 1550/5919  avg_loss=0.1700
+    step 1600/5919  avg_loss=0.1707
+    step 1650/5919  avg_loss=0.1695
+    step 1700/5919  avg_loss=0.1694
+    step 1750/5919  avg_loss=0.1713
+    step 1800/5919  avg_loss=0.1698
+    step 1850/5919  avg_loss=0.1703
+    step 1900/5919  avg_loss=0.1701
+    step 1950/5919  avg_loss=0.1717
+    step 2000/5919  avg_loss=0.1699
+    step 2050/5919  avg_loss=0.1694
+    step 2100/5919  avg_loss=0.1678
+    step 2150/5919  avg_loss=0.1672
+    step 2200/5919  avg_loss=0.1660
+    step 2250/5919  avg_loss=0.1681
+    step 2300/5919  avg_loss=0.1666
+    step 2350/5919  avg_loss=0.1681
+    step 2400/5919  avg_loss=0.1675
+    step 2450/5919  avg_loss=0.1680
+    step 2500/5919  avg_loss=0.1678
+    step 2550/5919  avg_loss=0.1664
+    step 2600/5919  avg_loss=0.1642
+    step 2650/5919  avg_loss=0.1638
+    step 2700/5919  avg_loss=0.1630
+    step 2750/5919  avg_loss=0.1640
+    step 2800/5919  avg_loss=0.1634
+    step 2850/5919  avg_loss=0.1640
+    step 2900/5919  avg_loss=0.1632
+    step 2950/5919  avg_loss=0.1629
+    step 3000/5919  avg_loss=0.1617
+    step 3050/5919  avg_loss=0.1605
+    step 3100/5919  avg_loss=0.1603
+    step 3150/5919  avg_loss=0.1604
+    step 3200/5919  avg_loss=0.1612
+    step 3250/5919  avg_loss=0.1612
+    step 3300/5919  avg_loss=0.1613
+    step 3350/5919  avg_loss=0.1611
+    step 3400/5919  avg_loss=0.1604
+    step 3450/5919  avg_loss=0.1598
+    step 3500/5919  avg_loss=0.1596
+    step 3550/5919  avg_loss=0.1588
+    step 3600/5919  avg_loss=0.1594
+    step 3650/5919  avg_loss=0.1594
+    step 3700/5919  avg_loss=0.1586
+    step 3750/5919  avg_loss=0.1591
+    step 3800/5919  avg_loss=0.1590
+    step 3850/5919  avg_loss=0.1581
+    step 3900/5919  avg_loss=0.1579
+    step 3950/5919  avg_loss=0.1581
+    step 4000/5919  avg_loss=0.1591
+    step 4050/5919  avg_loss=0.1586
+    step 4100/5919  avg_loss=0.1578
+    step 4150/5919  avg_loss=0.1568
+    step 4200/5919  avg_loss=0.1561
+    step 4250/5919  avg_loss=0.1564
+    step 4300/5919  avg_loss=0.1562
+    step 4350/5919  avg_loss=0.1560
+    step 4400/5919  avg_loss=0.1564
+    step 4450/5919  avg_loss=0.1558
+    step 4500/5919  avg_loss=0.1551
+    step 4550/5919  avg_loss=0.1548
+    step 4600/5919  avg_loss=0.1546
+    step 4650/5919  avg_loss=0.1548
+    step 4700/5919  avg_loss=0.1547
+    step 4750/5919  avg_loss=0.1542
+    step 4800/5919  avg_loss=0.1542
+    step 4850/5919  avg_loss=0.1537
+    step 4900/5919  avg_loss=0.1532
+    step 4950/5919  avg_loss=0.1530
+    step 5000/5919  avg_loss=0.1533
+    step 5050/5919  avg_loss=0.1526
+    step 5100/5919  avg_loss=0.1526
+    step 5150/5919  avg_loss=0.1528
+    step 5200/5919  avg_loss=0.1527
+    step 5250/5919  avg_loss=0.1524
+    step 5300/5919  avg_loss=0.1523
+    step 5350/5919  avg_loss=0.1519
+    step 5400/5919  avg_loss=0.1516
+    step 5450/5919  avg_loss=0.1513
+    step 5500/5919  avg_loss=0.1508
+    step 5550/5919  avg_loss=0.1505
+    step 5600/5919  avg_loss=0.1503
+    step 5650/5919  avg_loss=0.1500
+    step 5700/5919  avg_loss=0.1495
+    step 5750/5919  avg_loss=0.1493
+    step 5800/5919  avg_loss=0.1494
+    step 5850/5919  avg_loss=0.1492
+    step 5900/5919  avg_loss=0.1488
+  Train loss: 0.1490  (4061s)
+  Val AUPRC:  0.8721
+  [BENCH] train_pulsnar/full_training: 12617.5s wall, 12307.5s cpu, 2.25 GB peak, 3.5049 GPU-h
+
+[5/5] Saving ...
+  Estimates → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_pulsnar_estimates.json
+  Training log → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_pulsnar_training_log.csv
+
+=================================================================
+PULSNAR TRAINING COMPLETE
+=================================================================
+  Alpha (class prior): 0.1957 (PULSNAR (SAR))
+  Best val AUPRC: 0.8725
+  Checkpoint: /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_pulsnar
+Done.

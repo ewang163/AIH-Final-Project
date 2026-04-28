@@ -1,0 +1,738 @@
+{
+  "val_thresholds": {
+    "longformer": 0.307,
+    "bioclinbert": 0.976,
+    "tfidf": 0.3,
+    "structured": 0.338,
+    "keyword": 0.0
+  },
+  "longformer": {
+    "model": "Clinical Longformer (PU)",
+    "AUPRC": 0.8881,
+    "AUROC": 0.8926,
+    "threshold_recall_85": 0.307,
+    "threshold_source": "validation",
+    "sensitivity": 0.8409,
+    "specificity": 0.7497,
+    "precision": 0.7134,
+    "F1": 0.7719,
+    "tp": 555,
+    "fp": 223,
+    "tn": 668,
+    "fn": 105,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 0.5016,
+    "LR_positive": 3.3599,
+    "LR_negative": 0.2122,
+    "diagnostic_odds_ratio": 15.83,
+    "workup_reduction_vs_treat_all": 0.4984,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 396,
+        "mean_predicted": 0.0597,
+        "observed_rate": 0.0758
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 237,
+        "mean_predicted": 0.1447,
+        "observed_rate": 0.1477
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 136,
+        "mean_predicted": 0.2462,
+        "observed_rate": 0.2868
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 111,
+        "mean_predicted": 0.3498,
+        "observed_rate": 0.3153
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 66,
+        "mean_predicted": 0.4476,
+        "observed_rate": 0.4697
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 58,
+        "mean_predicted": 0.5489,
+        "observed_rate": 0.431
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 64,
+        "mean_predicted": 0.6506,
+        "observed_rate": 0.5469
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 61,
+        "mean_predicted": 0.75,
+        "observed_rate": 0.541
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 96,
+        "mean_predicted": 0.8523,
+        "observed_rate": 0.8333
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 326,
+        "mean_predicted": 0.9755,
+        "observed_rate": 0.9724
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 1.0,
+      "sensitivity_PU_corrected": 0.8409,
+      "specificity_PU_corrected": 1.0,
+      "precision_PU_corrected": 0.8125,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "bioclinbert": {
+    "model": "BioClinicalBERT (PU, truncated)",
+    "AUPRC": 0.8576,
+    "AUROC": 0.8656,
+    "threshold_recall_85": 0.976,
+    "threshold_source": "validation",
+    "sensitivity": 0.8197,
+    "specificity": 0.7284,
+    "precision": 0.6909,
+    "F1": 0.7498,
+    "tp": 541,
+    "fp": 242,
+    "tn": 649,
+    "fn": 119,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 0.5048,
+    "LR_positive": 3.018,
+    "LR_negative": 0.2475,
+    "diagnostic_odds_ratio": 12.19,
+    "workup_reduction_vs_treat_all": 0.4952,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 5,
+        "mean_predicted": 0.3755,
+        "observed_rate": 0.0
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 17,
+        "mean_predicted": 0.4566,
+        "observed_rate": 0.0588
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 52,
+        "mean_predicted": 0.5563,
+        "observed_rate": 0.0769
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 84,
+        "mean_predicted": 0.6502,
+        "observed_rate": 0.1071
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 143,
+        "mean_predicted": 0.7519,
+        "observed_rate": 0.0839
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 159,
+        "mean_predicted": 0.8521,
+        "observed_rate": 0.1321
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 1091,
+        "mean_predicted": 0.9823,
+        "observed_rate": 0.5619
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 1.0,
+      "sensitivity_PU_corrected": 0.8197,
+      "specificity_PU_corrected": 1.0,
+      "precision_PU_corrected": 0.7955,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "bioclinbert_chunkpool": {
+    "model": "BioClinicalBERT (PU, chunk-pool)",
+    "AUPRC": 0.8775,
+    "AUROC": 0.8853,
+    "threshold_recall_85": 0.976,
+    "threshold_source": "validation",
+    "sensitivity": 0.9015,
+    "specificity": 0.6274,
+    "precision": 0.6419,
+    "F1": 0.7498,
+    "tp": 595,
+    "fp": 332,
+    "tn": 559,
+    "fn": 65,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 0.5977,
+    "LR_positive": 2.4194,
+    "LR_negative": 0.157,
+    "diagnostic_odds_ratio": 15.41,
+    "workup_reduction_vs_treat_all": 0.4023,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 2,
+        "mean_predicted": 0.3729,
+        "observed_rate": 0.0
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 9,
+        "mean_predicted": 0.4574,
+        "observed_rate": 0.0
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 31,
+        "mean_predicted": 0.5545,
+        "observed_rate": 0.0323
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 53,
+        "mean_predicted": 0.6489,
+        "observed_rate": 0.0377
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 112,
+        "mean_predicted": 0.7535,
+        "observed_rate": 0.0982
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 144,
+        "mean_predicted": 0.8524,
+        "observed_rate": 0.125
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 1200,
+        "mean_predicted": 0.9854,
+        "observed_rate": 0.5233
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 1.0,
+      "sensitivity_PU_corrected": 0.9015,
+      "specificity_PU_corrected": 1.0,
+      "precision_PU_corrected": 0.7573,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "tfidf": {
+    "model": "TF-IDF + LogReg",
+    "AUPRC": 0.838,
+    "AUROC": 0.8567,
+    "threshold_recall_85": 0.3,
+    "threshold_source": "validation",
+    "sensitivity": 0.8167,
+    "specificity": 0.7205,
+    "precision": 0.684,
+    "F1": 0.7445,
+    "tp": 539,
+    "fp": 249,
+    "tn": 642,
+    "fn": 121,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 0.5081,
+    "LR_positive": 2.9223,
+    "LR_negative": 0.2544,
+    "diagnostic_odds_ratio": 11.49,
+    "workup_reduction_vs_treat_all": 0.4919,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 385,
+        "mean_predicted": 0.0502,
+        "observed_rate": 0.0961
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 244,
+        "mean_predicted": 0.1479,
+        "observed_rate": 0.2008
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 134,
+        "mean_predicted": 0.2466,
+        "observed_rate": 0.2612
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 97,
+        "mean_predicted": 0.3502,
+        "observed_rate": 0.3918
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 96,
+        "mean_predicted": 0.4441,
+        "observed_rate": 0.4062
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 72,
+        "mean_predicted": 0.5503,
+        "observed_rate": 0.5278
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 73,
+        "mean_predicted": 0.6534,
+        "observed_rate": 0.589
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 87,
+        "mean_predicted": 0.7509,
+        "observed_rate": 0.6207
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 124,
+        "mean_predicted": 0.8477,
+        "observed_rate": 0.7984
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 239,
+        "mean_predicted": 0.9597,
+        "observed_rate": 0.954
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 1.0,
+      "sensitivity_PU_corrected": 0.8167,
+      "specificity_PU_corrected": 1.0,
+      "precision_PU_corrected": 0.7903,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "structured": {
+    "model": "Structured + LogReg",
+    "AUPRC": 0.6833,
+    "AUROC": 0.731,
+    "threshold_recall_85": 0.338,
+    "threshold_source": "validation",
+    "sensitivity": 0.9091,
+    "specificity": 0.2065,
+    "precision": 0.4591,
+    "F1": 0.6101,
+    "tp": 600,
+    "fp": 707,
+    "tn": 184,
+    "fn": 60,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 0.8427,
+    "LR_positive": 1.1457,
+    "LR_negative": 0.4402,
+    "diagnostic_odds_ratio": 2.6,
+    "workup_reduction_vs_treat_all": 0.1573,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 8,
+        "mean_predicted": 0.1892,
+        "observed_rate": 0.125
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 79,
+        "mean_predicted": 0.2662,
+        "observed_rate": 0.1899
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 569,
+        "mean_predicted": 0.359,
+        "observed_rate": 0.2109
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 456,
+        "mean_predicted": 0.4279,
+        "observed_rate": 0.5461
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 219,
+        "mean_predicted": 0.5568,
+        "observed_rate": 0.5525
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 126,
+        "mean_predicted": 0.6265,
+        "observed_rate": 0.5159
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 6,
+        "mean_predicted": 0.752,
+        "observed_rate": 0.1667
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 88,
+        "mean_predicted": 0.9993,
+        "observed_rate": 1.0
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 0.9021,
+      "sensitivity_PU_corrected": 0.9091,
+      "specificity_PU_corrected": 0.2921,
+      "precision_PU_corrected": 0.5964,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "keyword": {
+    "model": "Keyword (DSM-5/PCL-5)",
+    "AUPRC": 0.5373,
+    "AUROC": 0.6086,
+    "threshold_recall_85": 0.0,
+    "threshold_source": "validation",
+    "sensitivity": 1.0,
+    "specificity": 0.0,
+    "precision": 0.4255,
+    "F1": 0.597,
+    "tp": 660,
+    "fp": 891,
+    "tn": 0,
+    "fn": 0,
+    "n_samples": 1551,
+    "n_pos": 660,
+    "alert_rate": 1.0,
+    "LR_positive": 1.0,
+    "LR_negative": "inf",
+    "diagnostic_odds_ratio": "inf",
+    "workup_reduction_vs_treat_all": 0.0,
+    "calibration": [
+      {
+        "bin": "0.0-0.1",
+        "n": 1091,
+        "mean_predicted": 0.0,
+        "observed_rate": 0.3556
+      },
+      {
+        "bin": "0.1-0.2",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.2-0.3",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.3-0.4",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.4-0.5",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.5-0.6",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.6-0.7",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.7-0.8",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.8-0.9",
+        "n": 0,
+        "mean_predicted": null,
+        "observed_rate": null
+      },
+      {
+        "bin": "0.9-1.0",
+        "n": 30,
+        "mean_predicted": 1.0,
+        "observed_rate": 0.7667
+      }
+    ],
+    "PU_corrected": {
+      "AUPRC_PU_corrected": 1.0,
+      "AUROC_PU_corrected": 0.689,
+      "sensitivity_PU_corrected": 1.0,
+      "specificity_PU_corrected": 0.0,
+      "precision_PU_corrected": 0.5632,
+      "pi_p_used": 0.4255,
+      "note": "Ramola et al. 2019 correction; raw metrics are PU lower bounds"
+    },
+    "metrics_note": "Raw metrics are PU lower bounds (Fix 6)"
+  },
+  "mcnemar_vs_longformer": {
+    "tfidf": {
+      "p_value": 0.009228,
+      "b_lf_correct_comp_wrong": 145,
+      "c_lf_wrong_comp_correct": 103
+    },
+    "structured": {
+      "p_value": 0.0,
+      "b_lf_correct_comp_wrong": 566,
+      "c_lf_wrong_comp_correct": 127
+    },
+    "keyword": {
+      "p_value": 0.0,
+      "b_lf_correct_comp_wrong": 668,
+      "c_lf_wrong_comp_correct": 105
+    },
+    "bioclinbert": {
+      "p_value": 0.026864,
+      "b_lf_correct_comp_wrong": 121,
+      "c_lf_wrong_comp_correct": 88
+    }
+  },
+  "prevalence_recalibration": [
+    {
+      "prevalence": 0.01,
+      "PPV": 0.0328,
+      "NPV": 0.9979,
+      "NNS": 30.5,
+      "NNE": 1.7,
+      "LR_positive": 3.36,
+      "LR_negative": 0.2122
+    },
+    {
+      "prevalence": 0.02,
+      "PPV": 0.0642,
+      "NPV": 0.9957,
+      "NNS": 15.6,
+      "NNE": 1.7,
+      "LR_positive": 3.36,
+      "LR_negative": 0.2122
+    },
+    {
+      "prevalence": 0.05,
+      "PPV": 0.1503,
+      "NPV": 0.989,
+      "NNS": 6.7,
+      "NNE": 1.7,
+      "LR_positive": 3.36,
+      "LR_negative": 0.2122
+    },
+    {
+      "prevalence": 0.1,
+      "PPV": 0.2718,
+      "NPV": 0.977,
+      "NNS": 3.7,
+      "NNE": 1.7,
+      "LR_positive": 3.36,
+      "LR_negative": 0.2122
+    },
+    {
+      "prevalence": 0.2,
+      "PPV": 0.4565,
+      "NPV": 0.9496,
+      "NNS": 2.2,
+      "NNE": 1.7,
+      "LR_positive": 3.36,
+      "LR_negative": 0.2122
+    }
+  ],
+  "clinical_utility": {
+    "threshold_source": "validation (Fix 4)",
+    "operating_threshold": 0.307,
+    "alert_rate_study_cohort": 0.5016,
+    "LR_positive": 3.3599,
+    "LR_negative": 0.2122,
+    "diagnostic_odds_ratio": 15.83,
+    "workup_reduction_vs_treat_all": 0.4984,
+    "sensitivity_at_threshold": 0.8409,
+    "specificity_at_threshold": 0.7497
+  },
+  "pu_correction_info": {
+    "pi_p_estimate_used": 0.4255,
+    "pi_p_source": "empirical labeled fraction in test set",
+    "reference": "Ramola et al. 2019, Pac Symp Biocomput, PMID 30864316"
+  },
+  "subgroup_analysis": {
+    "sex": {
+      "F": {
+        "n": 940,
+        "n_pos": 433,
+        "AUPRC": 0.9189
+      },
+      "M": {
+        "n": 611,
+        "n_pos": 227,
+        "AUPRC": 0.8225
+      }
+    },
+    "age_group": {
+      "20s": {
+        "n": 293,
+        "n_pos": 140,
+        "AUPRC": 0.9426
+      },
+      "30s": {
+        "n": 359,
+        "n_pos": 194,
+        "AUPRC": 0.9138
+      },
+      "40s": {
+        "n": 308,
+        "n_pos": 131,
+        "AUPRC": 0.8656
+      },
+      "50s": {
+        "n": 277,
+        "n_pos": 81,
+        "AUPRC": 0.8699
+      },
+      "Other": {
+        "n": 314,
+        "n_pos": 114,
+        "AUPRC": 0.8258
+      }
+    },
+    "race": {
+      "Asian": {
+        "n": 48,
+        "n_pos": 5,
+        "AUPRC": 0.7435
+      },
+      "Black": {
+        "n": 209,
+        "n_pos": 91,
+        "AUPRC": 0.9312
+      },
+      "Hispanic": {
+        "n": 93,
+        "n_pos": 44,
+        "AUPRC": 0.8424
+      },
+      "Other/Unknown": {
+        "n": 118,
+        "n_pos": 35,
+        "AUPRC": 0.8942
+      },
+      "White": {
+        "n": 1083,
+        "n_pos": 485,
+        "AUPRC": 0.8881
+      }
+    },
+    "emergency": {
+      "False": {
+        "n": 696,
+        "n_pos": 210,
+        "AUPRC": 0.826
+      },
+      "True": {
+        "n": 855,
+        "n_pos": 450,
+        "AUPRC": 0.921
+      }
+    }
+  }
+}

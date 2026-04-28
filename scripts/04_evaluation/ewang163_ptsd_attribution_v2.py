@@ -21,7 +21,9 @@ Submit via SLURM:
     sbatch ewang163_ptsd_attribution_v2.sh
 """
 
+import argparse
 import csv
+import os
 import re
 import sys
 import time
@@ -45,18 +47,28 @@ MODEL_DIR          = f'{STUDENT_DIR}/models'
 RESULTS_ATTRIBUTION = f'{STUDENT_DIR}/results/attribution'
 
 TEST_PARQUET  = f'{DATA_SPLITS}/ewang163_split_test.parquet'
-BEST_DIR      = f'{MODEL_DIR}/ewang163_longformer_best'
 DISCHARGE_F   = f'{MIMIC}/note/2.2/discharge.csv'
 
-SECTION_CSV   = f'{RESULTS_ATTRIBUTION}/ewang163_attribution_by_section_v2.csv'
-TOKENS_CSV    = f'{RESULTS_ATTRIBUTION}/ewang163_top_attributed_tokens_v2.csv'
-FAILURES_LOG  = f'{RESULTS_ATTRIBUTION}/ewang163_attribution_failures_v2.log'
+# Allow override via env var or CLI arg (set later in main()).
+# Default: pi_p=0.25 winner via the symlink.
+BEST_DIR      = os.environ.get('PTSD_MODEL_DIR',
+                               f'{MODEL_DIR}/ewang163_longformer_best')
+SUFFIX        = os.environ.get('PTSD_MODEL_SUFFIX', '')
 
-MAX_LEN_INFER = 4096  # for initial probability ranking
-MAX_LEN_IG    = 1024  # truncated for IG (memory scales with seq_len * n_steps)
+SECTION_CSV   = f'{RESULTS_ATTRIBUTION}/ewang163_attribution_by_section_v2{SUFFIX}.csv'
+TOKENS_CSV    = f'{RESULTS_ATTRIBUTION}/ewang163_top_attributed_tokens_v2{SUFFIX}.csv'
+WORDS_CSV     = f'{RESULTS_ATTRIBUTION}/ewang163_top_attributed_words_v2{SUFFIX}.csv'
+FAILURES_LOG  = f'{RESULTS_ATTRIBUTION}/ewang163_attribution_failures_v2{SUFFIX}.log'
+
+# Fix 10: IG at full context length (4096), matching training input length.
+# Previous MAX_LEN_IG=1024 only attributed the first quarter of each note,
+# missing Brief Hospital Course content that appears later in long notes.
+# n_steps reduced from 50 to 20 and internal_batch_size=1 for memory safety.
+MAX_LEN_INFER = 4096
+MAX_LEN_IG    = 4096
 N_SAMPLES     = 50
-N_IG_STEPS    = 50
-IG_BATCH_SIZE = 1     # internal_batch_size — safe for Longformer attention
+N_IG_STEPS    = 20
+IG_BATCH_SIZE = 1
 TOP_K_TOKENS  = 50
 
 # ── Section parsing (same as v1 / notes_extract.py) ─────────────────────
@@ -249,7 +261,8 @@ def main():
     # Accumulators
     section_attr_sum = defaultdict(float)    # section → sum of |attr|
     section_token_count = defaultdict(int)   # section → total tokens
-    token_attr_accum = defaultdict(list)     # clean_token → list of |attr|
+    token_attr_accum = defaultdict(list)     # clean_token → list of |attr|  (subword level)
+    word_attr_accum = defaultdict(list)      # whole_word → list of summed |attr| (Fix 5)
 
     n_success = 0
     n_fail = 0
@@ -328,20 +341,69 @@ def main():
 
         # Map each token to section and accumulate
         seq_len = int(attention_mask[0].sum().item())
+
+        # Fix 5: word-level aggregation using offset_mapping + source text
+        # Group contiguous subword tokens that map to the same word in note_text.
+        # A "word" is a maximal span of alphabetic characters; we collect all
+        # token attributions whose offsets fall within each such span.
+        current_word_start = None
+        current_word_end = None
+        current_word_attr = 0.0
+
+        def _flush_current_word():
+            nonlocal current_word_start, current_word_end, current_word_attr
+            if current_word_start is not None and current_word_end is not None:
+                word = note_text[current_word_start:current_word_end].strip().lower()
+                # Keep only alphabetic words of length >= 2
+                if len(word) >= 2 and all(c.isalpha() or c in "-'" for c in word):
+                    word_attr_accum[word].append(current_word_attr)
+            current_word_start = None
+            current_word_end = None
+            current_word_attr = 0.0
+
         for t_idx in range(1, seq_len - 1):  # skip CLS and SEP
             token = tokens[t_idx]
             attr_val = float(attr_scores[t_idx])
             char_start, char_end = offsets[t_idx]
 
-            # Section mapping
+            # Section mapping (unchanged)
             section = map_token_to_section(char_start, char_end, section_ranges)
             section_attr_sum[section] += attr_val
             section_token_count[section] += 1
 
-            # Token accumulation (clean up Ġ prefix for readability)
+            # Subword accumulation (unchanged — kept for comparison)
             clean = token.replace('Ġ', '').strip().lower()
             if len(clean) >= 2 and clean.isalpha():
                 token_attr_accum[clean].append(attr_val)
+
+            # Word-level aggregation via offsets (Fix 5)
+            # Special tokens have char_start == char_end == 0
+            if char_start == 0 and char_end == 0:
+                continue
+
+            # Inspect the character immediately before this token:
+            # if it's alphabetic and we have a current word, extend it.
+            # Otherwise, flush and start a new word.
+            prev_char = note_text[char_start - 1] if char_start > 0 else ' '
+            token_is_continuation = (
+                current_word_start is not None
+                and (prev_char.isalpha() or prev_char in "-'")
+                and (char_start == current_word_end
+                     or (note_text[current_word_end:char_start].strip() == ''
+                         and all(c.isalpha() or c in "-'"
+                                 for c in note_text[current_word_end:char_start])))
+            )
+
+            if token_is_continuation:
+                current_word_end = char_end
+                current_word_attr += attr_val
+            else:
+                _flush_current_word()
+                current_word_start = char_start
+                current_word_end = char_end
+                current_word_attr = attr_val
+
+        _flush_current_word()
 
         # Free GPU memory between patients
         del input_ids, attention_mask, input_embeds, baseline_embeds
@@ -420,6 +482,32 @@ def main():
               f'{r["std_attribution"]:>10.6f} {r["n_occurrences"]:>6}')
     print(f'  → {TOKENS_CSV}')
 
+    # ── Fix 5: Word-level attribution (whole-word aggregation) ────────────
+    word_rows = []
+    for word, attrs in word_attr_accum.items():
+        if len(attrs) >= 3:
+            word_rows.append({
+                'word': word,
+                'mean_abs_attribution': round(float(np.mean(attrs)), 6),
+                'std_attribution': round(float(np.std(attrs)), 6),
+                'n_occurrences': len(attrs),
+                'total_attribution': round(float(np.sum(attrs)), 4),
+            })
+
+    word_df = pd.DataFrame(word_rows)
+    if len(word_df) > 0:
+        word_df = word_df.sort_values('mean_abs_attribution', ascending=False)
+        top_words = word_df.head(TOP_K_TOKENS)
+        top_words.to_csv(WORDS_CSV, index=False)
+
+        print(f'\n  Top 20 WORDS by mean |attribution| (min 3 occurrences) — Fix 5:')
+        print(f'  {"Word":<25} {"Mean |Attr|":>12} {"Std":>10} {"N":>6}')
+        print(f'  {"-"*25} {"-"*12} {"-"*10} {"-"*6}')
+        for _, r in top_words.head(20).iterrows():
+            print(f'  {r["word"]:<25} {r["mean_abs_attribution"]:>12.6f} '
+                  f'{r["std_attribution"]:>10.6f} {r["n_occurrences"]:>6}')
+        print(f'  → {WORDS_CSV}')
+
     # ── Interpretation ────────────────────────────────────────────────────
     print('\n' + '=' * 65)
     print('INTERPRETATION')
@@ -428,9 +516,12 @@ def main():
         top_section = section_df.iloc[0]['section']
         top_pct = section_df.iloc[0]['pct_of_total']
         print(f'  Highest-attribution section: {top_section} ({top_pct:.1f}% of total)')
+    if len(word_df) > 0:
+        top_3_words = ', '.join(word_df['word'].head(3).tolist())
+        print(f'  Top 3 attributed WORDS (Fix 5): {top_3_words}')
     if len(top_tokens) > 0:
         top_3 = ', '.join(top_tokens['token'].head(3).tolist())
-        print(f'  Top 3 attributed tokens: {top_3}')
+        print(f'  Top 3 attributed subword tokens: {top_3}')
     print(f'\n  Expected: social history and HPI sections should drive')
     print(f'  predictions if the model learns genuine clinical signal.')
     print(f'  High PMH attribution may indicate residual label leakage.')

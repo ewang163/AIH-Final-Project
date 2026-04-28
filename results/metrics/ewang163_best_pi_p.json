@@ -1,0 +1,8 @@
+{
+  "checkpoint_label": "pi_p=0.25",
+  "checkpoint_suffix": "_pip025",
+  "pi_p": 0.25,
+  "proxy_auc": 0.799,
+  "mw_p_value": 8.2856e-22,
+  "val_auprc_reeval": 0.8834
+}

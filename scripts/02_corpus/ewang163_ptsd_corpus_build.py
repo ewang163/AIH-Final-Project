@@ -2,12 +2,16 @@
 ewang163_ptsd_corpus_build.py
 =============================
 Assembles the training corpus from extracted notes:
-  - PTSD+ pre-diagnosis notes: used as-is (no leakage risk)
-  - PTSD+ fallback (index-admission) notes: masked with Ablation 1
+  - PTSD+ notes (ALL — pre-diagnosis AND fallback): masked with Ablation 1
   - Unlabeled notes: used as-is
   - Proxy notes: split out for post-training validation only
 
-Ablation 1 masking replaces PTSD-related strings with [PTSD_MASKED].
+Fix 1 applied: masking is applied to ALL PTSD+ notes, not just fallback.
+Pre-diagnosis notes can still contain "h/o PTSD from MVA 2012" in HPI/PMH
+carried forward from outside records — this was a leakage path.
+
+An audit step counts the pre-dx leakage hit rate before masking to quantify
+the scope of the issue.
 
 Outputs:
     ewang163_ptsd_corpus.parquet   — training rows (PTSD+ label=1, unlabeled label=0)
@@ -62,26 +66,42 @@ def main():
         n = (df['group'] == grp).sum()
         print(f'    {grp}: {n:,} rows')
 
-    # ── Step 2: Apply Ablation 1 masking to fallback PTSD+ notes ──────────
-    print('\n[2/4] Applying Ablation 1 masking to PTSD+ fallback notes ...')
-    fallback_mask = (df['group'] == 'ptsd_pos') & (~df['is_prediagnosis'])
-    n_fallback = fallback_mask.sum()
+    # ── Step 2a: Audit pre-diagnosis leakage (Fix 1) ───────────────────────
+    print('\n[2a/5] Auditing pre-diagnosis leakage before masking ...')
+    predx_mask = (df['group'] == 'ptsd_pos') & (df['is_prediagnosis'] == True)
+    n_predx = predx_mask.sum()
+    if n_predx > 0:
+        predx_hit = df.loc[predx_mask, 'note_text'].str.contains(MASK_RE).sum()
+        predx_hit_rate = predx_hit / n_predx
+        print(f'  Pre-diagnosis PTSD+ notes: {n_predx:,}')
+        print(f'  Of those, notes containing PTSD-related strings: {predx_hit:,} '
+              f'({predx_hit_rate:.1%})')
+        print(f'  *** This is the pre-Fix-1 leakage rate in the primary training set ***')
+    else:
+        predx_hit_rate = 0.0
+        print(f'  No pre-diagnosis notes found (all PTSD+ are fallback)')
+
+    # ── Step 2b: Apply masking to ALL PTSD+ notes (Fix 1) ────────────────
+    print('\n[2b/5] Applying Ablation 1 masking to ALL PTSD+ notes (Fix 1) ...')
+    all_pos_mask = (df['group'] == 'ptsd_pos')
+    n_pos_total = all_pos_mask.sum()
 
     df['is_masked'] = False
-    df.loc[fallback_mask, 'note_text'] = df.loc[fallback_mask, 'note_text'].apply(apply_masking)
-    df.loc[fallback_mask, 'is_masked'] = True
+    df.loc[all_pos_mask, 'note_text'] = df.loc[all_pos_mask, 'note_text'].apply(apply_masking)
+    df.loc[all_pos_mask, 'is_masked'] = True
 
-    # Count how many fallback notes actually had substitutions
     n_with_subs = 0
-    for idx in df[fallback_mask].index:
+    for idx in df[all_pos_mask].index:
         if MASK_TOKEN in df.at[idx, 'note_text']:
             n_with_subs += 1
 
-    print(f'  Fallback notes masked: {n_fallback:,}')
-    print(f'  Of those, notes containing [PTSD_MASKED]: {n_with_subs:,}')
+    print(f'  Total PTSD+ notes masked: {n_pos_total:,} '
+          f'(pre-dx: {n_predx:,}, fallback: {n_pos_total - n_predx:,})')
+    print(f'  Of those, notes containing [PTSD_MASKED]: {n_with_subs:,} '
+          f'({n_with_subs / n_pos_total * 100:.1f}%)')
 
     # ── Step 3: Assign labels and split ───────────────────────────────────
-    print('\n[3/4] Assigning labels and splitting proxy ...')
+    print('\n[3/5] Assigning labels and splitting proxy ...')
 
     # Proxy → separate file, no label
     proxy_df = df[df['group'] == 'proxy'].copy()
@@ -101,7 +121,7 @@ def main():
     print(f'  Proxy validation set: {len(proxy_df):,} rows')
 
     # ── Step 4: Save ──────────────────────────────────────────────────────
-    print('\n[4/4] Saving ...')
+    print('\n[4/5] Saving ...')
     train_df.to_parquet(CORPUS_PARQUET, index=False)
     print(f'  Training corpus → {CORPUS_PARQUET}')
 

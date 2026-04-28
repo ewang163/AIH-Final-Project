@@ -1,0 +1,66 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1918657
+##  Job Name : wrap
+##  Nodelist : gpu2264
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 08:33:06 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — PULSNAR Re-Evaluation (Fixes 5, 6, 9)
+=================================================================
+
+Device: cuda
+Model:  /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_pulsnar
+
+[1/6] Loading data + PULSNAR model ...
+  Val:  n=1471 pos_rate=0.394
+  Test: n=1551 pos_rate=0.426
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 22734.03it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+
+[2/6] Running PULSNAR inference ...
+Initializing global attention on CLS token...
+  [BENCH] pulsnar_reeval/val_inference: 154.9s wall, 143.5s cpu, 1.48 GB peak, 0.0430 GPU-h
+  [BENCH] pulsnar_reeval/test_inference: 162.8s wall, 151.6s cpu, 1.48 GB peak, 0.0452 GPU-h
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_val_predictions_pulsnar.csv
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_test_predictions_pulsnar.csv
+
+[3/6] Computing val-derived threshold + metrics + utility ...
+  Val-derived threshold (recall>=0.85): 0.1880
+  Val:  AUPRC=0.8725 AUROC=0.8979
+  Test: AUPRC=0.8848 AUROC=0.8904
+        sens=0.846 spec=0.745 F1=0.772
+  LR+ = 3.318 | LR- = 0.207 | DOR = 16.01
+  Alert rate = 0.5061 | Workup reduction = 0.4939
+    Prev=0.01  PPV=0.0324  NPV=0.9979  NNS=30.83
+    Prev=0.02  PPV=0.0634  NPV=0.9958  NNS=15.77
+    Prev=0.05  PPV=0.1487  NPV=0.9892  NNS=6.73
+    Prev=0.10  PPV=0.2694  NPV=0.9775  NNS=3.71
+    Prev=0.20  PPV=0.4534  NPV=0.9507  NNS=2.21
+
+[4/6] Calibration analysis (Fix 5) ...
+  Elkan-Noto c = 0.7283
+  ECE raw          = 0.0881
+  ECE Platt-scaled = 0.0767
+  ECE Elkan-Noto   = 0.0973
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_calibration_curve_pulsnar.png
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_calibration_results_pulsnar.csv
+
+[5/6] Fairness analysis (Fix 9) ...
+  [BENCH] pulsnar_reeval/fairness: 13.0s wall, 13.0s cpu, 1.48 GB peak
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_fairness_results_pulsnar.csv
+
+  Equal-opportunity differences (recall gap at threshold):
+    sex             EO diff = 0.1136  (min=0.771, max=0.884)
+    age_group       EO diff = 0.2109  (min=0.711, max=0.921)
+    race            EO diff = 0.1011  (min=0.800, max=0.901)
+    race_binary     EO diff = 0.0237  (min=0.839, max=0.863)
+    emergency       EO diff = 0.0457  (min=0.814, max=0.860)
+
+[6/6] Saving consolidated results JSON ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_evaluation_results_pulsnar.json
+
+Done.

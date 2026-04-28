@@ -1,0 +1,99 @@
+{
+  "model": "Clinical Longformer (PULSNAR, alpha=0.1957)",
+  "checkpoint": "/oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_pulsnar",
+  "val_threshold": 0.18799999999999994,
+  "val_metrics": {
+    "AUPRC": 0.8725,
+    "AUROC": 0.8979,
+    "threshold": 0.188,
+    "sensitivity": 0.85,
+    "specificity": 0.7609,
+    "precision": 0.6983,
+    "F1": 0.7667,
+    "tp": 493,
+    "fp": 213,
+    "tn": 678,
+    "fn": 87,
+    "n_total": 1471,
+    "n_pos": 580,
+    "pos_rate": 0.3943
+  },
+  "test_metrics": {
+    "AUPRC": 0.8848,
+    "AUROC": 0.8904,
+    "threshold": 0.188,
+    "sensitivity": 0.8455,
+    "specificity": 0.7452,
+    "precision": 0.7108,
+    "F1": 0.7723,
+    "tp": 558,
+    "fp": 227,
+    "tn": 664,
+    "fn": 102,
+    "n_total": 1551,
+    "n_pos": 660,
+    "pos_rate": 0.4255
+  },
+  "utility": {
+    "LR_positive": 3.3183,
+    "LR_negative": 0.2073,
+    "DOR": 16.01,
+    "alert_rate": 0.5061,
+    "workup_reduction": 0.4939,
+    "by_prevalence": [
+      {
+        "prevalence": 0.01,
+        "PPV": 0.0324,
+        "NPV": 0.9979,
+        "NNS": 30.83
+      },
+      {
+        "prevalence": 0.02,
+        "PPV": 0.0634,
+        "NPV": 0.9958,
+        "NNS": 15.77
+      },
+      {
+        "prevalence": 0.05,
+        "PPV": 0.1487,
+        "NPV": 0.9892,
+        "NNS": 6.73
+      },
+      {
+        "prevalence": 0.1,
+        "PPV": 0.2694,
+        "NPV": 0.9775,
+        "NNS": 3.71
+      },
+      {
+        "prevalence": 0.2,
+        "PPV": 0.4534,
+        "NPV": 0.9507,
+        "NNS": 2.21
+      }
+    ]
+  },
+  "calibration": {
+    "ece_raw": 0.0881,
+    "ece_platt": 0.0767,
+    "ece_elkan_noto": 0.0973,
+    "elkan_noto_c": 0.7283
+  },
+  "fairness": {
+    "sex": {
+      "eo_diff": 0.1136
+    },
+    "age_group": {
+      "eo_diff": 0.2109
+    },
+    "race": {
+      "eo_diff": 0.1011
+    },
+    "race_binary": {
+      "eo_diff": 0.0237
+    },
+    "emergency": {
+      "eo_diff": 0.0457
+    }
+  }
+}

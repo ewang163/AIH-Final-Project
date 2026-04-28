@@ -1,0 +1,126 @@
+{
+  "temporal_model_temporal_test": {
+    "model_dir": "/oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best_temporal",
+    "val_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val_temporal.parquet",
+    "test_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test_temporal.parquet",
+    "val_threshold": 0.30599999999999994,
+    "val": {
+      "AUPRC": 0.905,
+      "AUROC": 0.9047,
+      "threshold": 0.306,
+      "sensitivity": 0.8513,
+      "specificity": 0.7893,
+      "precision": 0.76,
+      "F1": 0.803,
+      "tp": 475,
+      "fp": 150,
+      "tn": 562,
+      "fn": 83,
+      "n_total": 1270,
+      "n_pos": 558,
+      "pos_rate": 0.4394
+    },
+    "test": {
+      "AUPRC": 0.8417,
+      "AUROC": 0.9025,
+      "threshold": 0.306,
+      "sensitivity": 0.8321,
+      "specificity": 0.8049,
+      "precision": 0.6111,
+      "F1": 0.7047,
+      "tp": 550,
+      "fp": 350,
+      "tn": 1444,
+      "fn": 111,
+      "n_total": 2455,
+      "n_pos": 661,
+      "pos_rate": 0.2692
+    }
+  },
+  "random_model_temporal_test": {
+    "model_dir": "/oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best",
+    "val_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val.parquet",
+    "test_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test_temporal.parquet",
+    "val_threshold": 0.30699999999999994,
+    "val": {
+      "AUPRC": 0.8745,
+      "AUROC": 0.8963,
+      "threshold": 0.307,
+      "sensitivity": 0.85,
+      "specificity": 0.752,
+      "precision": 0.6905,
+      "F1": 0.762,
+      "tp": 493,
+      "fp": 221,
+      "tn": 670,
+      "fn": 87,
+      "n_total": 1471,
+      "n_pos": 580,
+      "pos_rate": 0.3943
+    },
+    "test": {
+      "AUPRC": 0.8861,
+      "AUROC": 0.9273,
+      "threshold": 0.307,
+      "sensitivity": 0.8608,
+      "specificity": 0.8333,
+      "precision": 0.6555,
+      "F1": 0.7443,
+      "tp": 569,
+      "fp": 299,
+      "tn": 1495,
+      "fn": 92,
+      "n_total": 2455,
+      "n_pos": 661,
+      "pos_rate": 0.2692
+    }
+  },
+  "random_model_random_test": {
+    "model_dir": "/oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_longformer_best",
+    "val_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_val.parquet",
+    "test_parquet": "/oscar/data/class/biol1595_2595/students/ewang163/data/splits/ewang163_split_test.parquet",
+    "val_threshold": 0.30699999999999994,
+    "val": {
+      "AUPRC": 0.8745,
+      "AUROC": 0.8963,
+      "threshold": 0.307,
+      "sensitivity": 0.85,
+      "specificity": 0.752,
+      "precision": 0.6905,
+      "F1": 0.762,
+      "tp": 493,
+      "fp": 221,
+      "tn": 670,
+      "fn": 87,
+      "n_total": 1471,
+      "n_pos": 580,
+      "pos_rate": 0.3943
+    },
+    "test": {
+      "AUPRC": 0.8881,
+      "AUROC": 0.8926,
+      "threshold": 0.307,
+      "sensitivity": 0.8409,
+      "specificity": 0.7497,
+      "precision": 0.7134,
+      "F1": 0.7719,
+      "tp": 555,
+      "fp": 223,
+      "tn": 668,
+      "fn": 105,
+      "n_total": 1551,
+      "n_pos": 660,
+      "pos_rate": 0.4255
+    }
+  },
+  "delta": {
+    "temporal_minus_random_AUPRC": -0.0444,
+    "temporal_minus_random_AUROC": -0.0248,
+    "interpretation": "Positive delta: temporal training helps generalization. Negative delta: random-split training is sufficient."
+  },
+  "generalization_penalty": {
+    "random_random_AUPRC": 0.8881,
+    "random_temporal_AUPRC": 0.8861,
+    "penalty": 0.002
+  }
+}

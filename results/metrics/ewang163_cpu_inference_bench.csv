@@ -1,0 +1,5 @@
+model,stage,wall_clock_s,n_samples,ms_per_patient,n_cpus,slurm_node,slurm_job
+Keyword-DSM5/PCL5,val_inference,0.472,1471,0.32,16,node2303,1923698
+Keyword-DSM5/PCL5,test_inference,0.52,1551,0.34,16,node2303,1923698
+Structured-LogReg,val_inference,63.06,1471,42.87,16,node2303,1923698
+Structured-LogReg,test_inference,27.731,1551,17.88,16,node2303,1923698

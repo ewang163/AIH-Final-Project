@@ -1,0 +1,158 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1732165
+##  Job Name : eval_v2
+##  Nodelist : gpu3002
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 02:38:34 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Full Model Evaluation on Test Set
+  (Fix 4: thresholds derived from validation set)
+=================================================================
+
+Device: cuda
+  GPU: NVIDIA L40S
+
+[1/9] Loading validation and test data ...
+  Val:  1,471 notes (pos=580, unl=891)
+  Test: 1,551 notes (pos=660, unl=891)
+
+[2/9] Computing val-derived thresholds (Fix 4) ...
+  Loading Longformer for val inference ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 44772.04it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+Initializing global attention on CLS token...
+  [BENCH] evaluate/lf_val_inference: 117.6s wall, 110.5s cpu, 1.49 GB peak, 0.0327 GPU-h
+    Longformer val threshold: 0.3070
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 43631.88it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] evaluate/bert_val_inference: 7.9s wall, 3.1s cpu, 1.71 GB peak, 0.0022 GPU-h
+    BioClinicalBERT val threshold: 0.9760
+    TF-IDF val threshold: 0.3000
+    Structured val threshold: 0.3380
+  Scoring keyword baseline on val ...
+    Keyword val threshold: 0.0000
+
+  All val-derived thresholds stored.
+
+[3/9] Clinical Longformer test inference ...
+  [BENCH] evaluate/lf_test_inference: 122.8s wall, 115.9s cpu, 1.71 GB peak, 0.0341 GPU-h
+  AUPRC=0.8881  AUROC=0.8926
+
+[4/9] BioClinicalBERT ...
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 43297.99it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] evaluate/bert_test_inference: 6.1s wall, 3.1s cpu, 1.71 GB peak, 0.0017 GPU-h
+  Truncated: AUPRC=0.8576  AUROC=0.8656
+  Running chunk-and-pool inference (Fix 8) ...
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 16273.94it/s]
+    Chunk-pool inference: 300/1551
+    Chunk-pool inference: 400/1551
+    Chunk-pool inference: 600/1551
+    Chunk-pool inference: 1000/1551
+    Chunk-pool inference: 1100/1551
+    Chunk-pool inference: 1300/1551
+    Chunk-pool inference: 1400/1551
+    Chunk-pool inference: 1500/1551
+  [BENCH] evaluate/bert_chunk_pool_test: 29.2s wall, 29.0s cpu, 1.72 GB peak, 0.0081 GPU-h
+  Chunk-pool: AUPRC=0.8775  AUROC=0.8853
+
+[5/9] TF-IDF + Logistic Regression ...
+  [BENCH] evaluate/tfidf_test: 0.7s wall, 0.7s cpu, 1.72 GB peak
+  AUPRC=0.8380  AUROC=0.8567
+
+[6/9] Structured Features + Logistic Regression ...
+  [BENCH] evaluate/struct_test: 19.5s wall, 19.4s cpu, 1.72 GB peak
+  AUPRC=0.6833  AUROC=0.7310
+
+[7/9] Keyword/Phrase-Lookup Baseline ...
+  [BENCH] evaluate/keyword_test: 1.7s wall, 1.7s cpu, 1.72 GB peak
+  AUPRC=0.5373  AUROC=0.6086
+
+[8/9] McNemar's tests vs. Longformer ...
+  Longformer vs TF-IDF + LogReg: p=0.009228 (**)  b=145, c=103
+  Longformer vs Structured + LogReg: p=0.000000 (***)  b=566, c=127
+  Longformer vs Keyword (DSM-5/PCL-5): p=0.000000 (***)  b=668, c=105
+  Longformer vs BioClinicalBERT: p=0.026864  b=121, c=88
+
+  Prevalence recalibration + clinical utility (Longformer):
+      Prev      PPV      NPV      NNS      NNE      LR+      LR-
+       1%   0.0328   0.9979     30.5      1.7     3.36   0.2122
+       2%   0.0642   0.9957     15.6      1.7     3.36   0.2122
+       5%   0.1503   0.9890      6.7      1.7     3.36   0.2122
+      10%   0.2718   0.9770      3.7      1.7     3.36   0.2122
+      20%   0.4565   0.9496      2.2      1.7     3.36   0.2122
+
+  Clinical utility (study cohort):
+    Alert rate:        50.2%
+    LR+:               3.3599
+    LR-:               0.2122
+    DOR:               15.83
+    Workup reduction:  49.8% (vs. treat-all)
+
+  PU-corrected metrics (Fix 6, Ramola et al. 2019):
+    pi_p estimate: 0.4255
+    Longformer corrected AUPRC: 1.0
+    Longformer corrected AUROC: 1.0
+
+[9/9] Subgroup analysis (Longformer) ...
+  Sex:
+    F: n=940, pos=433, AUPRC=0.9189
+    M: n=611, pos=227, AUPRC=0.8225
+  Age group:
+    20s: n=293, pos=140, AUPRC=0.9426
+    30s: n=359, pos=194, AUPRC=0.9138
+    40s: n=308, pos=131, AUPRC=0.8656
+    50s: n=277, pos=81, AUPRC=0.8699
+    Other: n=314, pos=114, AUPRC=0.8258
+  Race/ethnicity:
+    Asian: n=48, pos=5, AUPRC=0.7435
+    Black: n=209, pos=91, AUPRC=0.9312
+    Hispanic: n=93, pos=44, AUPRC=0.8424
+    Other/Unknown: n=118, pos=35, AUPRC=0.8942
+    White: n=1083, pos=485, AUPRC=0.8881
+  Emergency admission:
+    Non-emergency: n=696, pos=210, AUPRC=0.826
+    Emergency: n=855, pos=450, AUPRC=0.921
+
+Full results → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_evaluation_results.json
+Summary CSV  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_evaluation_summary.csv
+
+=================================================================
+SPEED vs. ACCURACY COMPARISON
+=================================================================
+
+  Model                            AUPRC     Training  Inference
+  ------------------------------ ------- ------------ ----------
+  Keyword (DSM-5/PCL-5)           0.5373           0s   ~seconds
+  TF-IDF + LogReg                 0.8380     ~minutes   ~seconds
+  Structured + LogReg             0.6833     ~minutes   ~seconds
+  BioClinicalBERT (512)           0.8576      ~12 min   ~minutes
+  Clinical Longformer (4096)      0.8881      ~7.5 hr   ~minutes
+
+=================================================================
+TEST SET EVALUATION SUMMARY (thresholds from validation)
+=================================================================
+
+  Model                            AUPRC   AUROC   Sens   Spec   Prec     F1  McNemar p
+  ------------------------------ ------- ------- ------ ------ ------ ------ ----------
+  Clinical Longformer (PU)        0.8881  0.8926 0.8409 0.7497 0.7134 0.7719          —
+  BioClinicalBERT (PU, truncated)  0.8576  0.8656 0.8197 0.7284 0.6909 0.7498   0.026864
+  BioClinicalBERT (PU, chunk-pool)  0.8775  0.8853 0.9015 0.6274 0.6419 0.7498          —
+  TF-IDF + LogReg                 0.8380  0.8567 0.8167 0.7205 0.6840 0.7445   0.009228
+  Structured + LogReg             0.6833  0.7310 0.9091 0.2065 0.4591 0.6101   0.000000
+  Keyword (DSM-5/PCL-5)           0.5373  0.6086 1.0000 0.0000 0.4255 0.5970   0.000000
+
+  Prevalence recalibration (Longformer, sens=0.8409, spec=0.7497):
+    prev=1%: PPV=0.0328, NPV=0.9979, NNS=30.5
+    prev=2%: PPV=0.0642, NPV=0.9957, NNS=15.6
+    prev=5%: PPV=0.1503, NPV=0.9890, NNS=6.7
+    prev=10%: PPV=0.2718, NPV=0.9770, NNS=3.7
+    prev=20%: PPV=0.4565, NPV=0.9496, NNS=2.2
+
+Done.

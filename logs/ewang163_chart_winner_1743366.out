@@ -1,0 +1,38 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1743366
+##  Job Name : chart_win
+##  Nodelist : node2336
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 10:25:17 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Chart Review Packet (Fix 11)
+=================================================================
+
+[1/3] Loading data ...
+
+[2/3] Selecting top-50 unlabeled patients ...
+  Unlabeled test patients: 891
+  Selected top-50 by predicted probability
+  Prob range: [0.8403, 0.9905]
+  Prob mean: 0.9259
+
+[3/3] Writing review packet ...
+  Packet → /oscar/data/class/biol1595_2595/students/ewang163/results/chart_review/ewang163_top50_review_packet.txt
+  Form   → /oscar/data/class/biol1595_2595/students/ewang163/results/chart_review/ewang163_top50_review_form.csv
+
+=================================================================
+CHART REVIEW PACKET SUMMARY
+=================================================================
+  Patients: 50
+  Score range: [0.8403, 0.9905]
+  Score mean: 0.9259
+
+  After clinician review, compute:
+    PPV@top50 = (n_probable + n_possible) / 50
+    This is the clinician-rated PPV at the top decile —
+    the single most persuasive validation metric.
+
+Done.

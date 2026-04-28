@@ -1,0 +1,50 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1743288
+##  Job Name : dca_winner
+##  Nodelist : gpu2109
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 10:16:20 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Decision Curve Analysis
+=================================================================
+
+Device: cuda
+  GPU: NVIDIA GeForce RTX 3090
+
+[1/5] Loading cached predictions ...
+  Val: 1,471 patients
+  Test: 1,551 patients
+  Test set: 1,551 patients (660 pos, 891 unlabeled)
+
+[2/5] Platt scaling (fit on validation set) ...
+  Platt coef: 4.6705, intercept: -2.8522
+  Raw  test probs: mean=0.4772, median=0.4031
+  Calibrated test: mean=0.4049, median=0.2750
+  Updated /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_test_predictions.csv with calibrated_prob column
+
+[3/5] Prevalence recalibration ...
+  Study prevalence (test set): 0.4255
+  2pct: mean recalibrated prob = 0.0459
+  5pct: mean recalibrated prob = 0.1009
+
+[4/5] Computing decision curves ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_dca_results.csv
+
+[5/5] Generating DCA plots ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_dca_2pct.png
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_dca_5pct.png
+
+=================================================================
+DECISION CURVE ANALYSIS SUMMARY
+=================================================================
+
+  2% prevalence:
+    Model does not beat treat-all in [0.01, 0.40]
+
+  5% prevalence:
+    Model does not beat treat-all in [0.01, 0.40]
+
+Done.

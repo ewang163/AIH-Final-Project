@@ -15,6 +15,8 @@ ewang163/
 ├── documentation.md           This file — methodology, results, discussion
 │
 ├── scripts/                   Pipeline code, ordered by stage
+│   ├── common/                Shared utilities
+│   │   └── ewang163_bench_utils.py               Runtime benchmarking
 │   ├── 01_cohort/             Cohort construction from MIMIC-IV
 │   │   ├── ewang163_ptsd_table1.py
 │   │   ├── ewang163_ptsd_cohort_sets.py
@@ -24,10 +26,14 @@ ewang163/
 │   │   ├── ewang163_ptsd_corpus_build.py
 │   │   └── ewang163_ptsd_splits.py
 │   ├── 03_training/           Model training
-│   │   ├── ewang163_ptsd_train_longformer.py     (+ .sbatch)
+│   │   ├── ewang163_ptsd_train_longformer.py     (+ .sbatch) — accepts --pi_p for sweep
 │   │   ├── ewang163_ptsd_train_bioclinbert.py    (+ .sh)
 │   │   ├── ewang163_ptsd_train_tfidf.py
 │   │   ├── ewang163_ptsd_train_structured.py     (+ .sh)
+│   │   ├── ewang163_ptsd_train_keyword.py        Naive phrase-lookup baseline
+│   │   ├── ewang163_ptsd_train_pulsnar.py        Fix 3: SAR-PU with propensity weights
+│   │   ├── ewang163_ptsd_pip_sweep.sh            Fix 2: π_p sweep launcher
+│   │   ├── ewang163_ptsd_pip_sweep_eval.py       Fix 2: sweep aggregator
 │   │   └── ewang163_ptsd_specificity.py          (+ .sh)
 │   └── 04_evaluation/         Evaluation, calibration, ablations, attribution
 │       ├── ewang163_ptsd_evaluate.py             (+ .sh)
@@ -36,8 +42,10 @@ ewang163/
 │       ├── ewang163_ptsd_proxy_validation.py     (+ .sh)
 │       ├── ewang163_ptsd_ablations.py            (+ .sh)
 │       ├── ewang163_ptsd_attribution.py          (+ .sh)
-│       ├── ewang163_ptsd_attribution_v2.py       (+ .sh)
-│       └── ewang163_ptsd_error_analysis.py       (+ .sh)
+│       ├── ewang163_ptsd_attribution_v2.py       (+ .sh) — Fix 10: IG at 4096
+│       ├── ewang163_ptsd_error_analysis.py       (+ .sh)
+│       ├── ewang163_ptsd_fairness.py             Fix 9: bootstrap fairness
+│       └── ewang163_ptsd_chart_review_packet.py  Fix 11: top-50 review packet
 │
 ├── data/                      Cohort extracts and intermediate datasets
 │   ├── cohort/                Subject ID lists, admission extracts
@@ -58,13 +66,14 @@ ewang163/
 │   ├── metrics/               JSON + CSV evaluation outputs (eval, ablations, calibration, DCA, proxy, training logs)
 │   ├── figures/               PNG plots (calibration curve, DCA at 2%/5%, proxy histogram)
 │   ├── attribution/           Integrated Gradients section/token attribution
-│   └── error_analysis/        Sampled FP/FN notes + aggregate stats
+│   ├── error_analysis/        Sampled FP/FN notes + aggregate stats
+│   └── chart_review/          Fix 11: top-50 flagged patient review packet
 │
 ├── logs/                      SLURM .out files from every job submitted
 └── ptsd_env/                  Python virtual environment (do not move)
 ```
 
-> **Note on script paths.** Each script uses absolute paths to `STUDENT_DIR` (the directory root) as both an input and output anchor. Files have been physically moved into the layout above for organization, so re-running a script will re-create its outputs at the old root locations rather than the new subdirectories. The reorganized layout is the project snapshot; if the pipeline is re-run, scripts' `OUT` constants need to be updated to point inside `data/`, `models/`, or `results/`.
+> **Script paths.** All scripts use absolute paths to `STUDENT_DIR` and its `data/`, `models/`, `results/` subdirectories. Output constants have been updated to match the reorganized layout, so re-running any script will write to the correct subdirectory.
 
 ---
 
@@ -97,8 +106,9 @@ Full Table 1 in `results/table1/`.
 The single biggest obstacle to building this model honestly is that discharge notes for ICD-coded patients usually contain "PTSD" verbatim in the Assessment & Plan or Discharge Diagnosis section. A model trained on these notes learns to recognise the label, not the underlying clinical condition. A tiered defense is used:
 
 1. **Section filtering (all notes).** From `discharge_detail.csv`, only narrative low-leakage sections are kept: history of present illness, social history, past medical history, brief hospital course, family history. The high-leakage sections — discharge diagnosis, assessment and plan, discharge medications, discharge condition, discharge instructions, follow-up instructions — are excluded entirely.
-2. **Pre-diagnosis notes (primary, n = 2,492 patients).** For multi-admission PTSD+ patients with ≥ 1 admission before their first F43.1 coding, training text is restricted to those earlier admissions. The PTSD label cannot appear in notes from before the patient was ever coded.
-3. **Masking fallback (n = 3,219 patients).** For the remaining single-admission and multi-admission patients without pre-diagnosis admissions, section-filtered index notes are used instead, with PTSD-related strings replaced by `[PTSD_MASKED]`. Two ablations (Section 3.6 below) quantify how much residual leakage these notes still carry.
+2. **Pre-diagnosis notes (primary, n = 2,492 patients).** For multi-admission PTSD+ patients with ≥ 1 admission before their first F43.1 coding, training text is restricted to those earlier admissions.
+3. **PTSD-string masking on ALL positive notes (Fix 1).** Masking is applied to *all* PTSD+ notes — both pre-diagnosis and fallback — not just the fallback subset. The original design assumed pre-diagnosis notes could not contain PTSD references, but clinicians routinely carry forward trauma history in HPI/PMH ("h/o PTSD from MVA 2012") from outside records on pre-diagnosis admissions. An audit step quantifies the pre-dx leakage hit rate before masking. Jin et al. (2023, JAMIA, [10.1093/jamia/ocac230]) explicitly identifies annotation noise from undercoded records as the dominant failure mode for supervised models on MIMIC; any residual leakage between text and code-derived labels biases the learned representation.
+4. **Masking fallback specifics (n = 3,219 patients).** For the remaining single-admission and multi-admission patients without pre-diagnosis admissions, section-filtered index notes are used with masking applied. Two ablations (Section 3.6 below) quantify how much residual leakage these notes still carry.
 
 ### 3.4 Variable selection
 
@@ -107,14 +117,17 @@ The single biggest obstacle to building this model honestly is that discharge no
 
 ### 3.5 Models
 
-Four classifiers were built so that improvements attributable to the transformer architecture and the PU loss can be isolated.
+Five classifiers were built so that improvements attributable to the transformer architecture and the PU loss can be isolated — including a zero-training naive keyword baseline to measure the floor performance achievable without any model training.
 
-| Model | Architecture | Input | Loss / training |
-|---|---|---|---|
-| **Clinical Longformer (primary)** | `yikuan8/Clinical-Longformer`, 4,096 tokens | Section-filtered note text | Kiryo et al. (2017) non-negative PU risk estimator. Pre-trained on MIMIC-III clinical notes. AdamW, LR 2e-5, batch 4, 5 epochs, warmup 10%, weight decay 0.01. |
-| **BioClinicalBERT (comparison)** | `emilyalsentzer/Bio_ClinicalBERT`, 512 tokens | Truncated section-filtered text | Same PU loss. Comparison of long-context vs. truncated context. |
-| **TF-IDF + logistic regression (text baseline)** | sklearn LR | Word 1- and 2-grams, max 50k features, sublinear TF | `class_weight='balanced'`, L2 regularization, C tuned on validation AUPRC. |
-| **Structured + logistic regression (no-text baseline)** | sklearn LR | 20 structured features | Same L2/balanced setup. |
+| Model | Architecture | Input | Loss / training | Training time | Inference time |
+|---|---|---|---|---|---|
+| **Clinical Longformer (primary)** | `yikuan8/Clinical-Longformer`, 4,096 tokens | Section-filtered note text | Kiryo et al. (2017) non-negative PU risk estimator. Pre-trained on MIMIC-III clinical notes. AdamW, LR 2e-5, batch 4, 5 epochs, warmup 10%, weight decay 0.01. | ~7.5 GPU-hours | ~minutes |
+| **BioClinicalBERT (comparison)** | `emilyalsentzer/Bio_ClinicalBERT`, 512 tokens | Truncated section-filtered text | Same PU loss. Comparison of long-context vs. truncated context. | ~12 GPU-minutes | ~minutes |
+| **TF-IDF + logistic regression (text baseline)** | sklearn LR | Word 1- and 2-grams, max 50k features, sublinear TF | `class_weight='balanced'`, L2 regularization, C tuned on validation AUPRC. | ~minutes (CPU) | ~seconds |
+| **Structured + logistic regression (no-text baseline)** | sklearn LR | 20 structured features | Same L2/balanced setup. | ~minutes (CPU) | ~seconds |
+| **Keyword/phrase-lookup (naive baseline)** | Regex matching | DSM-5/PCL-5 derived phrase lexicon, 62 weighted patterns | No training — hand-curated phrase weights by DSM-5 criterion specificity. Best variant (raw vs. TF-normalized) selected on validation AUPRC. | **0 seconds** | ~seconds |
+
+**Why include a keyword baseline.** The keyword baseline establishes the floor performance achievable by a domain expert crafting a phrase list without any machine learning. If the NLP models cannot substantially outperform it, the added compute cost and complexity are unjustified. The keyword lexicon is derived from DSM-5 diagnostic criteria (A–E) and PCL-5 screening items, with weights reflecting clinical specificity for PTSD vs. general psychiatric language (3.0 for highly specific terms like "flashback", "hypervigilance"; 1.0 for shared terms like "insomnia"; 0.5 for weak signals like "guilt"). This comparison also provides a speed-vs-accuracy reference point: the keyword model runs in seconds on CPU, while the Longformer requires ~7.5 GPU-hours to train.
 
 **Why Clinical Longformer was chosen as primary.** Discharge notes are long; truncating to 512 tokens with BioClinicalBERT loses the social history and a large fraction of brief hospital course, which are the sections clinicians use to encode trauma exposure. Li et al. (2022) showed Clinical Longformer outperforms BioClinicalBERT on MIMIC-III phenotyping with long inputs, and the same advantage is expected here.
 
@@ -139,11 +152,23 @@ A class-weighted cross-entropy is **not** layered on top of the PU loss — that
 
 **Primary metric: AUPRC.** AUROC is misleading under class imbalance — it can stay high while precision at clinically actionable thresholds is poor. AUPRC is reported alongside AUROC; AUPRC is what the ranking decision is based on.
 
-**Operating threshold.** Calibrated for sensitivity ≥ 0.85 (a screening tool's job is to catch cases; false positives are reviewed by clinicians, false negatives are not). Sensitivity, specificity, precision, and F1 at that threshold are reported.
+**Operating threshold (Fix 4: val-derived).** Calibrated for sensitivity ≥ 0.85 on the **validation** set, then frozen before any test-set metrics are computed. This eliminates selection-on-test bias that inflates F1/specificity (Kennedy et al. 2024, TRIPOD-AI guidelines). The val-derived threshold is stored in `evaluation_results.json` under `val_thresholds` and inherited by all downstream scripts (proxy validation, error analysis). Sensitivity, specificity, precision, and F1 at that threshold are reported.
 
-**Statistical comparisons.** McNemar's test on the test set for pairwise model comparison.
+**Statistical comparisons.** McNemar's test on the test set for pairwise model comparison (all five models, including keyword baseline).
 
-**Prevalence recalibration.** Because of 3:1 case-control matching, study cohort prevalence is much higher than real inpatient prevalence (~ 1–3%). PPV and number-needed-to-screen are recalibrated to deployment prevalences of 1%, 2%, and 5% via Bayes' theorem so that reported precision is not deceptively flattering.
+**Prevalence recalibration.** Because of 3:1 case-control matching, study cohort prevalence is much higher than real inpatient prevalence (~ 1–3%). PPV, NPV, and number-needed-to-screen are recalibrated to deployment prevalences of 1%, 2%, 5%, 10%, and 20% via Bayes' theorem so that reported precision is not deceptively flattering.
+
+**Clinical utility metrics.** For each model at the operating threshold, the following metrics are reported to assess real-world deployment viability:
+- *Alert rate*: fraction of patients flagged positive — determines clinician workload.
+- *Positive likelihood ratio (LR+)*: how much a positive result increases the odds of PTSD. LR+ > 10 is considered strong; LR+ > 5 is moderate.
+- *Negative likelihood ratio (LR-)*: how much a negative result decreases the odds. LR- < 0.1 is strong rule-out.
+- *Diagnostic odds ratio (DOR)*: ratio of LR+ to LR-, a single summary of discriminative power.
+- *Workup reduction vs. treat-all*: 1 − alert_rate. The fraction of patients the model avoids flagging compared to screening everyone.
+- *Number needed to evaluate (NNE)*: 1 / (sensitivity − false positive rate). How many patients must be evaluated per correct detection above chance.
+
+**Speed-vs-accuracy comparison.** Runtime benchmarks for each model (training wall-clock, inference wall-clock, GPU-hours, peak memory) are logged to `results/metrics/ewang163_runtime_benchmarks.csv` and reported alongside AUPRC in the evaluation summary. This allows direct assessment of whether the Longformer's ~7.5 GPU-hour training investment is justified vs. the keyword baseline's zero training cost.
+
+**PU-corrected metrics (Fix 6: Ramola et al. 2019).** Every reported AUPRC, AUROC, specificity, and PPV treats unlabeled test patients as confirmed negatives. A model that correctly identifies hidden PTSD in unlabeled patients is penalized as producing false positives. Following Ramola et al. (2019, Pac Symp Biocomput, PMID 30864316), all metrics are labelled as "PU lower bounds" and corrected estimates are reported alongside them. The corrections take the estimated class prior $\pi_p$ as input and adjust for the fraction of the unlabeled pool that is truly positive. Both raw and corrected metrics are reported; the proxy validation Mann-Whitney AUC is elevated to co-headline status as the only PU-uncontaminated metric.
 
 **Calibration.** Reliability curves by decile, Expected Calibration Error before/after Platt scaling. Kiryo PU loss is not natively calibrated, so post-hoc Platt scaling is fit on the validation set.
 
@@ -168,6 +193,36 @@ A class-weighted cross-entropy is **not** layered on top of the PU loss — that
 - **Zhou et al. (2015)** identified depression patients from discharge summaries using MTERMS and machine learning, finding ~ 20% additional cases beyond ICD coding alone. This is a direct precedent for the central claim that NLP can recover undercoded psychiatric diagnoses from inpatient notes — the present project tests whether the same is true for PTSD specifically and whether PU learning makes the recovery quantitatively defensible.
 - **Kiryo et al. (2017)** is the methodological backbone for handling the unlabeled pool. **Elkan & Noto (2008)** is run as a sensitivity analysis only because the SCAR assumption is implausible for PTSD.
 - **Li et al. (2022)** introduced Clinical Longformer and showed it outperforms BioClinicalBERT on long-context MIMIC-III phenotyping; that motivates the primary model choice and the explicit head-to-head comparison.
+
+### 3.9 Methodology fixes (post-initial-results)
+
+After the initial pipeline was built and results reviewed, a systematic code-level audit identified 11 methodology improvements. These are documented in `methodology_fix_plans.md` with published evidence for each. The key fixes are summarized here:
+
+**Fix 1 — Universal PTSD-string masking.** Masking now applied to all PTSD+ notes (pre-dx + fallback), closing a leakage path where clinicians carry forward "h/o PTSD" in HPI/PMH on pre-diagnosis admissions. Jin et al. (2023, JAMIA) identified this exact annotation-noise failure mode.
+
+**Fix 2 — Class prior sweep.** π_p is swept over {0.05, 0.08, 0.10, 0.12, 0.15, 0.20, 0.25} rather than naively set to the empirical labeled fraction. Best value selected by proxy Mann-Whitney AUC, the only PU-uncontaminated criterion.
+
+**Fix 3 — PULSNAR SAR-PU.** Propensity-weighted nnPU loss reweights the positive term by 1/e(x), where e(x) is estimated from structured features via logistic regression. This addresses the SCAR violation that PTSD coding is biased by age, sex, and prior psychiatric contact. PULSNAR library (Kumar & Lambert 2024) used for class-prior estimation when available.
+
+**Fix 4 — Val-derived thresholds.** All operating thresholds computed on validation, not test. Eliminates selection-on-test bias (Kennedy et al. 2024, TRIPOD-AI).
+
+**Fix 5 — Elkan-Noto calibration.** Post-Platt probabilities divided by c = P(s=1|y=1) so outputs approximate P(PTSD=1|text) rather than P(coded=1|text).
+
+**Fix 6 — PU lower-bound metrics.** All reported metrics labelled as "PU lower bounds" with Ramola et al. (2019) correction formulas applied alongside raw values. Proxy AUC elevated to co-headline.
+
+**Fix 7 — Temporal split.** Pre-2015 train, post-2015 test, to assess generalization across the ICD-9→ICD-10 coding transition and post-DSM-5 reclassification.
+
+**Fix 8 — Chunk-and-pool BERT.** BioClinicalBERT evaluated with both single-512 truncation and overlapping chunk-and-pool (512 window, 256 stride, max-pool). This controls for context length and isolates the architecture comparison.
+
+**Fix 9 — Defensible fairness.** Subgroup AUPRC replaced with calibration-in-the-large, equal opportunity difference, and bootstrap 95% CI. Per-race AUPRC only reported when CI width < 0.15.
+
+**Fix 10 — Full-context IG.** Integrated Gradients at 4096 tokens (was 1024), matching the training context length. Ensures attribution covers Brief Hospital Course content that appears late in long notes.
+
+**Fix 11 — Chart review packet.** Top-50 model-flagged unlabeled patients packaged with de-identified notes and a rating form for clinician review. Clinician-rated PPV at the top decile would be the single most persuasive validation metric.
+
+**Naive keyword baseline.** A zero-training phrase-lookup model using 62 DSM-5/PCL-5-derived patterns establishes the floor performance and enables speed-vs-accuracy comparison across all methods.
+
+**Runtime benchmarking.** All scripts log wall-clock time, CPU time, peak memory, and GPU-hours to a shared CSV for compute-cost analysis.
 
 ---
 

@@ -1,0 +1,67 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1743365
+##  Job Name : fair_win
+##  Nodelist : node2336
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 10:25:17 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Fairness Analysis (Fix 9)
+=================================================================
+
+[1/3] Loading data ...
+  Operating threshold: 0.3240
+  Loaded predictions from /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_longformer_test_predictions.csv
+
+[2/3] Building demographics ...
+
+[3/3] Computing fairness metrics ...
+  [BENCH] fairness/full_analysis: 12.1s wall, 12.1s cpu, 0.23 GB peak
+
+Results → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_fairness_results.csv
+
+=================================================================
+FAIRNESS SUMMARY
+=================================================================
+
+  Operating threshold: 0.3240
+
+  SEX:
+    Value                     n  n_pos   Recall   Cal-in-large            AUPRC [95% CI]   Reliable
+    F                       940    433   0.8915        +0.0300   0.9252 [0.9078, 0.9417]        Yes
+    M                       611    227   0.7753        +0.0107   0.8282 [0.7883, 0.8656]        Yes
+    Equal opportunity difference: 0.1162
+
+  AGE_GROUP:
+    Value                     n  n_pos   Recall   Cal-in-large            AUPRC [95% CI]   Reliable
+    20s                     293    140   0.9286        +0.0315   0.9442 [0.9180, 0.9675]        Yes
+    30s                     359    194   0.8402        -0.0163   0.9199 [0.8886, 0.9464]        Yes
+    40s                     308    131   0.8702        +0.0454   0.8766 [0.8311, 0.9186]        Yes
+    50s                     277     81   0.9012        +0.1130   0.8669 [0.8023, 0.9197]        Yes
+    Other                   314    114   0.7193        -0.0442   0.8450 [0.7866, 0.8927]        Yes
+    Equal opportunity difference: 0.2093
+
+  RACE:
+    Value                     n  n_pos   Recall   Cal-in-large            AUPRC [95% CI]   Reliable
+    Asian                    48      5   0.8000        +0.1375   0.8476 [0.4510, 1.0000]         No
+    Black                   209     91   0.9121        +0.0757   0.9322 [0.8920, 0.9636]        Yes
+    Hispanic                 93     44   0.8409        +0.0257   0.8654 [0.7714, 0.9371]         No
+    Other/Unknown           118     35   0.8000        +0.0326   0.8924 [0.8128, 0.9569]        Yes
+    White                  1083    485   0.8454        +0.0057   0.8920 [0.8692, 0.9125]        Yes
+    Equal opportunity difference: 0.1121
+
+  RACE_BINARY:
+    Value                     n  n_pos   Recall   Cal-in-large            AUPRC [95% CI]   Reliable
+    Non-White               468    175   0.8686        +0.0612   0.9048 [0.8718, 0.9343]        Yes
+    White                  1083    485   0.8454        +0.0057   0.8920 [0.8692, 0.9125]        Yes
+    Equal opportunity difference: 0.0232
+
+  EMERGENCY:
+    Value                     n  n_pos   Recall   Cal-in-large            AUPRC [95% CI]   Reliable
+    False                   696    210   0.8286        +0.0659   0.8310 [0.7864, 0.8699]        Yes
+    True                    855    450   0.8622        -0.0130   0.9251 [0.9086, 0.9416]        Yes
+    Equal opportunity difference: 0.0336
+
+Done.

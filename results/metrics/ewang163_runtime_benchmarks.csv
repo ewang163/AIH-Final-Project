@@ -1,0 +1,81 @@
+timestamp,script,stage,wall_clock_s,cpu_s,peak_mem_gb,n_samples,device,gpu_hours,notes
+2026-04-15T21:56:11,keyword_baseline,scoring_all,127.4,126.92,0.314,14859,cpu,0.0,
+2026-04-15T21:56:11,keyword_baseline,test_eval,0.0,0.0,0.315,1551,cpu,0.0,
+2026-04-15T21:58:33,fairness,full_analysis,13.31,13.21,0.21,1551,cpu,0.0,
+2026-04-15T21:59:31,evaluate,lf_val_inference,120.89,110.53,1.488,1471,gpu,0.0336,
+2026-04-15T21:59:38,evaluate,bert_val_inference,7.43,2.9,1.733,1471,gpu,0.0021,
+2026-04-15T22:02:26,evaluate,lf_test_inference,122.48,115.72,1.733,1551,gpu,0.034,
+2026-04-15T22:02:32,evaluate,bert_test_inference,5.82,2.89,1.733,1551,gpu,0.0016,
+2026-04-15T22:03:00,evaluate,bert_chunk_pool_test,28.57,28.35,1.733,1551,gpu,0.0079,"chunk_len=512, stride=256, pool=max"
+2026-04-15T22:03:01,evaluate,tfidf_test,0.69,0.69,1.733,1551,cpu,0.0,
+2026-04-15T22:03:20,evaluate,struct_test,19.32,19.24,1.733,1551,cpu,0.0,
+2026-04-15T22:03:22,evaluate,keyword_test,1.7,1.7,1.733,1551,cpu,0.0,
+2026-04-16T04:19:50,train_longformer,full_training,20684.14,20270.95,1.995,11837,gpu,5.7456,pi_p=0.3979
+2026-04-16T04:21:34,train_longformer,full_training,20775.34,20323.28,1.991,11837,gpu,5.7709,pi_p=0.0500
+2026-04-16T10:07:38,train_longformer,full_training,20739.6,20284.88,2.033,11837,gpu,5.761,pi_p=0.0800
+2026-04-16T10:15:06,train_longformer,full_training,20701.23,20285.05,2.055,11837,gpu,5.7503,pi_p=0.1000
+2026-04-16T15:52:27,train_longformer,full_training,20641.06,20225.79,2.042,11837,gpu,5.7336,pi_p=0.1200
+2026-04-16T15:59:16,train_longformer,full_training,20625.9,20210.34,1.995,11837,gpu,5.7294,pi_p=0.1500
+2026-04-16T21:43:03,train_longformer,full_training,20979.31,20479.47,2.068,11837,gpu,5.8276,pi_p=0.2000
+2026-04-16T21:43:30,train_longformer,full_training,20631.36,20207.11,2.037,11837,gpu,5.7309,pi_p=0.2500
+2026-04-17T01:13:53,train_pulsnar,full_training,12617.48,12307.49,2.254,11837,gpu,3.5049,"pi_p=0.1957, propensity-weighted"
+2026-04-17T03:07:27,train_longformer,full_training,19408.89,19002.38,1.994,11134,gpu,5.3914,pi_p=0.4249
+2026-04-17T10:08:30,pip_sweep_eval,pi_p=0.05,228.58,206.87,1.57,2073,gpu,0.0635,
+2026-04-17T10:12:17,pip_sweep_eval,pi_p=0.08,227.27,206.47,1.926,2073,gpu,0.0631,
+2026-04-17T10:16:04,pip_sweep_eval,pi_p=0.10,227.33,206.62,1.941,2073,gpu,0.0631,
+2026-04-17T10:19:53,pip_sweep_eval,pi_p=0.12,228.46,206.79,1.966,2073,gpu,0.0635,
+2026-04-17T10:23:42,pip_sweep_eval,pi_p=0.15,228.64,206.14,1.969,2073,gpu,0.0635,
+2026-04-17T10:27:29,pip_sweep_eval,pi_p=0.20,227.48,205.84,1.969,2073,gpu,0.0632,
+2026-04-17T10:31:16,pip_sweep_eval,pi_p=0.25,226.55,206.14,1.969,2073,gpu,0.0629,
+2026-04-17T10:35:02,pip_sweep_eval,retrain (empirical 0.398),226.33,206.05,1.969,2073,gpu,0.0629,
+2026-04-17T10:38:48,pip_sweep_eval,PULSNAR (alpha=0.196),226.15,205.94,1.969,2073,gpu,0.0628,
+2026-04-17T14:40:48,evaluate,lf_val_inference,117.6,110.46,1.489,1471,gpu,0.0327,
+2026-04-17T14:40:56,evaluate,bert_val_inference,7.88,3.07,1.714,1471,gpu,0.0022,
+2026-04-17T14:43:46,evaluate,lf_test_inference,122.82,115.91,1.714,1551,gpu,0.0341,
+2026-04-17T14:43:52,evaluate,bert_test_inference,6.12,3.07,1.714,1551,gpu,0.0017,
+2026-04-17T14:44:21,evaluate,bert_chunk_pool_test,29.18,28.99,1.718,1551,gpu,0.0081,"chunk_len=512, stride=256, pool=max"
+2026-04-17T14:44:22,evaluate,tfidf_test,0.71,0.71,1.718,1551,cpu,0.0,
+2026-04-17T14:44:41,evaluate,struct_test,19.47,19.39,1.718,1551,cpu,0.0,
+2026-04-17T14:44:43,evaluate,keyword_test,1.74,1.73,1.718,1551,cpu,0.0,
+2026-04-17T14:44:55,temporal_eval,"Temporal model, temporal test_val",100.04,93.53,1.47,1270,gpu,0.0278,
+2026-04-17T14:48:06,temporal_eval,"Temporal model, temporal test_test",191.18,180.61,1.47,2455,gpu,0.0531,
+2026-04-17T14:50:04,temporal_eval,"Random model, temporal test_val",114.97,107.98,1.824,1471,gpu,0.0319,
+2026-04-17T14:53:16,temporal_eval,"Random model, temporal test_test",191.76,180.13,1.824,2455,gpu,0.0533,
+2026-04-17T14:55:11,temporal_eval,"Random model, random test_val",114.94,107.99,1.824,1471,gpu,0.0319,
+2026-04-17T14:57:12,temporal_eval,"Random model, random test_test",121.17,113.84,1.824,1551,gpu,0.0337,
+2026-04-17T22:01:12,evaluate,lf_val_inference,158.74,144.15,1.529,1471,gpu,0.0441,
+2026-04-17T22:01:24,evaluate,bert_val_inference,11.79,5.44,1.766,1471,gpu,0.0033,
+2026-04-17T22:05:01,evaluate,lf_test_inference,162.5,150.87,1.766,1551,gpu,0.0451,
+2026-04-17T22:05:11,evaluate,bert_test_inference,10.38,5.58,1.799,1551,gpu,0.0029,
+2026-04-17T22:06:01,evaluate,bert_chunk_pool_test,50.08,49.75,1.799,1551,gpu,0.0139,"chunk_len=512, stride=256, pool=max"
+2026-04-17T22:06:03,evaluate,tfidf_test,1.3,1.29,1.799,1551,cpu,0.0,
+2026-04-17T22:06:37,evaluate,struct_test,34.74,34.54,1.799,1551,cpu,0.0,
+2026-04-17T22:06:40,evaluate,keyword_test,2.95,2.94,1.799,1551,cpu,0.0,
+2026-04-17T22:25:37,fairness,full_analysis,12.14,12.06,0.227,1551,cpu,0.0,
+2026-04-26T08:36:32,pulsnar_reeval,val_inference,154.93,143.51,1.475,1471,gpu,0.043,
+2026-04-26T08:39:14,pulsnar_reeval,test_inference,162.75,151.65,1.475,1551,gpu,0.0452,
+2026-04-26T08:39:28,pulsnar_reeval,fairness,13.04,12.96,1.475,1551,cpu,0.0,
+2026-04-26T08:56:56,train_tfidf,vectorize_fit_transform,12.39,12.31,0.671,11837,cpu,0.0,"max_features=50000, ngram=(1, 2)"
+2026-04-26T08:56:59,train_tfidf,logreg_C_sweep,3.78,3.75,0.671,11837,cpu,0.0,"C_grid=[0.001, 0.01, 0.1, 1.0, 10.0, 100.0], balanced"
+2026-04-26T08:57:15,train_tfidf,full_training,15.84,15.78,0.754,11837,cpu,0.0,fit + C_sweep over 6 C values
+2026-04-26T09:21:34,pulsnar_reeval,val_inference,151.13,141.85,1.501,1471,gpu,0.042,
+2026-04-26T09:24:13,pulsnar_reeval,test_inference,158.59,149.88,1.501,1551,gpu,0.0441,
+2026-04-26T09:24:25,pulsnar_reeval,fairness,11.18,11.06,1.501,1551,cpu,0.0,
+2026-04-26T15:29:52,runtime_audit,keyword_val_inference,2.47,2.45,0.652,1471,cpu,0.0,
+2026-04-26T15:29:54,runtime_audit,keyword_test_inference,2.58,2.57,0.652,1551,cpu,0.0,
+2026-04-26T15:30:44,runtime_audit,structured_val_inference,49.64,35.75,0.656,1471,cpu,0.0,
+2026-04-26T15:31:15,runtime_audit,structured_test_inference,31.26,31.13,0.656,1551,cpu,0.0,
+2026-04-26T15:47:21,unified_bench,val_inference,119.76,110.63,1.367,1471,gpu,0.0333,Longformer-PULSNAR
+2026-04-26T15:49:25,unified_bench,test_inference,124.63,116.0,1.367,1551,gpu,0.0346,Longformer-PULSNAR
+2026-04-26T15:49:32,unified_bench,val_inference,4.49,1.3,1.524,1471,gpu,0.0012,BERT-truncated-512
+2026-04-26T15:49:37,unified_bench,test_inference,4.61,1.31,1.524,1551,gpu,0.0013,BERT-truncated-512
+2026-04-26T15:50:10,unified_bench,val_inference,33.14,32.86,1.524,1471,gpu,0.0092,BERT-chunk-pool-512x256
+2026-04-26T15:50:45,unified_bench,test_inference,35.13,34.86,1.524,1551,gpu,0.0098,BERT-chunk-pool-512x256
+2026-04-26T15:50:50,unified_bench,val_inference,5.35,5.33,1.524,1471,cpu,0.0,Keyword-DSM5/PCL5
+2026-04-26T15:50:56,unified_bench,test_inference,5.71,5.69,1.524,1551,cpu,0.0,Keyword-DSM5/PCL5
+2026-04-26T15:51:42,unified_bench,val_inference,45.13,25.56,1.524,1471,cpu,0.0,Structured-LogReg
+2026-04-26T15:52:05,unified_bench,test_inference,23.93,23.81,1.524,1551,cpu,0.0,Structured-LogReg
+2026-04-26T16:17:02,cpu_bench,val_inference,0.47,0.03,0.17,1471,cpu,0.0,Keyword-DSM5/PCL5 | n_cpus=16 | node=node2303
+2026-04-26T16:17:02,cpu_bench,test_inference,0.52,0.03,0.17,1551,cpu,0.0,Keyword-DSM5/PCL5 | n_cpus=16 | node=node2303
+2026-04-26T16:18:10,cpu_bench,val_inference,63.05,45.36,0.296,1471,cpu,0.0,Structured-LogReg | n_cpus=16 | node=node2303
+2026-04-26T16:18:38,cpu_bench,test_inference,27.72,27.66,0.296,1551,cpu,0.0,Structured-LogReg | n_cpus=16 | node=node2303

@@ -1,0 +1,18 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1918704
+##  Job Name : wrap
+##  Nodelist : node2333
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 08:56:34 AM EDT 2026
+###############################################################################
+Loading splits ...
+  Train: 11,837   Val: 1,471
+  Vocab: 50,000, matrix=(11837, 50000)
+  [BENCH] train_tfidf/vectorize_fit_transform: 12.4s wall, 12.3s cpu, 0.67 GB peak
+  Best AUPRC over C grid: 0.8501
+  [BENCH] train_tfidf/logreg_C_sweep: 3.8s wall, 3.7s cpu, 0.67 GB peak
+  TF-IDF full_training complete.
+  [BENCH] train_tfidf/full_training: 15.8s wall, 15.8s cpu, 0.75 GB peak
+Done.

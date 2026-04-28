@@ -1,0 +1,71 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1732385
+##  Job Name : pulsnar_alpha
+##  Nodelist : node2346
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 02:52:37 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — PULSNAR SAR-PU Training (Fix 3, rich features)
+  MODE: alpha-only (no GPU retraining)
+=================================================================
+2026-04-17 14:54:32,351 INFO:cffi mode is CFFI_MODE.ANY
+2026-04-17 14:54:32,373 ERROR:Unable to determine R home: [Errno 2] No such file or directory: 'R'
+2026-04-17 14:54:32,373 INFO:R home found: None
+2026-04-17 14:54:32,388 WARNING:Error importing in API mode: ImportError('libicuuc.so.74: cannot open shared object file: No such file or directory')
+2026-04-17 14:54:32,402 WARNING:Trying to import in ABI mode.
+2026-04-17 14:54:32,402 WARNING:rpy2 not available (r_home is None. Try python -m rpy2.situation); R bandwidth methods disabled, hist method still works
+
+Device: cpu
+
+[1/5] Loading data ...
+  Train: 11,837 (pos=4,710, unl=7,127)
+  Empirical labeled fraction: 0.3979
+
+[2/5] Estimating propensities (rich features) ...
+  Building propensity features (with prior comorbidities) ...
+  Building prior-admission flags from MIMIC streams ...
+    Cohort: 9,649 subjects, 0 prior admissions total
+    prior_MDD: 0 / 9,649 subjects (0.0%)
+    prior_anxiety: 0 / 9,649 subjects (0.0%)
+    prior_SUD: 0 / 9,649 subjects (0.0%)
+    prior_suicidal: 0 / 9,649 subjects (0.0%)
+    prior_SSRI: 0 / 9,649 subjects (0.0%)
+    prior_prazosin: 0 / 9,649 subjects (0.0%)
+    prior_SGA: 0 / 9,649 subjects (0.0%)
+    prior_psych_any: 0 / 9,649 subjects (0.0%)
+  Fitting propensity LR on 9649 patients, 13 features ...
+  Propensity model coefficients:
+    medicaid                  +0.7989
+    emergency                 -0.4064
+    sex_female                +0.0705
+    age                       -0.0088
+    n_prior_admissions        +0.0000
+    prior_MDD                 +0.0000
+    prior_anxiety             +0.0000
+    prior_SUD                 +0.0000
+    prior_suicidal            +0.0000
+    prior_SSRI                +0.0000
+    prior_prazosin            +0.0000
+    prior_SGA                 +0.0000
+    prior_psych_any           +0.0000
+    Propensity range: [0.126, 0.497]
+    Propensity mean (pos): 0.287
+    Propensity mean (unl): 0.250
+
+[3/5] Estimating class prior with PULSNAR (rich features) ...
+  PULSNAR input: 9649 patients, 13 features
+  Features: ['sex_female', 'age', 'emergency', 'medicaid', 'n_prior_admissions', 'prior_MDD', 'prior_anxiety', 'prior_SUD', 'prior_suicidal', 'prior_SSRI', 'prior_prazosin', 'prior_SGA', 'prior_psych_any']
+Number of clusters in the positive set:  5
+  Alpha estimate (rich): 0.1957 (method: PULSNAR (SAR))
+  Empirical labeled fraction: 0.3979
+  Alpha estimate saved → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_pulsnar_estimates_v2.json
+
+=================================================================
+ALPHA-ONLY MODE: exiting without retraining
+=================================================================
+  Alpha (class prior): 0.1957 (PULSNAR (SAR))
+  Empirical labeled fraction: 0.3979
+  Delta vs. v1 (alpha=0.1957): -0.0000

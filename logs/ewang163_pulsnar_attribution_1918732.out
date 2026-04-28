@@ -1,0 +1,115 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1918732
+##  Job Name : wrap
+##  Nodelist : gpu2111
+##      CPUs : 
+##  Mem/Node : 65536 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun Apr 26 09:18:23 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Integrated Gradients Attribution v2
+=================================================================
+
+Device: cuda
+  GPU: NVIDIA GeForce RTX 3090
+
+[1/5] Loading model and tokenizer ...
+Loading weights:   0%|          | 0/273 [00:00<?, ?it/s]Loading weights: 100%|██████████| 273/273 [00:00<00:00, 20241.92it/s]
+Initializing global attention on CLS token...
+  IntegratedGradients initialized on embedding inputs
+
+[2/5] Selecting high-confidence true positive patients ...
+  Running inference on positive test patients ...
+  Positive test patients: 660
+  Top decile threshold: 0.9995
+  Patients in top decile: 69
+  Selected for attribution: 50
+
+[3/5] Loading raw discharge notes for section boundaries ...
+  Loaded 50 raw notes
+
+[4/5] Computing Integrated Gradients (this may take a while) ...
+  [10/50] 86s elapsed, 9 ok, 0 fail
+  [20/50] 180s elapsed, 19 ok, 0 fail
+  [30/50] 275s elapsed, 29 ok, 0 fail
+  [40/50] 369s elapsed, 39 ok, 0 fail
+  [50/50] 464s elapsed, 49 ok, 0 fail
+
+  Completed: 50 succeeded, 0 failed out of 50 patients in 473s
+  Failures log: /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_failures_v2_pulsnar.log
+
+[5/5] Aggregating results ...
+
+  Section-level attribution:
+  Section                             Total  % Total   Tokens   Mean/Token
+  ------------------------------ ---------- -------- -------- ------------
+  history of present illness       282.8461   43.21%    23176     0.012204
+  brief hospital course            209.5800   32.02%    24937     0.008404
+  past medical history             146.5372   22.39%     4070     0.036004
+  social history                     8.5898    1.31%      939     0.009148
+  unknown                            7.0519    1.08%      427     0.016515
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_by_section_v2_pulsnar.csv
+
+  Top 20 tokens by mean |attribution| (min 3 occurrences):
+  Token                 Mean |Attr|        Std      N
+  -------------------- ------------ ---------- ------
+  ipolar                   0.278218   0.370630     17
+  mas                      0.253300   0.239208     71
+  ts                       0.234852   0.265981     87
+  mur                      0.197357   0.051670      4
+  ed                       0.140545   0.287260    230
+  intoxicated              0.109660   0.131402      3
+  schizophrenia            0.108335   0.189001      8
+  cocaine                  0.079341   0.129850      9
+  ill                      0.077949   0.100465      3
+  narc                     0.077681   0.076094      4
+  substances               0.076851   0.104606      3
+  personality              0.076182   0.071104      9
+  hma                      0.069785   0.087621      7
+  substance                0.065167   0.178434     13
+  foreign                  0.063430   0.050674      4
+  ocd                      0.061731   0.069555      8
+  against                  0.060623   0.060918      4
+  motor                    0.058482   0.123116      8
+  disorder                 0.058107   0.116273     63
+  paranoid                 0.057850   0.069096      5
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_top_attributed_tokens_v2_pulsnar.csv
+
+  Top 20 WORDS by mean |attribution| (min 3 occurrences) — Fix 5:
+  Word                       Mean |Attr|        Std      N
+  ------------------------- ------------ ---------- ------
+  bipolar                       0.149105   0.316057     32
+  narcotic                      0.116482   0.108619      5
+  illness                       0.115731   0.160343      3
+  arrested                      0.086410   0.072284      3
+  delayed                       0.084704   0.113956      3
+  pancreatitis                  0.080756   0.050773      4
+  schizoaffective               0.078925   0.037860      8
+  psychosis                     0.077323   0.068270      3
+  anemia                        0.075345   0.051885      4
+  assault                       0.074363   0.038380      3
+  psych                         0.073747   0.056494      7
+  personality                   0.073140   0.066224     11
+  hyperlipidemia                0.073136   0.036124      3
+  mrcp                          0.070413   0.030612      4
+  ocd                           0.068454   0.058832      5
+  disorder                      0.066487   0.151706     46
+  hypothyroidism                0.065042   0.114170      9
+  foreign                       0.063430   0.050674      4
+  hiv                           0.061395   0.110936      7
+  against                       0.060623   0.060918      4
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_top_attributed_words_v2_pulsnar.csv
+
+=================================================================
+INTERPRETATION
+=================================================================
+  Highest-attribution section: history of present illness (43.2% of total)
+  Top 3 attributed WORDS (Fix 5): bipolar, narcotic, illness
+  Top 3 attributed subword tokens: ipolar, mas, ts
+
+  Expected: social history and HPI sections should drive
+  predictions if the model learns genuine clinical signal.
+  High PMH attribution may indicate residual label leakage.
+
+Done.

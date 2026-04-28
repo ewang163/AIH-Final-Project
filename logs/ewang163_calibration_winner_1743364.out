@@ -1,0 +1,81 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 1743364
+##  Job Name : calib_win
+##  Nodelist : node2336
+##      CPUs : 
+##  Mem/Node : 16384 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Fri Apr 17 10:25:17 PM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Probability Calibration Analysis
+=================================================================
+
+[1/4] Loading predictions ...
+  Val:  1,471 patients (580 pos, 891 unlabeled)
+  Test: 1,551 patients (660 pos, 891 unlabeled)
+
+[2/4] Fitting Platt scaling on validation set ...
+  Platt coef: 4.3287, intercept: -2.5403
+  → /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_platt_calibrator.pkl
+  Raw  test: mean=0.4480, median=0.2937
+  Platt test: mean=0.4036, median=0.2194
+
+[2b/5] Applying Elkan-Noto correction (Fix 5) ...
+  Elkan-Noto c = P(s=1|y=1) estimate: 0.7833
+    (mean raw prob on 580 val positives)
+  Elkan-Noto test: mean=0.4934, median=0.2801
+
+[3/5] Computing calibration bins ...
+  ECE (raw):          0.0638
+  ECE (Platt-scaled): 0.0742
+  ECE (Elkan-Noto):   0.0797
+
+[4/5] Generating calibration plot ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/figures/ewang163_calibration_curve.png
+
+[5/5] Saving results ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_calibration_results.csv
+
+=================================================================
+CALIBRATION SUMMARY
+=================================================================
+
+  ECE before Platt scaling:  0.0638
+  ECE after Platt scaling:   0.0742
+  ECE after Elkan-Noto:      0.0797
+  Elkan-Noto c estimate:     0.7833
+  Note: Elkan-Noto correction did not improve ECE (delta = -0.0159)
+
+  Interpretation: Elkan-Noto-corrected probabilities approximate P(PTSD=1|text)
+  rather than P(coded=1|text). Use these for clinical decision support.
+
+  Raw calibration (10 equal-frequency bins):
+   Bin      N  Mean pred   Obs frac           95% CI
+  ---- ------ ---------- ---------- ----------------
+     1    155     0.0173     0.0194 [0.0066, 0.0554]
+     2    155     0.0285     0.0774 [0.0448, 0.1304]
+     3    155     0.0475     0.1355 [0.0904, 0.1982]
+     4    155     0.0941     0.1226 [0.0799, 0.1835]
+     5    155     0.2063     0.2452 [0.1841, 0.3185]
+     6    155     0.4354     0.4194 [0.3445, 0.4981]
+     7    155     0.7329     0.5290 [0.4507, 0.6060]
+     8    155     0.9285     0.7355 [0.6610, 0.7986]
+     9    155     0.9863     0.9677 [0.9267, 0.9861]
+    10    156     0.9994     1.0000 [0.9760, 1.0000]
+
+  Platt-scaled calibration:
+   Bin      N  Mean pred   Obs frac           95% CI
+  ---- ------ ---------- ---------- ----------------
+     1    155     0.0783     0.0194 [0.0066, 0.0554]
+     2    155     0.0819     0.0774 [0.0448, 0.1304]
+     3    155     0.0883     0.1355 [0.0904, 0.1982]
+     4    155     0.1062     0.1226 [0.0799, 0.1835]
+     5    155     0.1634     0.2452 [0.1841, 0.3185]
+     6    155     0.3466     0.4194 [0.3445, 0.4981]
+     7    155     0.6491     0.5290 [0.4507, 0.6060]
+     8    155     0.8136     0.7355 [0.6610, 0.7986]
+     9    155     0.8492     0.9677 [0.9267, 0.9861]
+    10    156     0.8564     1.0000 [0.9760, 1.0000]
+
+Done.
