@@ -171,7 +171,7 @@ Two scoring variants are compared on val AUPRC: raw weighted count (winner) vs. 
 
 Implemented across nine scripts in `scripts/04_evaluation/`:
 
-**Threshold derivation (Fix 4).** All operating thresholds computed on **validation** at sensitivity ≥ 0.85 via `threshold_at_recall(probs, labels, target_recall=0.85)` — sweeps `np.linspace(1.0, 0.0, 1001)` for the lowest threshold achieving recall ≥ 0.85. **Frozen before any test-set metrics.** The val-derived threshold is stored in `evaluation_results.json` under `val_thresholds.{model}` and inherited by all downstream scripts (proxy validation, fairness, error analysis, chart review). Pre-Fix-4 ablation script and v1 attribution still use test-set thresholds, but the deltas are interpretable.
+**Threshold derivation (Fix 4).** All operating thresholds computed on **validation** at sensitivity ≥ 0.85 via `threshold_at_recall(probs, labels, target_recall=0.85)` — sweeps `np.linspace(1.0, 0.0, 1001)` for the lowest threshold achieving recall ≥ 0.85. **Frozen before any test-set metrics.** The val-derived threshold is stored in `evaluation_results.json` under `val_thresholds.{model}` and inherited by all downstream scripts (proxy validation, fairness, error analysis). Pre-Fix-4 ablation script and v1 attribution still use test-set thresholds, but the deltas are interpretable.
 
 **Discrimination.** AUPRC (primary) via `average_precision_score`; AUROC via `roc_auc_score`.
 
@@ -246,11 +246,11 @@ MIMIC-IV (read-only)
    ↓
 [04_evaluation/] evaluate (Fix 4/6/8) → calibration (Fix 5) → decision_curves →
                 proxy_validation (Fix 4) → ablations → fairness (Fix 9) →
-                attribution_v2 (Fix 10) → error_analysis → chart_review_packet
-                (Fix 11) → temporal_eval → pulsnar_reeval → unified/cpu inference benches
+                attribution_v2 (Fix 10) → error_analysis → temporal_eval →
+                pulsnar_reeval → unified/cpu inference benches
    ↓
-results/{table1, predictions, metrics, figures, attribution, error_analysis,    [OHDSI: Research Products]
-         chart_review, runtime_benchmarks}
+results/{table1, predictions, metrics, figures, attribution,                     [OHDSI: Research Products]
+         error_analysis, runtime_benchmarks}
 ```
 
 GitHub: https://github.com/ewang163/AIH-Final-Project — programs documented in README.md.
@@ -468,10 +468,6 @@ The structured logistic regression's coefficients (saved in `ewang163_structured
 
 The +6.51 coefficient on `n_prior_admissions` is **3.6× larger than the next feature** and matches the +5.63 dominance the same feature has in the PULSNAR propensity model. This is the SAR violation made manifest: the structured model is largely learning "this patient has been admitted many times, therefore probably PTSD-coded" — a coding-frequency signal, not a PTSD signal. It is also a **dataset artifact**: by construction, Group 3 (unlabeled) has index = first MIMIC-IV admission, so prior-admission count is always 0. Group 1 (PTSD+) has index = first PTSD-coded admission, which tends to be later. Deploying the structured model would entrench this artifact. Race coefficients are small in magnitude (max |0.67| for Asian, n = 5 in test — unstable), confirming Fix 9's main race-binary EO diff of 0.024.
 
-### 3.17 The chart review packet — outstanding deliverable (Fix 11)
-
-`ewang163_ptsd_chart_review_packet.py` produced a 195.7 KB packet (`ewang163_top50_review_packet.txt`) and an empty rating form (`ewang163_top50_review_form.csv`) for the **top-50 model-flagged unlabeled patients**. Score range: 0.840 to 0.991 (mean 0.926). Each entry includes subject_id, hadm_id, model score, age, sex, and section-filtered note (truncated at 10,000 chars). Rating scheme: 1 = Probable PTSD, 2 = Possible PTSD, 3 = Unlikely PTSD. **Clinician review is pending** — this would yield clinician-rated PPV@top50, the most persuasive single validity metric for an *undercoding* detection model.
-
 ---
 
 ## Discussion
@@ -514,7 +510,7 @@ The AUPRC of 0.894 is competitive with or exceeds the substance-misuse phenotypi
 
 Most importantly, the **proxy Mann-Whitney AUC of 0.799 (p = 8.3e-22)** is the single most actionable finding: a model trained without any reference to medications or proxy patients assigns 6× higher median probability to patients whose pharmacotherapy is consistent with PTSD treatment. This is direct, non-circular evidence that the model recovers a real PTSD-associated narrative signal rather than just re-deriving the ICD coding rule. Combined with the specificity check (AUPRC 0.91 against MDD/anxiety controls — the model is not just learning generic psychiatric language) and the IG attribution (clinically appropriate trauma/psychiatric vocabulary, no label-leakage tokens), this constitutes a defensible body of validity evidence.
 
-A **meaningful and actionable finding** would be: clinician chart review (Fix 11, in progress) of the top-50 flagged unlabeled patients yields a clinician-rated PPV@top50 of, say, ≥ 70% — meaning ≥ 35 of the 50 most-confidently-flagged uncoded patients are judged "probable" or "possible" PTSD on chart review. That would convert this from a methodology demonstration into an actionable screening tool ready for prospective deployment trials. Conversely, a low rated PPV (< 40%) would force a re-evaluation of how much of the model's signal is true PTSD vs. coding-bias surface form.
+A **meaningful and actionable finding** would be downstream prospective validation against a true reference standard (PCL-5 / CAPS-5) at an external site — converting this from a methodology demonstration into an actionable screening tool ready for deployment trials. The combination of proxy validation (AUC 0.799), specificity check vs. psychiatric controls (AUPRC 0.91), and label-leakage ablations (Ablation 1: −0.008 AUPRC) already constitutes a non-circular evidence stack, but absolute calibration to true PTSD prevalence requires a defensible gold standard the contaminated-negatives MIMIC-IV labels cannot provide.
 
 ### 3.22 What this tool is and is not
 
@@ -524,7 +520,6 @@ A **meaningful and actionable finding** would be: clinician chart review (Fix 11
 
 ### 3.23 Future directions
 
-- **Clinician chart review (Fix 11 completion).** Finish rating the top-50 packet to produce clinician-validated PPV.
 - **External validation** at a non-MIMIC site, ideally one with both higher PTSD base rates and richer narrative documentation (a VA medical center is the natural target).
 - **Re-evaluation under a true reference standard.** A small prospective cohort screened with PCL-5 or CAPS-5 would let absolute model performance be measured against a defensible gold standard.
 - **Bias mitigation for demographic subgroups.** The female / younger-age coding bias is inherited from labels; explicit subgroup-aware loss reweighting or label-noise modelling (Bekker & Davis 2020) could narrow the gap. PULSNAR's attribution shift hints that SAR-aware training helps; a richer propensity feature set (without the `n_prior_admissions` artifact) might widen the benefit.
