@@ -1,0 +1,50 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 2215205
+##  Job Name : ewang163_ptsd_cross_model.sh
+##  Nodelist : node2334
+##      CPUs : 
+##  Mem/Node : 8192 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun May  3 10:03:44 AM EDT 2026
+###############################################################################
+======================================================================
+PTSD NLP — Cross-Model Comparison
+======================================================================
+
+[1/6] Loading thresholds
+      longformer_pulsnar  threshold = 0.1880
+              bert_trunc  threshold = 0.9760
+          bert_chunkpool  threshold = 0.9930
+              structured  threshold = 0.3380
+                 keyword  threshold = 0.0000
+
+[2/6] Loading per-patient predictions
+Traceback (most recent call last):
+  File "/oscar/data/class/biol1595_2595/students/ewang163/scripts/04_evaluation/ewang163_ptsd_cross_model.py", line 383, in <module>
+    main()
+    ~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/scripts/04_evaluation/ewang163_ptsd_cross_model.py", line 252, in main
+    probs = load_predictions(test_df)
+  File "/oscar/data/class/biol1595_2595/students/ewang163/scripts/04_evaluation/ewang163_ptsd_cross_model.py", line 173, in load_predictions
+    d = test_subj.merge(d, on=['subject_id', 'hadm_id'], how='left')
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/frame.py", line 12888, in merge
+    return merge(
+        self,
+    ...<10 lines>...
+        validate=validate,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/reshape/merge.py", line 385, in merge
+    op = _MergeOperation(
+        left_df,
+    ...<10 lines>...
+        validate=validate,
+    )
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/reshape/merge.py", line 1018, in __init__
+    ) = self._get_merge_keys()
+        ~~~~~~~~~~~~~~~~~~~~^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/reshape/merge.py", line 1620, in _get_merge_keys
+    right_keys.append(right._get_label_or_level_values(rk))
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^
+  File "/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/pandas/core/generic.py", line 1776, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'hadm_id'

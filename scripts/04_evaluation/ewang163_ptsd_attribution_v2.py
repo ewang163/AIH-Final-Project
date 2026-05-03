@@ -50,7 +50,7 @@ TEST_PARQUET  = f'{DATA_SPLITS}/ewang163_split_test.parquet'
 DISCHARGE_F   = f'{MIMIC}/note/2.2/discharge.csv'
 
 # Allow override via env var or CLI arg (set later in main()).
-# Default: pi_p=0.25 winner via the symlink.
+# Default: PULSNAR Longformer (the canonical primary model) via the symlink.
 BEST_DIR      = os.environ.get('PTSD_MODEL_DIR',
                                f'{MODEL_DIR}/ewang163_longformer_best')
 SUFFIX        = os.environ.get('PTSD_MODEL_SUFFIX', '')

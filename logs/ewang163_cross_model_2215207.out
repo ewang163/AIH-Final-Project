@@ -1,0 +1,45 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 2215207
+##  Job Name : ewang163_ptsd_cross_model.sh
+##  Nodelist : node2334
+##      CPUs : 
+##  Mem/Node : 8192 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun May  3 10:04:44 AM EDT 2026
+###############################################################################
+======================================================================
+PTSD NLP — Cross-Model Comparison
+======================================================================
+
+[1/6] Loading thresholds
+      longformer_pulsnar  threshold = 0.1880
+              bert_trunc  threshold = 0.9760
+          bert_chunkpool  threshold = 0.9930
+              structured  threshold = 0.3380
+                 keyword  threshold = 0.0000
+
+[2/6] Loading per-patient predictions
+  generating structured per-patient predictions (~1 min)...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/predictions/ewang163_structured_test_predictions.csv
+  Models loaded: ['longformer_pulsnar', 'bert_trunc', 'bert_chunkpool', 'structured', 'keyword']
+
+  Test AUPRC sanity check:
+    longformer_pulsnar      AUPRC=0.8164  AUROC=0.8250
+    bert_trunc              AUPRC=0.8576  AUROC=0.8656
+    bert_chunkpool          AUPRC=0.8775  AUROC=0.8853
+    structured              AUPRC=0.6833  AUROC=0.7310
+    keyword                 AUPRC=0.5096  AUROC=0.6190
+
+[3/6] All-pairs McNemar + agreement
+  → ewang163_cross_model_mcnemar.csv (10 pairs)
+
+[4/6] Top-quintile rank overlap
+
+[5/6] Subgroup NNS (per model x deployment prevalence)
+
+[6/6] Ensemble experiments
+  Best individual AUPRC: 0.8775
+  Max-pool ensemble AUPRC: 0.7535
+  Mean-pool ensemble AUPRC: 0.8556
+
+Done.

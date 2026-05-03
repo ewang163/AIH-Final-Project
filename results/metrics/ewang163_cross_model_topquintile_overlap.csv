@@ -1,0 +1,11 @@
+model_a,model_b,top_quintile_size,overlap_jaccard,overlap_fraction
+longformer_pulsnar,bert_trunc,310,0.6104,0.7581
+longformer_pulsnar,bert_chunkpool,310,0.7175,0.8355
+longformer_pulsnar,structured,310,0.1992,0.3323
+longformer_pulsnar,keyword,310,0.2375,0.3839
+bert_trunc,bert_chunkpool,310,0.7367,0.8484
+bert_trunc,structured,310,0.2229,0.3645
+bert_trunc,keyword,310,0.245,0.3935
+bert_chunkpool,structured,310,0.2133,0.3516
+bert_chunkpool,keyword,310,0.2475,0.3968
+structured,keyword,310,0.1742,0.2968

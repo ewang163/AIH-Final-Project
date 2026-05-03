@@ -1,0 +1,82 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 2215536
+##  Job Name : ptsd_errors
+##  Nodelist : gpu2708
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun May  3 11:07:05 AM EDT 2026
+###############################################################################
+=================================================================
+PTSD NLP — Error Analysis (PULSNAR Longformer FP/FN)
+=================================================================
+
+[1/5] Loading data ...
+  Test set: 1,551 patients
+  Threshold: 0.1880 (val-derived)
+
+[2/5] Identifying false positives and false negatives ...
+  TP=558  FP=227  FN=102  TN=664
+
+[3/5] Sampling 25 FPs and 25 FNs ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/error_analysis/ewang163_fp_notes_sample.txt
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/error_analysis/ewang163_fn_notes_sample.txt
+
+[4/5] Aggregate FP / FN / overall statistics ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/error_analysis/ewang163_error_analysis_summary.csv
+
+[5/5] Clinical-vocabulary distinctive-term analysis ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/error_analysis/ewang163_distinctive_terms.csv
+
+=================================================================
+ERROR ANALYSIS SUMMARY
+=================================================================
+
+  Confusion at threshold=0.1880:
+    TP=558  FP=227  FN=102  TN=664
+
+  FALSE POSITIVES (n=227):
+    mean predicted prob: 0.5361
+    mean note length:    3,249 chars (overall: 3,109)
+    sex:   {'F': 140, 'M': 87}
+    age:   {'50s': 54, '40s': 54, '30s': 50, 'Other': 37, '20s': 32}
+    race:  {'White': 157, 'Black': 31, 'Hispanic': 18, 'Other/Unknown': 13, 'Asian': 8}
+    emergency: 92/227 (40.5%)
+
+  FALSE NEGATIVES (n=102):
+    mean predicted prob: 0.0761
+    mean note length:    3,074 chars (overall: 3,109)
+    sex:   {'M': 52, 'F': 50}
+    age:   {'Other': 36, '40s': 26, '30s': 23, '50s': 9, '20s': 8}
+    race:  {'White': 77, 'Black': 9, 'Hispanic': 8, 'Other/Unknown': 7, 'Asian': 1}
+    emergency: 28/102 (27.5%)
+
+  Top 10 terms over-represented in FALSE POSITIVES (rate / overall):
+    gunshot        fp=0.009  overall=0.003  ratio=2.73x
+    paroxetine     fp=0.004  overall=0.002  ratio=2.28x
+    overdose       fp=0.066  overall=0.037  ratio=1.77x
+    stabbing       fp=0.044  overall=0.026  ratio=1.71x
+    bipolar        fp=0.097  overall=0.065  ratio=1.50x
+    schizo         fp=0.031  overall=0.021  ratio=1.45x
+    alcohol        fp=0.141  overall=0.106  ratio=1.33x
+    psychiatric    fp=0.110  overall=0.086  ratio=1.28x
+    detox          fp=0.026  overall=0.021  ratio=1.28x
+    abuse          fp=0.207  overall=0.167  ratio=1.24x
+
+  Top 10 terms over-represented in FALSE NEGATIVES (rate / overall):
+    combat         fn=0.029  overall=0.006  ratio=5.07x
+    opioid         fn=0.039  overall=0.023  ratio=1.69x
+    heroin         fn=0.049  overall=0.041  ratio=1.19x
+    mva            fn=0.049  overall=0.046  ratio=1.06x
+    alcohol        fn=0.108  overall=0.106  ratio=1.02x
+    detox          fn=0.020  overall=0.021  ratio=0.95x
+    cocaine        fn=0.049  overall=0.052  ratio=0.94x
+    assault        fn=0.020  overall=0.023  ratio=0.84x
+    depression     fn=0.304  overall=0.365  ratio=0.83x
+    methadone      fn=0.029  overall=0.035  ratio=0.83x
+
+  FN sparsity:
+    FN notes below test-set Q1 length: 24/102 (24%)
+    FN notes < 500 chars:              6/102 (6%)
+
+Done.

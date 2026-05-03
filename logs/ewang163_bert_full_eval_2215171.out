@@ -1,0 +1,84 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 2215171
+##  Job Name : ewang163_ptsd_bert_full_eval.sh
+##  Nodelist : gpu2108
+##      CPUs : 
+##  Mem/Node : 32768 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun May  3 09:53:45 AM EDT 2026
+###############################################################################
+======================================================================
+PTSD NLP — BioClinicalBERT FULL Evaluation Suite (truncated + chunk-pool)
+======================================================================
+
+Device: cuda
+
+[1/8] Loading splits, admissions, proxy ...
+  building no-PMH test corpus from discharge.csv (stream)...
+  No-PMH test corpus written → /oscar/data/class/biol1595_2595/students/ewang163/data/notes/ewang163_test_no_pmh.parquet
+
+[2/8] Loading BioClinicalBERT from /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_bioclinbert_best
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 29673.55it/s]
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+
+[3/8] Inference: truncated 512
+  [BENCH] bert_full_eval/trunc_val: 6.0s wall, 2.4s cpu, 1.45 GB peak, 0.0017 GPU-h
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] bert_full_eval/trunc_test: 5.2s wall, 2.2s cpu, 1.45 GB peak, 0.0014 GPU-h
+
+[4/8] Truncated proxy + unlab inference
+  [BENCH] bert_full_eval/trunc_proxy: 0.4s wall, 0.2s cpu, 1.45 GB peak, 0.0001 GPU-h
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+  [BENCH] bert_full_eval/trunc_unlab: 1.5s wall, 0.5s cpu, 1.45 GB peak, 0.0004 GPU-h
+
+  ▶ Mode = trunc: predictions cached, running analyses
+    Val threshold=0.9760  Test AUPRC=0.8576 AUROC=0.8656 F1=0.7507
+    ECE: raw=0.4822 platt=0.1738 en=0.1729 (c=0.9826)
+    Ablation 1 (PTSD masking)...
+/oscar/data/class/biol1595_2595/students/ewang163/ptsd_env/lib/python3.13/site-packages/torch/utils/data/dataloader.py:624: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+    Ablation 2 (PMH removed)...
+    Ablation deltas: A1=-0.0129 A2=-0.0627
+    Proxy AUC (trunc)=0.7442, p=3.66e-15
+
+[5/8] Inference: chunk-pool (512 stride 256)
+    chunk-pool 600/1471
+    chunk-pool 1000/1471
+  [BENCH] bert_full_eval/chunkpool_val: 39.9s wall, 39.6s cpu, 1.45 GB peak, 0.0111 GPU-h
+    chunk-pool 400/1551
+    chunk-pool 600/1551
+    chunk-pool 1000/1551
+    chunk-pool 1400/1551
+  [BENCH] bert_full_eval/chunkpool_test: 42.5s wall, 42.2s cpu, 1.45 GB peak, 0.0118 GPU-h
+
+[6/8] Chunk-pool proxy + unlab inference
+  [BENCH] bert_full_eval/chunkpool_proxy: 2.8s wall, 2.7s cpu, 1.45 GB peak, 0.0008 GPU-h
+    chunk-pool 200/500
+    chunk-pool 400/500
+  [BENCH] bert_full_eval/chunkpool_unlab: 13.0s wall, 12.9s cpu, 1.45 GB peak, 0.0036 GPU-h
+
+  ▶ Mode = chunkpool: predictions cached, running analyses
+    Val threshold=0.9930  Test AUPRC=0.8775 AUROC=0.8853 F1=0.7854
+    ECE: raw=0.5068 platt=0.2080 en=0.2079 (c=0.9907)
+    Ablation 1 (PTSD masking)...
+    chunk-pool 400/1551
+    chunk-pool 600/1551
+    chunk-pool 1000/1551
+    chunk-pool 1400/1551
+    Ablation 2 (PMH removed)...
+    chunk-pool 400/1551
+    chunk-pool 600/1551
+    chunk-pool 1000/1551
+    chunk-pool 1400/1551
+    Ablation deltas: A1=-0.0122 A2=-0.0662
+    Proxy AUC (chunkpool)=0.7333, p=5.31e-14
+
+[7/8] Writing summary JSON ...
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/metrics/ewang163_bioclinbert_full_eval_summary.json
+
+[8/8] Done. Highlights:
+      trunc  AUPRC=0.8576  AUROC=0.8656  F1=0.7507  ECE=0.4822  A1=-0.0129  A2=-0.0627
+  chunkpool  AUPRC=0.8775  AUROC=0.8853  F1=0.7854  ECE=0.5068  A1=-0.0122  A2=-0.0662

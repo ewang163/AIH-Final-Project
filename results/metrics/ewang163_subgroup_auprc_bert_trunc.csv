@@ -1,0 +1,17 @@
+group,value,n,n_pos,AUPRC,AUROC
+sex,F,940,433,0.8954,0.8921
+sex,M,611,227,0.7729,0.8141
+age_group,20s,293,140,0.9322,0.9297
+age_group,30s,359,194,0.8917,0.8492
+age_group,40s,308,131,0.8338,0.8517
+age_group,50s,277,81,0.7881,0.8596
+age_group,Other,314,114,0.7954,0.8254
+race,Asian,48,5,0.6131,0.893
+race,Black,209,91,0.917,0.9132
+race,Hispanic,93,44,0.8627,0.8428
+race,Other/Unknown,118,35,0.8613,0.905
+race,White,1083,485,0.8513,0.8533
+race_binary,Non-White,468,175,0.8806,0.8973
+race_binary,White,1083,485,0.8513,0.8533
+emergency,False,696,210,0.7649,0.8382
+emergency,True,855,450,0.9035,0.8783

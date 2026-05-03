@@ -2,16 +2,16 @@
 ewang163_ptsd_corpus_build.py
 =============================
 Assembles the training corpus from extracted notes:
-  - PTSD+ notes (ALL — pre-diagnosis AND fallback): masked with Ablation 1
+  - PTSD+ notes (ALL — pre-diagnosis AND fallback): PTSD-string-masked
   - Unlabeled notes: used as-is
   - Proxy notes: split out for post-training validation only
 
-Fix 1 applied: masking is applied to ALL PTSD+ notes, not just fallback.
-Pre-diagnosis notes can still contain "h/o PTSD from MVA 2012" in HPI/PMH
-carried forward from outside records — this was a leakage path.
-
-An audit step counts the pre-dx leakage hit rate before masking to quantify
-the scope of the issue.
+Universal PTSD-string masking is applied to ALL PTSD+ notes (pre-diagnosis
+and fallback alike). Pre-diagnosis notes can still contain "h/o PTSD from
+MVA 2012" in HPI/PMH carried forward from outside records — this was a
+leakage path that the original "pre-dx is automatically clean" assumption
+missed. An audit step counts the pre-dx leakage hit rate before masking to
+quantify the scope of the issue.
 
 Outputs:
     ewang163_ptsd_corpus.parquet   — training rows (PTSD+ label=1, unlabeled label=0)
@@ -66,7 +66,7 @@ def main():
         n = (df['group'] == grp).sum()
         print(f'    {grp}: {n:,} rows')
 
-    # ── Step 2a: Audit pre-diagnosis leakage (Fix 1) ───────────────────────
+    # ── Step 2a: Audit pre-diagnosis leakage ───────────────────────────────
     print('\n[2a/5] Auditing pre-diagnosis leakage before masking ...')
     predx_mask = (df['group'] == 'ptsd_pos') & (df['is_prediagnosis'] == True)
     n_predx = predx_mask.sum()
@@ -76,13 +76,13 @@ def main():
         print(f'  Pre-diagnosis PTSD+ notes: {n_predx:,}')
         print(f'  Of those, notes containing PTSD-related strings: {predx_hit:,} '
               f'({predx_hit_rate:.1%})')
-        print(f'  *** This is the pre-Fix-1 leakage rate in the primary training set ***')
+        print(f'  *** This is the pre-masking leakage rate in the primary training set ***')
     else:
         predx_hit_rate = 0.0
         print(f'  No pre-diagnosis notes found (all PTSD+ are fallback)')
 
-    # ── Step 2b: Apply masking to ALL PTSD+ notes (Fix 1) ────────────────
-    print('\n[2b/5] Applying Ablation 1 masking to ALL PTSD+ notes (Fix 1) ...')
+    # ── Step 2b: Apply masking to ALL PTSD+ notes ────────────────────────
+    print('\n[2b/5] Applying universal PTSD-string masking to ALL PTSD+ notes ...')
     all_pos_mask = (df['group'] == 'ptsd_pos')
     n_pos_total = all_pos_mask.sum()
 

@@ -1,0 +1,37 @@
+{
+  "n_test": 1551,
+  "n_pos": 660,
+  "individual": {
+    "longformer_pulsnar": {
+      "AUPRC": 0.8847912112897353,
+      "AUROC": 0.890351324694759
+    },
+    "bert_trunc": {
+      "AUPRC": 0.8576453354710439,
+      "AUROC": 0.8656234057749208
+    },
+    "bert_chunkpool": {
+      "AUPRC": 0.877478784819168,
+      "AUROC": 0.8853101724313845
+    },
+    "structured": {
+      "AUPRC": 0.6833312122942394,
+      "AUROC": 0.7310325476992144
+    },
+    "keyword": {
+      "AUPRC": 0.5096493883271221,
+      "AUROC": 0.6189563990069041
+    }
+  },
+  "ensemble_max_pool_rank": {
+    "AUPRC": 0.7514,
+    "AUROC": 0.822
+  },
+  "ensemble_mean_pool_rank": {
+    "AUPRC": 0.8743,
+    "AUROC": 0.8914
+  },
+  "best_individual_AUPRC": 0.8848,
+  "ensemble_max_beats_best": false,
+  "ensemble_mean_beats_best": false
+}

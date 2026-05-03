@@ -1,0 +1,4 @@
+group,mode,n,mean_predicted_prob,mean_note_len,pct_female,pct_age_20s,pct_age_other,pct_emergency,pct_white,pct_with_trauma_term
+false_positive,trunc,242,0.9925,3313.2,55.8,14.9,16.1,46.7,70.2,68.6
+false_negative,trunc,118,0.8735,3071.7,46.6,9.3,30.5,63.6,80.5,66.9
+overall,trunc,1551,0.9077,3108.6,60.6,18.9,20.2,55.1,69.8,69.9

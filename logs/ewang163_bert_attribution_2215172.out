@@ -1,0 +1,49 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 2215172
+##  Job Name : ewang163_ptsd_bert_attribution.sh
+##  Nodelist : gpu2262
+##      CPUs : 
+##  Mem/Node : 24576 MB
+## Directory : /oscar/data/class/biol1595_2595/students/ewang163
+##   Job Started : Sun May  3 09:53:45 AM EDT 2026
+###############################################################################
+======================================================================
+PTSD NLP — BioClinicalBERT Integrated Gradients (trunc + chunk-pool)
+======================================================================
+
+Device: cuda
+
+[1/4] Loading BERT from /oscar/data/class/biol1595_2595/students/ewang163/models/ewang163_bioclinbert_best
+Loading weights:   0%|          | 0/201 [00:00<?, ?it/s]Loading weights: 100%|██████████| 201/201 [00:00<00:00, 23193.99it/s]
+
+[2/4] Selecting 50 high-confidence true positive patients ...
+  cutoff=1.0000 | n_sample=50
+
+[3/4] Loading raw discharge notes for section mapping ...
+  loaded 50 raw notes
+
+[4/4] Running IG slices
+
+  === Slice = trunc ===
+    [10/50] 5s, 9 ok / 0 fail
+    [20/50] 10s, 19 ok / 0 fail
+    [30/50] 15s, 29 ok / 0 fail
+    [40/50] 19s, 39 ok / 0 fail
+    [50/50] 24s, 49 ok / 0 fail
+  Slice trunc: 50 ok, 0 fail in 25s
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_by_section_bert_trunc.csv
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_top_attributed_words_bert_trunc.csv
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_failures_bert_trunc.log  (50 ok, 0 fail)
+
+  === Slice = chunkpool ===
+    [10/50] 5s, 9 ok / 0 fail
+    [20/50] 10s, 19 ok / 0 fail
+    [30/50] 15s, 29 ok / 0 fail
+    [40/50] 21s, 39 ok / 0 fail
+    [50/50] 26s, 49 ok / 0 fail
+  Slice chunkpool: 50 ok, 0 fail in 27s
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_by_section_bert_chunkpool.csv
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_top_attributed_words_bert_chunkpool.csv
+  → /oscar/data/class/biol1595_2595/students/ewang163/results/attribution/ewang163_attribution_failures_bert_chunkpool.log  (50 ok, 0 fail)
+
+Done.

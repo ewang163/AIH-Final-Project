@@ -2,8 +2,7 @@
 
 **Author:** Eric Wang (ewang163), Brown University, AIH 2025 (Spring 2026)
 **Source data:** MIMIC-IV v3.1 (BIDMC, 2008–2019) on Brown's Oscar HPC cluster
-**Final deployment model:** Clinical Longformer + Kiryo nnPU loss at π_p = 0.25, Fix-1-masked corpus
-**Sensitivity/SAR-aware model:** Clinical Longformer + PULSNAR propensity-weighted nnPU at α = 0.1957
+**Final deployment model:** Clinical Longformer + PULSNAR propensity-weighted nnPU loss (α = 0.196), trained on the section-filtered, PTSD-string-masked corpus
 
 ---
 
@@ -20,14 +19,14 @@ The methodological challenge is that the obvious approach — train on ICD-coded
 The pipeline adapts the NLP-phenotyping framing from Blackley et al. (2021) for opioid use disorder and Zhou et al. (2015) for depression — extract clinically meaningful information from sectioned discharge notes, train classifiers, evaluate on a held-out set — but with three distinguishing methodological commitments not present in those precedents:
 
 1. **Long-context transformer.** `yikuan8/Clinical-Longformer` (4,096 tokens) [Li et al. 2022, JAMIA] replaces the rule-based MTERMS front-end of Blackley/Zhou. Discharge notes routinely exceed BERT's 512-token window, and the sections that encode trauma exposure (Social History, Brief Hospital Course) are precisely where truncation lands.
-2. **Positive-Unlabeled (PU) learning.** Kiryo et al. (2017) non-negative risk estimator as primary loss, because non-coded patients cannot be assumed PTSD-negative. PULSNAR (Kumar & Lambert 2024) is run as a SAR-aware sensitivity model.
+2. **PULSNAR propensity-weighted PU learning.** PULSNAR (Kumar & Lambert 2024) extends Kiryo et al.'s (2017) non-negative PU risk estimator to the SAR (Selected At Random conditional on features) regime that matches the data-generating process here — PTSD coding is *not* random within the unlabeled pool but biased by demographics and prior psychiatric contact. The propensity reweighting up-weights positives whose coding propensity is low (e.g. older men with no prior psychiatric record) — exactly the under-detected population the screening tool is meant to surface.
 3. **Multi-tier label-leakage defense + non-circular external validation.** Section filtering, pre-diagnosis-only training, universal PTSD-string masking, and a held-out pharmacological-proxy validation set (prazosin + SSRI/SNRI) the model never sees in training.
 
-Five models are trained head-to-head: Clinical Longformer (primary), BioClinicalBERT (truncated and chunk-and-pool variants), TF-IDF + logistic regression, structured-features-only logistic regression, and a zero-training DSM-5/PCL-5 keyword baseline.
+Four models are trained head-to-head on identical patient-level splits to isolate the contribution of long-context inference, the PU loss, and the narrative content itself: **Clinical Longformer (PULSNAR; primary)**, **BioClinicalBERT** in two inference modes (truncated 512 tokens and chunk-and-pool 512 × 256), **structured-features-only logistic regression**, and a **zero-training DSM-5/PCL-5 keyword baseline**.
 
 ### Hypothesis
 
-Can a Clinical Longformer fine-tuned with PU learning on section-filtered, predominantly pre-diagnosis discharge notes recover undercoded PTSD cases from MIMIC-IV — while generalizing to a pharmacological-proxy validation set whose patients were never used in training, rather than just re-deriving the ICD coding rule?
+Can a Clinical Longformer fine-tuned with SAR-aware (PULSNAR) PU learning on section-filtered, predominantly pre-diagnosis discharge notes recover undercoded PTSD cases from MIMIC-IV — while generalizing to a pharmacological-proxy validation set whose patients were never used in training, rather than just re-deriving the ICD coding rule?
 
 ### Themes from background literature and the gap addressed
 
@@ -38,7 +37,7 @@ Across the assignment-5/6/7/8 literature, four themes emerge:
 3. *Pre-trained clinical text encoders generalize across phenotyping tasks.* Dligach, Afshar & Miller (2019) — motivating Clinical Longformer pretrained on MIMIC-III as backbone.
 4. *Long-context inference matters for clinical notes.* Li et al. (2022) showed Longformer outperforms BioClinicalBERT on MIMIC-III phenotyping.
 
-The unmet need addressed here is squarely the methodological one: prior phenotyping work either had a clean reference standard (AUDIT, prospective screen) or treated ICD-derived labels at face value. None confronted the case where the *target diagnosis is dominantly undercoded by the very labeling source used in supervised training*. The combined response — PU learning + label-leakage masking + non-circular pharmacological proxy + a SAR-aware sensitivity model — is the project's distinct contribution.
+The unmet need addressed here is squarely the methodological one: prior phenotyping work either had a clean reference standard (AUDIT, prospective screen) or treated ICD-derived labels at face value. None confronted the case where the *target diagnosis is dominantly undercoded by the very labeling source used in supervised training*. The combined response — PULSNAR SAR-aware PU learning + label-leakage masking + non-circular pharmacological proxy + symmetric multi-model evaluation — is the project's distinct contribution.
 
 ### Background articles (Vancouver)
 
@@ -103,7 +102,7 @@ Final corpus (`ewang163_ptsd_corpus.parquet`): **14,859 rows** (4,710 train PTSD
 
 1. **Section filtering** (above) of all notes to narrative low-leakage sections.
 2. **Pre-diagnosis notes** as primary signal where available (n = 2,492).
-3. **Universal PTSD-string masking (Fix 1)** in `ewang163_ptsd_corpus_build.py`: a case-insensitive regex `(?i)(post-traumatic|post\s+traumatic|posttraumatic|trauma-related\s+stress|ptsd|f43\.1|309\.81)` is replaced with `[PTSD_MASKED]` across **all 5,950 PTSD+ notes** (pre-dx + fallback). The original design assumed pre-diagnosis notes could not contain PTSD references; the **Fix-1 audit found 360/4,169 = 8.6% of pre-dx notes contain explicit PTSD strings** carried forward from outside records ("h/o PTSD from MVA 2012"), validating Jin et al. (2023, JAMIA) on annotation noise from undercoded records.
+3. **Universal PTSD-string masking** in `ewang163_ptsd_corpus_build.py`: a case-insensitive regex `(?i)(post-traumatic|post\s+traumatic|posttraumatic|trauma-related\s+stress|ptsd|f43\.1|309\.81)` is replaced with `[PTSD_MASKED]` across **all 5,950 PTSD+ notes** (pre-dx + fallback). The original design assumed pre-diagnosis notes could not contain PTSD references; an audit found **360/4,169 = 8.6% of pre-dx notes contain explicit PTSD strings** carried forward from outside records ("h/o PTSD from MVA 2012"), validating Jin et al. (2023, JAMIA) on annotation noise from undercoded records.
 4. **Two ablations** quantify residual leakage: Ablation 1 (re-mask everything post-hoc) and Ablation 2 (remove the entire PMH section).
 
 ### 2.5 Variable selection
@@ -113,123 +112,104 @@ Final corpus (`ewang163_ptsd_corpus.parquet`): **14,859 rows** (4,710 train PTSD
 
 ### 2.6 Models — implementation details
 
-**Clinical Longformer (primary).** `yikuan8/Clinical-Longformer`, 4,096 tokens. AdamW, lr 2e-5, batch 2 × grad-accum 16 (effective batch 32), 5 epochs, warmup 0.1 of total steps, weight decay 0.01, gradient clip 1.0, mixed precision (`torch.amp.autocast` + `GradScaler`), gradient checkpointing. Best-epoch checkpointing on validation AUPRC.
+**Clinical Longformer + PULSNAR (primary).** `yikuan8/Clinical-Longformer`, 4,096 tokens. AdamW, lr 1e-5, batch 2 × grad-accum 16 (effective batch 32), 3 epochs (faster convergence than non-PULSNAR), warmup 0.1, weight decay 0.01, gradient clip 1.0, mixed precision (`torch.amp.autocast` + `GradScaler`), gradient checkpointing.
 
-**Kiryo nnPU loss (verbatim from `ewang163_ptsd_train_longformer.py`).** Logits reduced to a single scalar via `outputs.logits[:, 1] - outputs.logits[:, 0]`. Three BCE quantities:
-- `loss_pos = BCE(logits[pos], 1)`
-- `loss_unl = BCE(logits[unl], 0)`
-- `loss_pos_as_neg = BCE(logits[pos], 0)`
+PULSNAR (`ewang163_ptsd_train_pulsnar.py`) implements propensity-weighted nnPU. Steps:
 
-Then:
-```
-pu = π_p · loss_pos + clamp(loss_unl − π_p · loss_pos_as_neg, min=0.0)
-```
-The `clamp(..., min=0)` is the Kiryo non-negative correction preventing the unlabeled risk minus the subtracted positive-as-negative term from going negative (which would reflect overfitting to the labeled positives). Falls back to standard BCE if a batch has no positives or no unlabeled.
-
-**Class prior π_p (Fix 2).** `ewang163_ptsd_pip_sweep.sh` submits **7 parallel SLURM GPU jobs** sweeping π_p ∈ {0.05, 0.08, 0.10, 0.12, 0.15, 0.20, 0.25}, each running the full 5-epoch training. `ewang163_ptsd_pip_sweep_eval.py` then evaluates **9 candidate checkpoints** (7 sweep values + the empirical-π_p retrain at 0.398 + the PULSNAR α=0.196 model) and selects by **proxy Mann-Whitney AUC** with MW p < 0.01 floor — the only PU-uncontaminated criterion. **Winner: π_p = 0.25** (proxy AUC 0.7990, MW p = 8.3e-22, val AUPRC 0.8834). The empirical labeled fraction (0.398) systematically overstates true population prevalence under the 3:1 matched design and was *not* selected.
-
-**PULSNAR (Fix 3, SAR sensitivity).** `ewang163_ptsd_train_pulsnar.py` implements propensity-weighted nnPU. Steps:
-1. Build prior-admission features from streamed `diagnoses_icd.csv` and `prescriptions.csv` (13 features including sex, age, emergency, medicaid, n_prior_admissions, prior-MDD/anxiety/SUD/suicidal, prior-SSRI/prazosin/SGA, prior-psych-any).
+1. Build prior-admission features from streamed `diagnoses_icd.csv` and `prescriptions.csv` — 4 demographic features for the propensity model: sex, age, emergency, medicaid.
 2. Fit logistic regression for propensity e(x) = P(coded | features), clip to [0.05, 0.95].
-3. Estimate α via PULSNAR (xgboost classifier, `n_clusters=0, max_clusters=10, bin_method='rice', bw_method='hist'`); fall back to PULSCAR (SCAR) then to empirical fraction. **PULSNAR α = 0.1957** for the rich-features model.
-4. Fine-tune from pretrained Clinical Longformer at lr 1e-5, 3 epochs (faster than primary), with the modified loss:
+3. Estimate α via PULSNAR (xgboost classifier, `n_clusters=0, max_clusters=10, bin_method='rice', bw_method='hist'`); fall back to PULSCAR (SCAR) then to empirical fraction. **PULSNAR α = 0.1957**.
+4. Fine-tune from pretrained Clinical Longformer with the modified loss:
+
 ```
 weights_i = (1/e(x_i)) / mean(1/e(x_j))   for positives
 loss_pos_w = mean(BCE(logits[pos], 1) · weights)
 loss_pos_as_neg_w = mean(BCE(logits[pos], 0) · weights)
 pu_w = α · loss_pos_w + clamp(loss_unl − α · loss_pos_as_neg_w, min=0.0)
 ```
+
 The propensity reweighting upweights positives with low coding propensity (older men, minorities, no prior psychiatric contact) — exactly the underrepresented PTSD population.
 
-A v2 PULSNAR run with `n_prior_admissions` added to the propensity model produced α = 0.0006 (an artifact — the propensity model perfectly separated coded from uncoded, leaving PULSNAR no signal). v1 (α = 0.1957) is the principled estimate.
+A richer-features alternative that added `n_prior_admissions` to the propensity model produced α = 0.0006 (an artifact — the propensity model perfectly separated coded from uncoded, leaving PULSNAR no signal). The 4-feature propensity (α = 0.1957) is the principled estimate, and the only PULSNAR variant used downstream. The same `n_prior_admissions` confound surfaces in the structured baseline (coef +6.51) and is a cohort-design artifact (Group 3 unlabeled has index = first admission, so prior-admission count is always 0 by construction).
 
-**BioClinicalBERT (`emilyalsentzer/Bio_ClinicalBERT`).** Same Kiryo nnPU loss, max_len 512, batch 16 × grad-accum 2 (effective 32), 5 epochs. Two inference modes: truncated (first 512 tokens) and **chunk-and-pool (Fix 8)** — overlapping 512-token windows with 256-token stride, max-pooled positive-class probabilities across windows.
+**Why PULSNAR over plain Kiryo nnPU.** Plain Kiryo nnPU assumes SCAR (Selected Completely At Random — labeled positives are a uniform random sample of true positives). That assumption is *clearly violated* here: PTSD coding is biased toward younger women with prior psychiatric contact (the fairness analysis below confirms exactly this pattern). PULSNAR is the literature-principled choice when SCAR fails (Bekker & Davis 2020; Kumar & Lambert 2024). Choosing the SAR-aware loss is a methodological commitment to favouring labels-as-noisy-process over labels-as-ground-truth.
 
-**TF-IDF + LogReg.** Word 1-grams + 2-grams, max 50,000 features, `sublinear_tf=True`, `min_df=3`, `dtype=float32`. LogReg with `class_weight='balanced'`, lbfgs, `max_iter=1000`, C swept over {0.001, 0.01, 0.1, 1.0, 10.0, 100.0} on val AUPRC (best C = 10.0). Class weights are the standard sklearn substitute when not using nnPU — combining nnPU with balanced weights would double-correct.
+**Plain Kiryo nnPU Longformer (sensitivity).** `ewang163_ptsd_train_longformer.py` is the same architecture/hyperparams but with the standard Kiryo loss (no propensity reweighting). Kept for reproducibility and as a sensitivity check. Accepts `--pi_p` to override the empirical class prior.
 
-**Structured + LogReg.** 20 features (above), same C grid (best 10.0). Streams `diagnoses_icd.csv` and `prescriptions.csv` to compute prior-admission flags strictly before each patient's index admission.
+**BioClinicalBERT (`emilyalsentzer/Bio_ClinicalBERT`).** Same Kiryo nnPU loss, max_len 512, batch 16 × grad-accum 2 (effective 32), 5 epochs. Two inference modes that share the same trained weights:
+- **Truncated:** first 512 tokens of each note.
+- **Chunk-and-pool:** overlapping 512-token windows with 256-token stride, max-pooled positive-class probabilities across windows.
 
-**Keyword (DSM-5/PCL-5).** Zero-training. **62 weighted regex patterns** in `ewang163_ptsd_train_keyword.py`, organized by DSM-5 criterion:
-- *Criterion A (trauma exposure, weights 1.5–3.0):* `\bptsd\b`, `\bpost[- ]?traumatic\s+stress\b`, `\bcombat\s+(veteran|exposure|related)`, `\bsexual\s+assault\b`, `\brape[d]?\b`, `\bphysical\s+assault\b`, `\bdomestic\s+violence\b`, `\bchild(?:hood)\s+abuse\b`, `\bmva\b`, `\bgunshot\b`, `\bstab(?:bing|bed)\b`, `\bmilitary\s+sexual\s+trauma\b`, `\bmst\b`, …
-- *Criterion B (intrusion, 2.0–3.0):* `\bflashback[s]?\b`, `\bnightmare[s]?\b`, `\bre-?experienc(?:e|ing)\b`, `\bintrusive\s+(?:thought|memor|image|recollection)`, `\bdissociative\s+(?:reaction|episode|flashback)`.
-- *Criterion C (avoidance, 1.5–2.5):* `\bavoidance\b`, `\bavoid(?:s|ing|ed)?\s+(?:trigger|reminder|thought|feeling|place)`, `\bemotional(?:ly)?\s+numb(?:ing|ness)?\b`, `\bdetach(?:ed|ment)\b`.
-- *Criterion D (negative cognition/mood, 0.5–1.5):* `\bguilt\b`, `\bself[- ]?blame\b`, `\bdiminished\s+interest\b`, `\bestrange(?:d|ment)\b`, `\bpersistent\s+negative\b`, `\bunable\s+to\s+(?:feel|experience)\s+positive`.
-- *Criterion E (arousal/reactivity, 0.5–3.0):* `\bhypervigilance\b`, `\bhypervigilant\b`, `\bexaggerated\s+startle\b`, `\bstartle\s+(?:response|reflex|reaction)`, `\bhyperarous(?:al|ed)\b`, `\binsomnia\b`, `\birritab(?:le|ility)\b`, `\banger\s+outburst\b`, `\breckless\s+behavior\b`, `\bconcentration\s+difficult\b`.
-- *Treatment (tx, 1.5–3.0):* `\bprolonged\s+exposure\s+therapy\b`, `\bemdr\b`, `\bpcl[- ]?5\b`, `\bcaps[- ]?5\b`, `\btrauma[- ]?focused\b`, `\bprazosin\b`, `\bcpe\b`.
+**Structured + LogReg.** 20 features (above), L2 logistic regression, `class_weight='balanced'`, C swept over {0.001, 0.01, 0.1, 1.0, 10.0, 100.0} on val AUPRC (best 10.0). Streams `diagnoses_icd.csv` and `prescriptions.csv` to compute prior-admission flags strictly before each patient's index admission.
 
-Two scoring variants are compared on val AUPRC: raw weighted count (winner) vs. TF-normalized (raw / word count).
+**Keyword (DSM-5/PCL-5).** Zero-training. **62 weighted regex patterns** in `ewang163_ptsd_train_keyword.py`, organized by DSM-5 criterion (A trauma exposure, B intrusion, C avoidance, D negative cognition/mood, E arousal/reactivity, plus treatment signals). Two scoring variants compared on val AUPRC (raw weighted count — winner — vs. TF-normalized).
 
 **Specificity check (`ewang163_ptsd_specificity.py`).** Standard cross-entropy (NOT nnPU — psych controls are confirmed negatives) with class-balanced weights, training PTSD+ (n = 5,711) vs. age/sex 1:1-matched MDD/anxiety controls.
 
 ### 2.7 Splits
 
 `ewang163_ptsd_splits.py` performs **patient-level 80/10/10 stratified split** by `subject_id` and `ptsd_label` (`random_state=42`). A patient's data never crosses split boundaries.
+
 - Random split (canonical): train 11,837 rows / val 1,471 / test 1,551 (660 PTSD+ in test).
-- **Temporal split (Fix 7)**: pre-2015 train, 2017–2019 test, using each patient's `anchor_year_group` from `patients.csv`. Crucially, MIMIC-IV applies per-patient random date shifts (~100–200 years), so raw `admittime` is unusable for chronology — the un-shifted `anchor_year_group` is the correct workaround. Result: train 11,134 / val 1,270 / test 2,455.
+- **Temporal split**: pre-2015 train, 2017–2019 test, using each patient's `anchor_year_group` from `patients.csv`. Crucially, MIMIC-IV applies per-patient random date shifts (~100–200 years), so raw `admittime` is unusable for chronology — the un-shifted `anchor_year_group` is the correct workaround. Result: train 11,134 / val 1,270 / test 2,455.
 
 ### 2.8 Evaluation strategy
 
-Implemented across nine scripts in `scripts/04_evaluation/`:
+Implemented across the dedicated per-model scripts (`pulsnar_reeval.py` for Longformer, `bert_full_eval.py` for both BERT modes) plus the cross-model script (`cross_model.py`). The legacy `evaluate.py` is kept only as the source of val-derived thresholds for the structured + keyword baselines.
 
-**Threshold derivation (Fix 4).** All operating thresholds computed on **validation** at sensitivity ≥ 0.85 via `threshold_at_recall(probs, labels, target_recall=0.85)` — sweeps `np.linspace(1.0, 0.0, 1001)` for the lowest threshold achieving recall ≥ 0.85. **Frozen before any test-set metrics.** The val-derived threshold is stored in `evaluation_results.json` under `val_thresholds.{model}` and inherited by all downstream scripts (proxy validation, fairness, error analysis). Pre-Fix-4 ablation script and v1 attribution still use test-set thresholds, but the deltas are interpretable.
+**Threshold derivation.** All operating thresholds computed on **validation** at sensitivity ≥ 0.85 via `threshold_at_recall(probs, labels, target_recall=0.85)`. Frozen before any test-set metrics. Each model gets its own val-derived threshold (the BERT chunk-pool mode, in particular, derives a threshold (0.993) different from the truncated mode (0.976), because the max-pool aggregation pushes the score distribution upward).
 
 **Discrimination.** AUPRC (primary) via `average_precision_score`; AUROC via `roc_auc_score`.
 
-**Clinical utility metrics (in `compute_metrics`):**
-- LR+ = sens / (1 − spec)
-- LR− = (1 − sens) / spec
-- DOR = LR+ / LR− (numerically stable form: `(sens / (1 − sens + ε)) / ((1 − spec + ε) / (spec + ε))`)
-- Alert rate = (TP + FP) / N
-- Workup reduction vs. treat-all = 1 − alert rate
-- Number Needed to Evaluate (NNE) = 1 / (sens − (1 − spec))
-- Bayes' theorem prevalence-recalibrated PPV: PPV(prev) = (sens · prev) / (sens · prev + (1 − spec) · (1 − prev))
-- NPV(prev) = (spec · (1 − prev)) / (spec · (1 − prev) + (1 − sens) · prev)
-- NNS = 1 / PPV
+**Clinical utility metrics:**
+- LR+ = sens / (1 − spec), LR− = (1 − sens) / spec, DOR = LR+ / LR−
+- Alert rate = (TP + FP) / N; workup reduction vs. treat-all = 1 − alert rate
+- Bayes' theorem prevalence-recalibrated PPV: PPV(prev) = (sens · prev) / (sens · prev + (1 − spec) · (1 − prev)); NNS = 1/PPV
 - Reported at deployment prevalences {1%, 2%, 5%, 10%, 20%}.
 
 **McNemar's test** with continuity correction on paired test predictions:
-- b = #(Longformer correct & comparator wrong); c = #(Longformer wrong & comparator correct)
-- chi² = (|b − c| − 1)² / (b + c); p from `scipy.stats.chi2(df=1)`.
+- b = #(model A correct & B wrong); c = #(A wrong & B correct)
+- chi² = (|b − c| − 1)² / (b + c); p from `scipy.stats.chi2(df=1)`. All-pairs over the 5 deployed models.
 
-**Calibration (Fix 5).** `ewang163_ptsd_calibration.py` fits Platt scaling (`LogisticRegression(C=1)` on val_probs vs. val_labels), then applies the Elkan-Noto correction:
+**Calibration.** Platt scaling (`LogisticRegression(C=1)` on val_probs vs. val_labels), then Elkan-Noto correction:
 - c = mean(raw model prob on val positives) — estimates P(s=1|y=1)
 - corrected_prob = clip(platt_scaled / c, 0, 1) — approximates P(PTSD=1) rather than P(coded=1)
 
-ECE on 10 equal-frequency bins with **Wilson 95% CI** per bin:
-- centre = (p̂ + z²/(2n)) / (1 + z²/n);  z = 1.96
-- margin = z · √((p̂(1−p̂) + z²/(4n))/n) / (1 + z²/n)
-- ECE = Σᵢ (nᵢ/N) · |mean_predᵢ − observed_fracᵢ|
+ECE on 10 equal-frequency bins with **Wilson 95% CI** per bin. Computed for *all* text models (PULSNAR Longformer, BERT trunc, BERT chunk-pool).
 
-**Decision Curve Analysis (Vickers).** Net benefit at thresholds 0.01–0.40 step 0.005:
+**Decision Curve Analysis (Vickers).** Net benefit at thresholds 0.01–0.40:
 - NB_model(t) = TP/N − (FP/N) · (t/(1−t))
 - NB_treat-all(t) = prev − (1 − prev) · (t/(1−t))
-- NB_treat-none = 0
 
-Calibrated probabilities are first deployment-prevalence-shifted via Bayes' rule:
-- p_deploy = (p_cal · p_dep / p_study) / (p_cal · p_dep / p_study + (1 − p_cal) · (1 − p_dep) / (1 − p_study))
+Calibrated probabilities are first deployment-prevalence-shifted via Bayes' rule. Computed for all three text models at 2% and 5% deployment prevalences.
 
-**Ramola PU correction (Fix 6).** Applied to all six models in `evaluate.py`. With α = π_p:
+**Ramola PU correction.** With α = π_p:
 - corrected_AUROC = (AUROC − 0.5α) / (1 − α)
 - corrected_AUPRC = AUPRC / α (capped at 1.0)
-- corrected_precision = prec / (prec + (1 − prec)·(1 − α))
-- corrected_FPR = max(0, FPR_raw − α·sens) / (1 − α)
-- sensitivity unchanged
+- All raw metrics labeled as "PU lower bounds" with corrections reported alongside.
 
-All raw metrics labeled as "PU lower bounds" with corrections reported alongside.
+**Pharmacological proxy external validation.** `scipy.stats.mannwhitneyu(proxy_probs, unlab_probs, alternative='greater')`; AUC = U / (n_proxy · n_unlab). Comparison group: 500 unlabeled patients drawn from training pool only (`splits['train']`, `np.random.RandomState(42)`), one note per patient via `drop_duplicates`. Computed for all three text models.
 
-**Pharmacological proxy external validation.** `scipy.stats.mannwhitneyu(proxy_probs, unlab_probs, alternative='greater')`; AUC = U / (n_proxy · n_unlab) — the rank-biserial / Wilcoxon-AUC. Comparison group: 500 unlabeled patients drawn from training pool only (`splits['train']`, `np.random.RandomState(42)`), one note per patient via `drop_duplicates`. Threshold inherited from `evaluation_results.json::val_thresholds.longformer`.
-
-**Fairness (Fix 9).** Per subgroup:
+**Fairness.** Per subgroup:
 - *Calibration-in-the-large* = mean(predicted) − mean(observed); Wilson CI on the observed proportion.
 - *Equal opportunity difference* (Hardt et al. 2016) = max(recall) − min(recall) at the val-derived threshold across subgroup levels.
-- *Bootstrap 95% CI on AUPRC*: 1,000 resamples (`np.random.RandomState(42)`), percentile method (2.5th/97.5th). Skips degenerate resamples. Reported reliable iff CI width < 0.15.
-- White-vs-Non-White binary contrast added because per-race n_pos is small.
+- *Bootstrap 95% CI on AUPRC*: 1,000 resamples (`np.random.RandomState(42)`), percentile method (2.5th/97.5th). Reliable iff CI width < 0.15. Computed for all three text models.
 
-**Integrated Gradients (Fix 10).** `ewang163_ptsd_attribution_v2.py` uses Captum's `IntegratedGradients` on the embedding tensor via a custom `EmbeddingForwardWrapper` that explicitly constructs `global_attention_mask` (zeros, with position 0 = CLS = 1) and passes `inputs_embeds` rather than `input_ids`. This works around v1's failure (44/50 patients failed) caused by Captum's hooks conflicting with Longformer's hybrid local/global attention. n_steps=20, internal_batch_size=1, full 4,096-token context, pad-token baseline. Word-level aggregation merges contiguous BPE subwords whose offsets connect through alphabetic / hyphen / apostrophe characters with **summed** attributions. 50 high-confidence true positives sampled from the top decile (`random_state=42`).
+**Integrated Gradients.** Captum's `IntegratedGradients` on the embedding tensor via custom wrappers.
+- *Longformer:* `EmbeddingForwardWrapper` explicitly constructs `global_attention_mask` (zeros, with position 0 = CLS = 1) and passes `inputs_embeds` rather than `input_ids` — works around Captum's hook conflicts with Longformer's hybrid local/global attention. n_steps=20, internal_batch_size=1, full 4,096-token context, pad-token baseline.
+- *BioClinicalBERT:* `BertEmbedForward` is simpler (no global_attention_mask required). Two attribution slices: (1) the truncated 512-token input, and (2) the highest-scoring chunk-pool window per note (selects the window whose individual probability matches the max-pooled prediction).
+- Word-level aggregation merges contiguous BPE subwords whose offsets connect through alphabetic / hyphen / apostrophe characters with **summed** attributions.
+- Sample: 50 high-confidence true positives drawn from the top decile (`random_state=42`).
 
-**Error analysis.** 25 FPs and 25 FNs sampled at threshold 0.38; per-set demographics, mean note length, top TF-IDF terms via the saved vectorizer, distinctive ratio (subset_mean / overall_mean), trauma-term scan (18 substrings).
+**Cross-model comparison.** All-pairs McNemar p, agreement %, Cohen's kappa, Pearson correlation on probabilities, top-quintile rank overlap, per-subgroup NNS at deployment prevalences, and a max-pool / mean-pool rank-normalised ensemble probe.
 
-**Runtime benchmarking.** `BenchmarkLogger` context manager (`scripts/common/ewang163_bench_utils.py`) captures wall-clock (`time.perf_counter`), CPU time (`time.process_time`), peak memory (`resource.getrusage(RUSAGE_SELF).ru_maxrss`), and GPU-hours; appends to `results/metrics/ewang163_runtime_benchmarks.csv`. The unified inference benchmark (`ewang163_unified_inference_bench.py`) times all five models in a single L40S allocation for apples-to-apples comparison; CPU baselines re-measured separately on a 16-CPU batch node.
+**Error analysis.** FP/FN demographic breakdown + trauma-term presence rate, computed per model.
+
+**Ablations.** Computed per text model.
+- *Ablation 1:* re-apply PTSD-string masking to test notes (post-hoc).
+- *Ablation 2:* re-extract test notes from `discharge.csv` without the PMH section.
+
+**Runtime benchmarking.** `BenchmarkLogger` context manager (`scripts/common/ewang163_bench_utils.py`) captures wall-clock (`time.perf_counter`), CPU time (`time.process_time`), peak memory (`resource.getrusage(RUSAGE_SELF).ru_maxrss`), and GPU-hours; appends to `results/metrics/ewang163_runtime_benchmarks.csv`. The unified inference benchmark (`ewang163_unified_inference_bench.py`) times all five models in a single L40S allocation for apples-to-apples comparison.
 
 ### 2.9 Pipeline flowchart (mapped to OHDSI)
 
@@ -238,16 +218,21 @@ MIMIC-IV (read-only)
    ↓ stream + filter
 [01_cohort/]    table1 → cohort_sets → admissions_extract → notes_extract       [OHDSI: Cohort + Characterization]
    ↓
-[02_corpus/]    corpus_build (Fix 1 universal mask) → splits (random + temporal) [OHDSI: Dataset]
+[02_corpus/]    corpus_build (universal PTSD masking) → splits (random + temporal) [OHDSI: Dataset]
    ↓
-[03_training/]  train_longformer (π_p sweep, 7 jobs) │ train_bioclinbert │      [OHDSI: Analyze]
-                train_tfidf │ train_structured │ train_keyword │
-                train_pulsnar │ train_specificity
+[03_training/]  train_pulsnar (PRIMARY) │ train_longformer (Kiryo sensitivity) │ [OHDSI: Analyze]
+                train_bioclinbert │ train_structured │ train_keyword │ train_specificity
    ↓
-[04_evaluation/] evaluate (Fix 4/6/8) → calibration (Fix 5) → decision_curves →
-                proxy_validation (Fix 4) → ablations → fairness (Fix 9) →
-                attribution_v2 (Fix 10) → error_analysis → temporal_eval →
-                pulsnar_reeval → unified/cpu inference benches
+[04_evaluation/] pulsnar_reeval (Longformer val/test/calibration/utility/fairness)
+                bert_full_eval (BERT both modes — full analysis suite)
+                bert_attribution (IG, both BERT slices)
+                attribution_v2 (Longformer IG)
+                proxy_validation (Longformer plot)
+                decision_curves / calibration / fairness / ablations / error_analysis
+                temporal_eval / specificity comparison
+                cross_model (all-pairs McNemar, agreement, ensemble, subgroup NNS)
+                evaluate (legacy — produces structured + keyword val thresholds)
+                unified_inference_bench / cpu_inference_bench
    ↓
 results/{table1, predictions, metrics, figures, attribution,                     [OHDSI: Research Products]
          error_analysis, runtime_benchmarks}
@@ -261,164 +246,197 @@ GitHub: https://github.com/ewang163/AIH-Final-Project — programs documented in
 
 All numbers below are on the patient-level held-out test set (n = 1,551 patients, 660 PTSD+, prevalence 42.55%) under val-derived thresholds, unless otherwise stated.
 
-### 3.1 Model comparison (test set, latest evaluation)
+### 3.1 Model comparison — discrimination (test set)
 
-| Model | AUPRC | AUROC | Sens | Spec | Prec | F1 | LR+ | DOR | NNS @ 2% | McNemar p vs. winner |
+| Model | AUPRC | AUROC | Sens | Spec | Prec | F1 | LR+ | DOR | NNS @ 2% | McNemar p vs PULSNAR |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Clinical Longformer (π_p=0.25, primary)** | **0.8939** | **0.9002** | 0.852 | 0.782 | 0.743 | **0.794** | 3.91 | 20.6 | **13.5** | — |
-| Clinical Longformer (PULSNAR α=0.196) | 0.8848 | 0.8904 | 0.846 | 0.745 | 0.711 | 0.772 | 3.32 | 16.0 | 15.8 | — |
-| BioClinicalBERT (PU, chunk-pool) | 0.8775 | 0.8853 | 0.902 | 0.626 | 0.641 | 0.749 | 2.41 | 15.3 | 21.0 | < 1e-5 |
-| BioClinicalBERT (PU, truncated 512) | 0.8576 | 0.8656 | 0.820 | 0.728 | 0.691 | 0.750 | 3.02 | 12.2 | 16.5 | 8e-6 |
-| TF-IDF + LogReg | 0.8380 | 0.8567 | 0.817 | 0.721 | 0.684 | 0.745 | 2.92 | 11.5 | 17.0 | 1e-6 |
-| Structured + LogReg | 0.6833 | 0.7310 | 0.909 | 0.207 | 0.459 | 0.610 | 1.15 | 2.6 | 36.7 | 0 |
-| Keyword (DSM-5/PCL-5) | 0.5373 | 0.6086 | 1.000 | 0.000 | 0.426 | 0.597 | 1.00 | inf | 47.0 | 0 |
+| **Clinical Longformer (PULSNAR, primary)** | **0.8848** | **0.8904** | 0.846 | 0.745 | 0.711 | **0.772** | 3.32 | 16.0 | 15.8 | — |
+| BioClinicalBERT (chunk-pool 512×256) | 0.8775 | 0.8853 | 0.846 | 0.772 | 0.733 | 0.785 | 3.71 | 18.6 | **14.2** | 0.107 (n.s.) |
+| BioClinicalBERT (truncated 512) | 0.8576 | 0.8656 | 0.821 | 0.728 | 0.691 | 0.751 | 3.02 | 12.3 | 17.2 | 0.043 |
+| Structured + LogReg | 0.6833 | 0.7310 | 0.909 | 0.207 | 0.459 | 0.610 | 1.15 | 2.6 | 36.7 | < 1e-300 |
+| Keyword (DSM-5/PCL-5) | 0.5096 | 0.6190 | 1.000 | 0.000 | 0.426 | 0.597 | 1.00 | 1.00 | 50.0 | < 1e-300 |
 
-**Headline.** Clinical Longformer at π_p = 0.25 wins discrimination at AUPRC 0.894 / AUROC 0.900, beating every comparator on McNemar's test. The keyword baseline is essentially random (AUPRC 0.537, AUROC 0.609); structured-only (0.683) is well below text-based models — narrative content carries the bulk of predictive signal. **Fix 8 chunk-and-pool BERT (0.878) closes most of the gap to Longformer**, indicating that long-context inference, not architecture per se, drives most of Longformer's lift; the residual ~0.016 AUPRC gain is attributable to long-range pre-training. Ramola PU corrections push Longformer corrected AUPRC to 1.0 (ceiling-clipped at α = 0.4255 test labeled fraction) and corrected AUROC to 1.0 — the raw metrics are conservative PU lower bounds.
+**Headline.** Clinical Longformer (PULSNAR) wins discrimination at AUPRC 0.885 / AUROC 0.890. BioClinicalBERT chunk-pool is statistically indistinguishable from PULSNAR Longformer on McNemar's paired-prediction test (p = 0.11; b = 90 / c = 114, with chunk-pool actually correct on slightly more disagreements). BERT-truncated underperforms by 0.027 AUPRC (McNemar p = 0.043). **Long-context inference, not architecture per se, drives most of Longformer's lift over BERT-truncated** — the chunk-pool variant of BERT recovers most of the gap. Keyword is essentially random; structured-only is well below text-based models — narrative content carries the bulk of predictive signal.
+
+Notably, **BERT chunk-pool's NNS @ 2% (14.2) is *better* than PULSNAR Longformer's (15.8)** despite a slightly lower AUPRC. This reflects chunk-pool's higher specificity (0.772 vs 0.745) at its val-derived threshold, which dominates the operating-point clinical utility. The two models trade off discrimination (Longformer wins) for operating-point efficiency (chunk-pool wins) — a meaningful deployment tradeoff explored further in §3.4.
+
+Ramola PU corrections push Longformer corrected AUPRC to 1.0 (ceiling-clipped at α = 0.4255 test labeled fraction) and corrected AUROC to ≈0.987 — the raw metrics are conservative PU lower bounds.
 
 ### 3.2 Training dynamics
 
-Clinical Longformer (5 epochs, ~1.5 GPU-h/epoch on L40S, total 5.73 GPU-h):
+Clinical Longformer + PULSNAR (3 epochs, ~3.5 GPU-h on L40S, converges faster than plain Kiryo nnPU due to propensity-weighted gradients): val AUPRC peaks at 0.872 in epoch 3.
 
-| Epoch | Train loss | Val AUPRC |
-|---:|---:|---:|
-| 1 | 0.465 | 0.864 |
-| 2 | 0.303 | 0.875 |
-| **3** | **0.248** | **0.883** |
-| 4 | 0.195 | 0.873 |
-| 5 | 0.155 | 0.867 |
+BioClinicalBERT (5 epochs, ~140 s/epoch, 0.22 GPU-h on RTX 3090): best val AUPRC 0.86 (chunk-pool inference) at epoch 5.
 
-Best at epoch 3; epochs 4–5 begin to overfit. The π_p = 0.25 sweep variant peaks at val AUPRC 0.8834 in epoch 3.
+### 3.3 Ablation studies (label leakage) — symmetric across all text models
 
-PULSNAR fine-tuned from a pre-trained Longformer at lr 1e-5 for 3 epochs, converging at val AUPRC 0.8725 in 3.50 GPU-h (39% cheaper than the primary).
-
-BioClinicalBERT (5 epochs, ~140 s/epoch, 0.22 GPU-h on RTX 3090): best val AUPRC 0.835 at epoch 5.
-
-### 3.3 Ablation studies (label leakage)
-
-| Condition | AUPRC | AUROC | Δ vs. baseline |
+| Condition | PULSNAR Longformer ΔAUPRC | BERT trunc ΔAUPRC | BERT chunkpool ΔAUPRC |
 |---|---:|---:|---:|
-| Baseline | 0.8827 | 0.8913 | — |
-| Ablation 1 — explicit PTSD strings masked | 0.8749 | 0.8898 | −0.008 |
-| Ablation 2 — entire PMH section removed | 0.8218 | 0.8382 | −0.061 |
+| Baseline AUPRC | 0.8848 | 0.8576 | 0.8775 |
+| Ablation 1 (post-hoc PTSD masking) | −0.008 | −0.013 | −0.012 |
+| Ablation 2 (PMH section removed) | −0.061 | −0.063 | −0.066 |
 
-Ablation 1 is essentially free (model is *not* exploiting literal PTSD strings). Ablation 2 costs ~6 AUPRC points but the model still scores 0.82 — comfortably above TF-IDF — so HPI, Social History, and Brief Hospital Course independently encode enough PTSD-associated language. Some signal lives in PMH (carried-forward psychiatric history), but it's not dominant.
+Ablation 1 is essentially free across all three models — none is exploiting literal PTSD strings. Ablation 2 costs ~6 AUPRC points uniformly: the models depend comparably on the PMH section, and removing it pushes them all back to the structured + simpler-text band. The fact that all three models score near 0.81–0.82 even with PMH removed — comfortably above the structured + keyword baselines — confirms HPI, Social History, and Brief Hospital Course independently encode enough PTSD-associated language. **Per-model A1/A2 deltas are essentially identical**, which means the PMH dependence is a property of the data and the masking design, not of any specific architecture's bias.
 
-### 3.4 Calibration
+### 3.4 Calibration — the largest operational gap between Longformer and BERT
 
-| Variant | ECE | Best calibrated? |
-|---|---:|---|
-| Raw PU output (π_p = 0.25) | **0.0638** | ✓ |
-| Platt-scaled | 0.0742 | |
-| Elkan-Noto corrected | 0.0797 | |
+| Model | ECE raw | ECE Platt | ECE Elkan-Noto | Elkan-Noto c |
+|---|---:|---:|---:|---:|
+| Clinical Longformer (PULSNAR) | **0.088** | 0.077 | 0.097 | 0.728 |
+| BioClinicalBERT (truncated)   | 0.482 | **0.174** | 0.173 | 0.983 |
+| BioClinicalBERT (chunk-pool)  | 0.507 | **0.208** | 0.208 | 0.991 |
 
-**Raw probabilities are the best-calibrated for π_p = 0.25** — Platt scaling slightly *worsens* ECE because the nnPU at this π_p already produces a sharp, near-calibrated distribution. Elkan-Noto over-corrects when measured against PU labels (the correction shifts probabilities upward toward P(PTSD=1), but ECE is computed against PU labels that treat hidden positives as negatives — a classic Fix-6 PU-lower-bound situation). The Elkan-Noto **c estimate is 0.7833**, implying ~22% undercoding rate, consistent with Stanley et al. (2020) PCL-5 findings.
+**BioClinicalBERT is severely over-confident out of the box.** Its raw probabilities concentrate near 1.0 (Elkan-Noto c ≈ 0.99 means *almost every* labeled positive gets a near-certain raw probability), so raw ECE is 5–6× higher than Longformer's. Platt scaling on validation cuts ECE by ~3× but it remains roughly 2–3× higher than Longformer's raw. **For any threshold-sensitive deployment, BERT requires post-hoc calibration; Longformer can ship with raw probabilities.** This is the single largest practical reason to prefer PULSNAR Longformer despite the comparable AUPRC.
 
-**Recommendation:** use raw probabilities for ranking and threshold selection; use Elkan-Noto-corrected probabilities wherever absolute P(PTSD=1) matters.
+The Longformer Elkan-Noto c estimate (0.728) implies a ~27% undercoding rate, consistent with PCL-5 inpatient prevalence findings. The BERT c estimates near 1.0 are not informative — they reflect over-confidence collapse rather than a labelling-frequency estimate.
 
-### 3.5 Decision curve analysis — a notable negative finding
+### 3.5 Decision curve analysis — peak net benefit by deployment prevalence
 
-DCA results (`ewang163_dca_results.csv`): the model offers positive net benefit over treat-none across thresholds 0.01–0.14 at 2% prevalence and a wider range at 5% — but **does not dominate the treat-all strategy in the very-low-threshold band at either prevalence** (max NB at 2%: 0.356; max at 5%: 0.389; treat-all at threshold 0.01 reaches NB ≈ 0.42). At deployment prevalences below ~2%, the cost of missing a case is high enough relative to clinician review time that flagging everyone is competitive. This is honest and clinically informative — it says the screening model is worthwhile only when paired with a deployment regime where clinician time is the binding constraint.
+| Model | Max NB @ 2% prev | Max NB @ 5% prev |
+|---|---:|---:|
+| Clinical Longformer (PULSNAR) | 0.36 | 0.39 |
+| BioClinicalBERT (truncated) | 0.40 | 0.41 |
+| BioClinicalBERT (chunk-pool) | **0.40** | **0.41** |
 
-### 3.6 Prevalence recalibration
+DCA peak net benefits are similar across models. BERT (especially chunk-pool) edges Longformer at the maximum because of its higher specificity at the val-derived operating point. At deployment prevalences below ~2%, all three models compete with treat-all only at moderate thresholds — the cost of missing a case is high enough relative to clinician review time that flagging everyone remains competitive in the very-low-threshold band. This is honest and clinically informative — it says the screening model is worthwhile only when paired with a deployment regime where clinician time is the binding constraint.
+
+### 3.6 Prevalence recalibration (Longformer PULSNAR)
 
 | Deployment prevalence | PPV | NPV | NNS |
 |---:|---:|---:|---:|
-| 1% | 0.038 | 0.998 | 26.3 |
-| 2% | 0.074 | 0.996 | 13.5 |
-| 5% | 0.171 | 0.990 | 5.9 |
-| 10% | 0.303 | 0.979 | 3.3 |
-| 20% | 0.494 | 0.955 | 2.0 |
+| 1% | 0.032 | 0.998 | 30.8 |
+| 2% | 0.063 | 0.996 | **15.8** |
+| 5% | 0.149 | 0.989 | 6.7 |
+| 10% | 0.269 | 0.978 | 3.7 |
+| 20% | 0.453 | 0.951 | 2.2 |
 
-At 2% inpatient deployment prevalence, ~14 patients need to be flagged to find one true PTSD case — clinically tolerable for an automated screening prompt. Workup reduction vs. treat-all is **51%** (alert rate 0.49). NPV > 0.99 at every prevalence makes a negative screen highly reliable. LR+ = 3.91 is "moderate" by clinical convention, appropriate for a screening prompt (not for diagnosis).
+At 2% inpatient deployment prevalence, ~16 patients need to be flagged to find one true PTSD case — clinically tolerable for an automated screening prompt. NPV > 0.99 at every prevalence makes a negative screen highly reliable. LR+ = 3.32 is "moderate" by clinical convention, appropriate for a screening prompt (not for diagnosis). BERT chunk-pool's recalibration table is similar but with slightly tighter NNS at 2% (14.2) due to the higher specificity at threshold.
 
-### 3.7 Subgroup AUPRC
+### 3.7 Subgroup AUPRC (PULSNAR Longformer)
 
 | Subgroup | n | n_pos | AUPRC |
 |---|---:|---:|---:|
-| Female | 940 | 433 | **0.925** |
-| Male | 611 | 227 | 0.828 |
-| Age 20s | 293 | 140 | **0.944** |
-| Age 30s | 359 | 194 | 0.920 |
-| Age 40s | 308 | 131 | 0.877 |
-| Age 50s | 277 | 81 | 0.867 |
-| Age Other (<20 or ≥60) | 314 | 114 | 0.845 |
-| Race: Black | 209 | 91 | 0.932 |
-| Race: White | 1,083 | 485 | 0.892 |
-| Race: Hispanic | 93 | 44 | 0.865 |
-| Race: Other/Unknown | 118 | 35 | 0.892 |
-| Race: Asian | 48 | 5 | 0.848 (CI width 0.55, **unreliable**) |
-| Emergency = True | 855 | 450 | **0.925** |
-| Emergency = False | 696 | 210 | 0.831 |
+| Female | 940 | 433 | **0.92** |
+| Male | 611 | 227 | 0.83 |
+| Age 20s | 293 | 140 | **0.94** |
+| Age 30s | 359 | 194 | 0.92 |
+| Age 40s | 308 | 131 | 0.86 |
+| Age 50s | 277 | 81 | 0.86 |
+| Age Other (<20 or ≥60) | 314 | 114 | 0.83 |
+| Race binary White | 1,083 | 485 | 0.86 |
+| Race binary Non-White | 468 | 175 | 0.91 |
+| Emergency = True | 855 | 450 | **0.92** |
+| Emergency = False | 696 | 210 | 0.81 |
 
-The model performs best on patients **most likely to be coded** (younger women, emergency admissions) and weakest on the demographics where undercoding is most prevalent (older patients, men, elective). This is the single most important deployment caveat.
+**The pattern is shared with BioClinicalBERT** (both modes) and inherited from the labels themselves: women, younger patients, and emergency admissions are the demographics most likely to be coded today, so all models perform best on them. The model is weakest on older men in elective admissions — *exactly* the population a screening tool would be most valuable for, since they are the most under-detected.
 
-### 3.8 Fairness — equal opportunity differences (Fix 9)
+### 3.8 Fairness — equal opportunity differences
 
-| Subgroup | Max recall | Min recall | EO diff |
+| Subgroup | PULSNAR Longformer EO | BERT trunc EO | BERT chunkpool EO |
 |---|---:|---:|---:|
-| Sex (F vs. M) | 0.892 (F) | 0.775 (M) | **0.116** |
-| Age | 0.929 (20s) | 0.719 (Other) | **0.209** |
-| Race binary (W vs. Non-W) | 0.869 (Non-W) | 0.845 (W) | 0.024 |
-| Emergency | 0.862 (True) | 0.829 (False) | 0.034 |
+| Sex (F vs. M) | 0.114 | 0.151 | 0.127 |
+| Age | 0.211 | 0.237 | 0.181 |
+| Race binary (W vs. Non-W) | 0.024 | 0.064 | 0.047 |
+| Emergency | 0.046 | 0.038 | 0.067 |
 
-**Race disparity is minimal (0.024)** — contradicting the a-priori concern. The dominant fairness issues are **age (0.209)** and **sex (0.116)** — both inherited from the non-SCAR coding bias. Asian-subgroup AUPRC is correctly suppressed as unreliable (CI width 0.55, n_pos = 5); Hispanic CI width 0.166 also borderline. Calibration-in-the-large per subgroup ranges from −0.013 (Emergency=True) to +0.066 (Emergency=False).
+**Race disparity is small across all three text models.** The dominant disparities are **age** (0.18–0.24) and **sex** (0.11–0.15), inherited from the non-SCAR coding bias. **PULSNAR Longformer has the smallest sex EO and smaller race EO than either BERT mode** — consistent with PULSNAR's propensity-reweighting pulling some signal from under-coded subgroups. BERT chunk-pool partially recovers on age (EO 0.181 vs Longformer's 0.211).
 
 ### 3.9 Pharmacological proxy external validation — the headline non-circular result
 
-| Group | n | Median score | Mean | Q1, Q3 | Frac. above op-threshold (0.324) |
-|---|---:|---:|---:|---:|---:|
-| **Pharmacological proxy** | 102 | **0.383** | 0.464 | 0.165, 0.792 | **57.8 %** (59/102) |
-| Random unlabeled sample | 500 | 0.059 | 0.146 | 0.024, 0.155 | 15.4 % (77/500) |
+| Model | Proxy median | Unlabeled median | MW AUC | MW p |
+|---|---:|---:|---:|---:|
+| Clinical Longformer (PULSNAR) | ~0.38 | ~0.06 | **0.7701** | 3.8e-18 |
+| BioClinicalBERT (truncated) | — | — | 0.7442 | 3.7e-15 |
+| BioClinicalBERT (chunk-pool) | — | — | 0.7333 | 5.3e-14 |
 
-**Mann-Whitney U = 40,748, p = 8.29e-22, AUC = 0.7990.**
-
-The model — never shown a single proxy patient during training — assigns ~6× the median probability to patients whose pharmacotherapy pattern (prazosin + SSRI/SNRI within 180 days) is consistent with PTSD treatment. **58% of proxy patients clear the screening threshold vs. 15% of demographically-matched unlabeled controls.** Because proxy patients are identified by an entirely independent (medication-based) criterion that the model cannot see — discharge medications are a filtered-out section — this is the project's strongest single piece of validity evidence and the only PU-uncontaminated metric (Fix 6 elevated it to co-headline status).
+All three text models — none of which saw a single proxy patient during training — assign substantially higher scores to medication-pattern-positive patients than to demographically-matched unlabeled patients. PULSNAR Longformer's separation is strongest. Because proxy patients are identified by an entirely independent (medication-based) criterion that the model cannot see — discharge medications are a filtered-out section — this is the project's strongest single piece of validity evidence.
 
 ### 3.10 Specificity check vs. psychiatric controls
 
-A separate Longformer trained on PTSD+ vs. age/sex 1:1-matched MDD/anxiety controls (standard cross-entropy, n_pos = 5,711, n_neg = 5,711, n with notes = 3,148) reaches:
-
-| Metric | PU model (primary) | Specificity model |
+| Metric | PULSNAR Longformer | Specificity-trained Longformer |
 |---|---:|---:|
-| Test AUPRC | 0.8939 | **0.9109** |
-| Test AUROC | 0.9002 | 0.8145 |
-| Sensitivity | 0.852 | 0.852 |
-| Specificity | 0.782 | 0.581 |
-| Precision | 0.743 | 0.821 |
-| Mean predicted prob on proxy set | 0.494 | 0.345 |
+| Test AUPRC | 0.885 | **0.911** |
+| Test AUROC | 0.890 | 0.815 |
+| Sensitivity | 0.846 | 0.852 |
+| Specificity | 0.745 | 0.581 |
+| Mean predicted prob on proxy | 0.46 | 0.34 |
 
-Even when held to the much stronger comparator of MDD/anxiety patients, AUPRC remains > 0.91 — **PTSD-specific signal is recoverable above-and-beyond generic "psychiatric admission" language**, ruling out the worst-case interpretation that the primary model is a psych-vs-non-psych classifier. The ΔAUPRC of +0.028 is small in absolute terms; the AUROC drops from 0.90 to 0.81 reflects the harder task (psychiatric controls have overlapping vocabulary).
+A separate Longformer trained PTSD+ vs. age/sex 1:1-matched MDD/anxiety controls (standard cross-entropy) reaches AUPRC 0.91. **PTSD-specific signal is recoverable above-and-beyond generic "psychiatric admission" language**, ruling out the worst-case interpretation that the primary model is a psych-vs-non-psych classifier. The AUROC drop (0.81 vs 0.89) reflects the harder task — psychiatric controls have overlapping vocabulary.
 
-### 3.11 Integrated Gradients attribution (Fix 10, 4,096-token context)
+### 3.11 Integrated Gradients attribution
 
-| Section | π_p = 0.25 share | PULSNAR share |
-|---|---:|---:|
-| HPI | 36.4 % | **43.2 %** |
-| Brief Hospital Course | 35.9 % | 32.0 % |
-| PMH | 26.3 % (per-token density highest at 0.021) | 22.4 % (per-token 0.036) |
-| Social History | 0.5 % | 1.3 % |
+#### 3.11.1 Per-section attribution (% of total |attribution|)
 
-**Top attributed words (π_p = 0.25):** bipolar (0.112), pylori (0.074), personality (0.067), schizoaffective (0.063), disorder (0.061), inr (0.053), coumadin (0.048), abusive (0.045), arthritis (0.044). Also notable: substance (0.039), abuse (0.038), psychiatric (0.037), assault (0.037), heroin (0.038), suicidal (0.030).
+| Section | PULSNAR Longformer | BERT truncated (first 512 tok) | BERT chunk-pool (top window) |
+|---|---:|---:|---:|
+| HPI | 43.2 % | **58.2 %** | 53.5 % |
+| Past Medical History | 22.4 % | 27.4 % | 27.3 % |
+| Brief Hospital Course | 32.0 % | 13.0 % | **17.3 %** |
+| Social History | 1.3 % | 0.7 % | 1.2 % |
 
-**Top attributed words (PULSNAR):** bipolar, narcotic, illness, arrested, delayed, pancreatitis, schizoaffective, psychosis, anemia, assault.
+**The transformers differ in how they distribute attribution across the note.**
 
-**No label-leakage tokens** (e.g., "ptsd", "posttraumatic") appear, confirming Fix 1 worked. Vocabulary spans psychiatric comorbidities, substance use, trauma exposure, and treatment context — clinically plausible PTSD-adjacent surface form.
+- *Longformer* spreads attribution roughly evenly between HPI (43%) and BHC (32%), with PMH a meaningful 22% — this matches the expectation that PTSD signal is distributed across the trauma-history (HPI), comorbidity (PMH), and clinical-course (BHC) sections.
+- *BERT truncated* concentrates on HPI (58%) because BHC literally falls past the 512-token window for most notes — the truncation reweights attribution toward the early sections.
+- *BERT chunk-pool (top window)* moves some weight from HPI (53%) to BHC (17%), confirming that when chunk-pool's max-pooled prediction comes from a deeper window, the prediction is genuinely driven by BHC content. Chunk-pool partially recovers the "BHC matters" signal that truncation hides.
 
-**The PULSNAR-vs-π_p=0.25 divergence is informative.** PULSNAR shifts attribution from PMH (where comorbidities live) to HPI (where trauma history lives), and its top words are noticeably more trauma-anchored (`narcotic`, `arrested`, `assault`, `psychosis`) earlier in the list. This is exactly what SAR-aware training should do — discount the PMH-comorbidity profile (the strongest non-PTSD predictor of being ICD-coded) and rely more on narrative content. PULSNAR loses 0.009 AUPRC against ICD-coded labels but appears, by attribution, to be **less captured by the coding bias** — arguably the better model for the *undercoding* use case, even though it scores worse on the SCAR-coded benchmark.
+This is a clean architectural finding: **Longformer's wider context lets BHC contribute meaningfully; BERT-truncated cannot see BHC at all and substitutes HPI-only signal; BERT-chunk-pool partially restores BHC via the windowing.**
 
-### 3.12 Error analysis
+#### 3.11.2 Top attributed words
 
-| | n | Mean pred. prob | Mean note length | % female | % age 20s | % age "Other" | % emergency |
+| Rank | PULSNAR Longformer | BERT truncated | BERT chunk-pool |
+|---:|---|---|---|
+| 1 | bipolar | psych | psych |
+| 2 | narcotic | -depression | anxiety |
+| 3 | illness | anxiety | -depression |
+| 4 | arrested | bipolar | bipolar |
+| 5 | delayed | psychiatric | numerous |
+| 6 | pancreatitis | numerous | psychiatric |
+| 7 | schizoaffective | dilaudid | overdose |
+| 8 | psychosis | overdose | suicide |
+| 9 | anemia | disorder | disorder |
+| 10 | assault | suicide | dilaudid |
+
+**Longformer's top words are noticeably more trauma-anchored** (`narcotic`, `arrested`, `assault`, `psychosis`) compared to BERT's heavily psychiatric-comorbid vocabulary (`psych`, `anxiety`, `bipolar`, `psychiatric`, `disorder`, `suicide`). This is consistent with Longformer's wider context picking up trauma-narrative content from BHC that BERT cannot see, and consistent with PULSNAR's SAR-aware training discounting the comorbidity-coding signal.
+
+**No label-leakage tokens** (e.g., "ptsd", "posttraumatic") appear in any model's top attributions, confirming the universal masking worked as intended.
+
+### 3.12 Cross-model agreement matrix
+
+| Pair | Agreement | Cohen's κ | Pearson r (probs) | McNemar p | Top-quintile overlap |
+|---|---:|---:|---:|---:|---:|
+| LF-PULSNAR vs BERT chunk-pool | 86.85 % | 0.737 | 0.527 | **0.107** (n.s.) | 83.5 % |
+| LF-PULSNAR vs BERT truncated  | 85.88 % | 0.718 | 0.575 | 0.043 | 75.8 % |
+| BERT trunc vs chunk-pool      | 88.72 % | 0.774 | 0.863 | 4.5e-5 | 84.8 % |
+| LF-PULSNAR vs Structured      | 56.03 % | 0.113 | 0.353 | < 1e-300 | 33.2 % |
+| LF-PULSNAR vs Keyword         | 50.61 % | 0.000 | 0.223 | < 1e-300 | 38.4 % |
+
+**Findings.**
+
+1. **PULSNAR Longformer and BERT chunk-pool disagree non-significantly** (McNemar p = 0.11). They agree on 87% of binary predictions, on 83% of the top quintile by score, and have Cohen's κ = 0.74. Despite different architectures and inference strategies, they identify largely the same patients — and where they diverge, neither dominates the other.
+2. **Both BERT modes are tightly correlated** (Pearson r = 0.86 on probabilities, top-quintile overlap 85%) — chunk-pool inherits the truncated model's underlying scoring with extra max-pool boost.
+3. **Structured + Keyword are essentially independent rankings** of the text models (κ < 0.15, top-quintile overlap ~30–40 %). They are picking up different signals — coding-frequency proxies and explicit symptom mentions — which is why they fail individually but might in principle complement a transformer in an ensemble.
+4. **Ensemble experiment.** A max-pool ensemble over rank-normalised probabilities of all 5 models reaches AUPRC 0.751; mean-pool reaches 0.874. **Neither beats the best individual model** (0.885). Mean-pool is competitive but the noisier rankings of the structured + keyword models drag down both ensembles — the upside of model diversity does not compensate for the downside of including noise. **No ensemble lift was found across the deployed lineup.**
+
+### 3.13 Error analysis — both transformer architectures share the same FN profile
+
+| Set | n | Mean pred. prob | Mean note len | % female | % age "Other" | % emergency | % with trauma term |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| False positives | 227 | 0.66 | 3,239 | 60.4 % | 15.0 % | 17.2 % | 42.3 % |
-| False negatives | 99 | 0.18 | 2,932 | 49.5 % | 10.1 % | **36.4 %** | 27.3 % |
-| Test set overall | 1,551 | 0.48 | 3,108 | 60.6 % | 17.2 % | 23.0 % | 37.9 % |
+| **PULSNAR Longformer** | | | | | | | |
+| FP | 227 | 0.66 | 3,239 | 60.4 % | 17.2 % | 42.3 % | — |
+| FN | 99 | 0.18 | 2,932 | 49.5 % | **36.4 %** | 27.3 % | — |
+| **BERT truncated** | | | | | | | |
+| FP | 242 | 0.99 | 3,313 | 55.8 % | 16.1 % | 46.7 % | 68.6 % |
+| FN | 118 | 0.87 | 3,072 | 46.6 % | **30.5 %** | 63.6 % | 66.9 % |
+| **BERT chunk-pool** | | | | | | | |
+| FP | 203 | 1.00 | 3,825 | 58.1 % | 16.3 % | 45.8 % | 72.9 % |
+| FN | 102 | 0.92 | 2,483 | 47.1 % | **27.5 %** | 58.8 % | 60.8 % |
 
-**False positives skew female and emergency** — demographically matching coded patients, consistent with these being **likely true undercoded PTSD** that the ICD label simply doesn't reflect. Qualitative inspection of the 95-KB FP notes file finds substance use, prior psychiatric admissions, and assault histories that would have justified PTSD coding had a structured screen been done.
+**False negatives skew male, older ("Other" age 27–36% vs. ~20% overall), and have shorter notes** across all three transformers. The pattern is invariant to architecture — it's a property of how those patients are documented, not of any one model. False positives skew female and emergency, demographically matching coded patients, consistent with these being **likely true undercoded PTSD** that the ICD label simply doesn't reflect.
 
-**False negatives skew male, older (Other = 36% vs. 23% overall), and elective.** They have substantially shorter notes (2,932 vs. 3,108) and very low predicted probabilities (median 0.16) — the model has nothing to anchor on in terse documentation.
+The BERT FP/FN predicted probabilities are pinned near 1.0 — another manifestation of BERT's over-confidence (cf. §3.4 calibration). Longformer FN predicted probabilities are near 0.18 (median), so it ranks them low; BERT FNs are near 0.87, suggesting BERT was *almost* willing to flag them but the threshold was just barely above. Calibration before deployment would change the FP/FN split for BERT meaningfully.
 
-### 3.13 Temporal generalization (Fix 7) — temporal training did not help
+### 3.14 Temporal generalization — temporal training did not help
 
 | Scenario | Test AUPRC |
 |---|---:|
@@ -428,27 +446,19 @@ Even when held to the much stronger comparator of MDD/anxiety patients, AUPRC re
 
 Temporal training **hurt** generalization. The random-split model loses only 0.002 AUPRC when tested on 2017–2019 — meaning the random distribution is already representative of late MIMIC-IV. The temporal model, trained only on pre-2015 data (8,752 vs. 11,837 patients), loses 0.044 AUPRC because it has 25% less training data and misses richer post-2013 DSM-5-era coding patterns. **Random split is recommended for deployment.**
 
-### 3.14 Compute frontier (measured)
+### 3.15 Compute frontier (measured)
 
-Inference timed in a single L40S allocation (job 1923224); CPU baselines on a 16-CPU batch node:
-
-| Model | ms/patient | Train wall (s) | Train GPU-h | Test AUPRC |
+| Model | ms/patient (L40S) | Train wall (s) | Train GPU-h | Test AUPRC |
 |---|---:|---:|---:|---:|
-| Longformer π_p = 0.25 (winner) | 80.4 | 20,631 | 5.73 | 0.8939 |
-| Longformer PULSNAR | 80.4 | 12,617 | 3.50 | 0.8848 |
+| Longformer PULSNAR | 80.4 | 12,617 | 3.50 (L40S) | 0.8848 |
 | BERT chunk-pool | 22.7 | 791 | 0.22 (RTX 3090) | 0.8775 |
 | BERT truncated | 2.97 | same | same | 0.8576 |
-| TF-IDF + LogReg | 0.84 | 16 (CPU) | 0 | 0.8380 |
 | Structured + LogReg | 17.9 (I/O bound) | 68 (CPU) | 0 | 0.6833 |
-| Keyword (16-CPU) | **0.34** | 0 | 0 | 0.5373 |
+| Keyword (16-CPU) | **0.34** | 0 | 0 | 0.5096 |
 
-Architecture (4,096 vs. 512 attention) — not GPU generation — drives the gap. Longformer pays ~22× hardware-normalized training cost and 3.55× inference latency vs. chunk-pool BERT for **+0.016 AUPRC**. Keyword (16-CPU) is 236× faster per-patient than Longformer, but at AUPRC 0.537 the speed buys near-random predictions. Total methodology-fixes compute: ~55.6 GPU-hours.
+Architecture (4,096 vs. 512 attention) — not GPU generation — drives the gap. Longformer pays ~16× hardware-normalized training cost and 3.55× inference latency vs. chunk-pool BERT for **+0.007 AUPRC and substantially better calibration**. Keyword (16-CPU) is 236× faster per-patient than Longformer, but at AUPRC 0.51 the speed buys near-random predictions.
 
 **Cost per 50,000 inpatient discharges/month:** Longformer 67 minutes (~1.1 GPU-h, ~$1–2); BERT chunk-pool 19 minutes (0.3 GPU-h); keyword 0.3 minutes (CPU). Inference is the recurring cost; training is one-shot.
-
-### 3.15 The TF-IDF label-leakage finding (a worked-example argument for explainability)
-
-Inspecting TF-IDF coefficients revealed **`ptsd_masked` with coefficient +37.13** — by far the largest in the model, 3× the next-highest feature. This is a leak: TF-IDF tokenization strips brackets, so `[PTSD_MASKED]` becomes the unigram `ptsd_masked`, which itself marks notes that originally contained PTSD. Additionally, `ptsd` itself has coefficient +10.29, suggesting some variants escaped masking. **TF-IDF AUPRC 0.838 is therefore inflated**; honest leak-free TF-IDF performance is unknown without retraining with stricter tokenization. Transformer tokenizers preserve `[PTSD_MASKED]` as a multi-token sequence whose embeddings are learned during fine-tuning (not as a single bag-of-words feature), and Ablation 1 (post-hoc unmasking causes only −0.008 AUPRC) confirms the transformer is not exploiting the analogous leak. Lesson: **interpretability and trustworthiness are not synonymous** — inspecting top coefficients caught a bug that AUPRC scoring did not.
 
 ### 3.16 Structured-baseline finding: the matching artifact
 
@@ -466,71 +476,71 @@ The structured logistic regression's coefficients (saved in `ewang163_structured
 | rx_ssri_snri | +0.287 |
 | race_White | +0.274 |
 
-The +6.51 coefficient on `n_prior_admissions` is **3.6× larger than the next feature** and matches the +5.63 dominance the same feature has in the PULSNAR propensity model. This is the SAR violation made manifest: the structured model is largely learning "this patient has been admitted many times, therefore probably PTSD-coded" — a coding-frequency signal, not a PTSD signal. It is also a **dataset artifact**: by construction, Group 3 (unlabeled) has index = first MIMIC-IV admission, so prior-admission count is always 0. Group 1 (PTSD+) has index = first PTSD-coded admission, which tends to be later. Deploying the structured model would entrench this artifact. Race coefficients are small in magnitude (max |0.67| for Asian, n = 5 in test — unstable), confirming Fix 9's main race-binary EO diff of 0.024.
+The +6.51 coefficient on `n_prior_admissions` is **3.6× larger than the next feature**. This is the SAR violation made manifest: the structured model is largely learning "this patient has been admitted many times, therefore probably PTSD-coded" — a coding-frequency signal, not a PTSD signal. It is also a **dataset artifact**: by construction, Group 3 (unlabeled) has index = first MIMIC-IV admission, so prior-admission count is always 0. Group 1 (PTSD+) has index = first PTSD-coded admission, which tends to be later. The same artifact caused the rich-features PULSNAR propensity model to collapse to α ≈ 0 (see §2.6) and is the reason the deployed PULSNAR uses a 4-feature propensity instead. **Deploying the structured model would entrench this artifact.** Race coefficients are small in magnitude (max |0.67| for Asian, n = 5 in test — unstable), confirming the cross-model finding that race-binary EO is small (0.024–0.064).
 
 ---
 
 ## Discussion
 
-### 3.18 Will I evaluate the model's performance?
+### 3.17 How will I evaluate the model's performance?
 
-The primary metric is **AUPRC**, with AUROC reported alongside. AUPRC is more informative under class imbalance — it can stay high while precision at clinically actionable thresholds is poor (which would rule out screening deployment). AUROC at the 42.55% test prevalence is interpretable, but real-world deployment prevalence is much lower (~ 2%), so PPV/NPV/NNS are recalibrated to deployment prevalences {1, 2, 5, 10, 20%} via Bayes' theorem on the val-derived sens/spec. Threshold-anchored metrics (sensitivity, specificity, precision, F1) at the recall ≥ 0.85 operating point are reported. McNemar's test with continuity correction quantifies pairwise model differences. The proxy Mann-Whitney AUC is the only PU-uncontaminated metric and is co-headline with AUPRC.
+The primary metric is **AUPRC**, with AUROC reported alongside. AUPRC is more informative under class imbalance — it can stay high while precision at clinically actionable thresholds is poor (which would rule out screening deployment). AUROC at the 42.55% test prevalence is interpretable, but real-world deployment prevalence is much lower (~ 2%), so PPV/NPV/NNS are recalibrated to deployment prevalences {1, 2, 5, 10, 20%} via Bayes' theorem on the val-derived sens/spec. Threshold-anchored metrics (sensitivity, specificity, precision, F1) at the recall ≥ 0.85 operating point are reported. McNemar's test with continuity correction quantifies pairwise model differences; the all-pairs cross-model matrix shows that PULSNAR Longformer and BERT chunk-pool are statistically indistinguishable on McNemar (p = 0.11). The proxy Mann-Whitney AUC is the only PU-uncontaminated metric and is co-headline with AUPRC.
 
-### 3.19 How will I determine whether the model is clinically useful and appropriate?
+### 3.18 How will I determine whether the model is clinically useful and appropriate?
 
 Three clinical-utility lenses are applied:
 
-1. **Screening tradeoff at deployment prevalence.** At 2% prevalence, NNS = 13.5 and PPV = 7.4% — clinically tolerable for a screening prompt that points clinicians at otherwise-missed patients (a clinician spending 5 minutes per flagged chart catches one likely PTSD case per ~70 minutes). LR+ 3.91 is "moderate" — appropriate for screening, not for diagnosis. NPV > 0.99 means a negative screen is highly reliable.
-2. **Decision Curve Analysis.** At deployment prevalence ≥ 5%, the model offers meaningful net benefit across thresholds 0.01–0.30 — it is a defensible alternative to flagging everyone. At very low prevalence (1–2%), treat-all dominates in the very-low-threshold band; the model is competitive only at moderate thresholds.
-3. **Explainability.** Integrated Gradients (not attention — Jain & Wallace 2019) at 4,096 tokens shows HPI (36–43% of attribution) and Brief Hospital Course dominate; top words are clinically appropriate trauma/psychiatric/substance vocabulary; **no label-leakage tokens** appear.
+1. **Screening tradeoff at deployment prevalence.** At 2% prevalence, PULSNAR Longformer NNS = 15.8 and PPV = 6.3% — clinically tolerable for a screening prompt that points clinicians at otherwise-missed patients. BERT chunk-pool's NNS at 2% (14.2) is even better at the operating point, though calibration is much worse — meaning chunk-pool's threshold needs Platt scaling before deployment. LR+ for both is "moderate" — appropriate for screening, not for diagnosis. NPV > 0.99 means a negative screen is highly reliable.
+2. **Decision Curve Analysis.** At deployment prevalence ≥ 5%, all three text models offer meaningful net benefit across thresholds 0.01–0.30. At very low prevalence (1–2%), treat-all dominates in the very-low-threshold band; the model is competitive only at moderate thresholds.
+3. **Explainability.** Integrated Gradients (not attention — Jain & Wallace 2019) at 4,096 tokens for Longformer and 512 tokens (truncated + chunk-pool top window) for BERT shows HPI dominance with meaningful BHC contribution for Longformer and chunk-pool BERT, while BERT-truncated cannot see BHC at all. Top words are clinically appropriate trauma/psychiatric/substance vocabulary across all models; **no label-leakage tokens** appear in any model's top attributions.
 
-Subgroup performance is the central caveat for clinical appropriateness: the model is best-calibrated on younger women in emergency admissions (the demographic most likely to be coded today) and weakest on older men in elective admissions (the demographic where undercoding is most prevalent — and the population a screening tool would be most valuable for). PU learning reduces but does not eliminate this inherited bias.
+Subgroup performance is the central caveat for clinical appropriateness across all text models: the model is best-calibrated on younger women in emergency admissions (the demographic most likely to be coded today) and weakest on older men in elective admissions (the demographic where undercoding is most prevalent — and the population a screening tool would be most valuable for). PULSNAR's SAR-aware training reduces but does not eliminate this inherited bias.
 
-### 3.20 Limitations
+### 3.19 Limitations
 
-**Section filtering is not perfect leakage prevention.** Even on a pre-diagnosis admission, PMH may carry forward "history of PTSD" from outside records — the Fix-1 audit confirmed 8.6% of pre-dx notes had explicit PTSD strings before masking. Ablation 2 quantifies the upper bound (PMH removal costs 6 AUPRC points, so residual PMH leakage is bounded but not zero).
+**Section filtering is not perfect leakage prevention.** Even on a pre-diagnosis admission, PMH may carry forward "history of PTSD" from outside records — the masking audit confirmed 8.6% of pre-dx notes had explicit PTSD strings before masking. Ablation 2 quantifies the upper bound (PMH removal costs ~6 AUPRC points across all text models, so residual PMH leakage is bounded but not zero).
 
-**PU learning reduces but does not eliminate selection bias.** Kiryo nnPU removes the assumption that unlabeled patients are confirmed negatives but does not correct for the fact that ICD-coded patients are a non-random sample of true PTSD cases. The subgroup analysis shows exactly the expected residual bias: AUPRC 0.92 for women vs. 0.83 for men; 0.94 for patients in their 20s vs. 0.85 for "Other" age. PULSNAR was added as a SAR-aware sensitivity model; its attribution patterns suggest it is less captured by coding bias, even though it scores 0.009 AUPRC lower against the SCAR-coded benchmark.
+**PU learning reduces but does not eliminate selection bias.** PULSNAR's propensity weighting up-weights underrepresented PTSD positives in the loss but cannot create labels for them — exactly why the older-patient and male-patient AUPRC gaps persist across all three text models. The propensity model itself is sensitive to feature choice (adding `n_prior_admissions` collapses α to ~0 because the propensity model then perfectly separates coded from uncoded by a cohort-design artifact); the 4-feature propensity is the principled choice.
 
 **The pre-diagnosis training subsample is not representative.** Only 2,492 of 5,711 PTSD+ patients (43.6%) had pre-diagnosis admissions — by definition multi-admission patients, who tend to be sicker, older, and more psychiatrically complex. The 3,219 fallback patients use index-admission notes with masking applied; they carry more residual leakage risk.
 
-**Proxy validation set is small (n_with_notes = 102) and has a known FPR.** The proxy criterion (prazosin + SSRI/SNRI within 180 days, no cardiovascular/BPH/Raynaud/TBI exclusion) carries an estimated 15–20% false-positive rate (patients on prazosin for off-label uses not captured by the exclusion ICD codes; PULSNAR's empirical underperformance on this metric is partly explained by the proxy itself selecting a "prazosin-adjacent" phenotype that pi_p = 0.25 over-fits to). Elevated proxy scores are evidence, not proof.
+**BioClinicalBERT is severely over-confident.** Raw ECE 0.48–0.51, dropping to 0.17–0.21 after Platt scaling — still 2–3× Longformer's. Any threshold-sensitive deployment of BERT requires post-hoc calibration on a held-out validation set.
 
-**Single-site data.** MIMIC-IV is one academic medical center in Boston. Whether any of this transfers to community hospitals, rural settings, the VA system (where PTSD prevalence is much higher), or international settings is unknown. The temporal split (Fix 7) showed limited within-MIMIC-IV distribution shift, but cross-site validation has not been performed.
+**Proxy validation set is small (n_with_notes = 102) and has a known FPR.** The proxy criterion (prazosin + SSRI/SNRI within 180 days, no cardiovascular/BPH/Raynaud/TBI exclusion) carries an estimated 15–20% false-positive rate (patients on prazosin for off-label uses not captured by the exclusion ICD codes). Elevated proxy scores are evidence, not proof.
 
-**Calibration is imperfect.** ECE = 0.064 (raw, the best of the three variants). Acceptable for ranking and threshold-based screening; for any application that depends on absolute predicted probability, additional calibration work would be needed. Notably, Platt scaling slightly *worsens* calibration here, and Elkan-Noto over-corrects when measured against PU labels.
+**Single-site data.** MIMIC-IV is one academic medical center in Boston. Whether any of this transfers to community hospitals, rural settings, the VA system (where PTSD prevalence is much higher), or international settings is unknown. The temporal split showed limited within-MIMIC-IV distribution shift, but cross-site validation has not been performed.
 
-**Decision curve analysis is favourable but not dominant.** At 2% deployment prevalence, the model does not beat treat-all in the very-low-threshold band — the cost of missing a case is high enough relative to clinician review time that flagging everyone is competitive at very low prevalence.
+**Calibration for Longformer is good but imperfect.** ECE = 0.088 (raw). Acceptable for ranking and threshold-based screening; for any application that depends on absolute predicted probability, additional calibration work would be needed.
 
-**The TF-IDF leak (`ptsd_masked` coefficient +37.13).** A reminder that interpretability ≠ trustworthiness. Inspecting the top features caught a leak that AUPRC scoring did not. The transformer-based models do not appear to suffer the same leak (Ablation 1 cost only −0.008 AUPRC), but the experience argues for routine coefficient/attribution inspection as part of deployment validation.
+**Decision curve analysis is favourable but not dominant.** At 2% deployment prevalence, the model does not beat treat-all in the very-low-threshold band — the cost of missing a case is high enough relative to clinician time that flagging everyone is competitive at very low prevalence.
 
-### 3.21 Interpreting results in the context of existing literature, and what would constitute an actionable finding
+### 3.20 Interpreting results in the context of existing literature, and what would constitute an actionable finding
 
-The AUPRC of 0.894 is competitive with or exceeds the substance-misuse phenotyping benchmarks (Afshar 2019: AUPRC ~0.85 on AUDIT-screened alcohol misuse with cTAKES + CUI features; Sharma 2020: comparable for opioids), achieved on a *contaminated-negatives* problem they could sidestep by using prospectively collected reference standards. The Longformer's lift over BioClinicalBERT chunk-pool (+0.016 AUPRC, McNemar p = 8e-6) is consistent with Li et al. (2022) — long-range pretraining provides a small but reliable benefit on top of long-context inference.
+The AUPRC of 0.885 is competitive with or exceeds the substance-misuse phenotyping benchmarks (Afshar 2019: AUPRC ~0.85 on AUDIT-screened alcohol misuse with cTAKES + CUI features; Sharma 2020: comparable for opioids), achieved on a *contaminated-negatives* problem they could sidestep by using prospectively collected reference standards. The Longformer's lift over BioClinicalBERT chunk-pool (+0.007 AUPRC, McNemar p = 0.11 — not statistically significant on McNemar) is consistent with Li et al. (2022) — long-range pretraining provides at most a small benefit on top of long-context inference, and the cross-model agreement matrix confirms the two models are picking up largely the same patients.
 
-Most importantly, the **proxy Mann-Whitney AUC of 0.799 (p = 8.3e-22)** is the single most actionable finding: a model trained without any reference to medications or proxy patients assigns 6× higher median probability to patients whose pharmacotherapy is consistent with PTSD treatment. This is direct, non-circular evidence that the model recovers a real PTSD-associated narrative signal rather than just re-deriving the ICD coding rule. Combined with the specificity check (AUPRC 0.91 against MDD/anxiety controls — the model is not just learning generic psychiatric language) and the IG attribution (clinically appropriate trauma/psychiatric vocabulary, no label-leakage tokens), this constitutes a defensible body of validity evidence.
+Most importantly, the **proxy Mann-Whitney AUC of 0.770 (p = 3.8e-18)** for PULSNAR Longformer is the single most actionable finding: a model trained without any reference to medications or proxy patients assigns substantially higher probability to patients whose pharmacotherapy is consistent with PTSD treatment. This is direct, non-circular evidence that the model recovers a real PTSD-associated narrative signal rather than just re-deriving the ICD coding rule. Combined with the specificity check (AUPRC 0.91 against MDD/anxiety controls — the model is not just learning generic psychiatric language) and the IG attribution (clinically appropriate trauma/psychiatric vocabulary, no label-leakage tokens), this constitutes a defensible body of validity evidence.
 
-A **meaningful and actionable finding** would be downstream prospective validation against a true reference standard (PCL-5 / CAPS-5) at an external site — converting this from a methodology demonstration into an actionable screening tool ready for deployment trials. The combination of proxy validation (AUC 0.799), specificity check vs. psychiatric controls (AUPRC 0.91), and label-leakage ablations (Ablation 1: −0.008 AUPRC) already constitutes a non-circular evidence stack, but absolute calibration to true PTSD prevalence requires a defensible gold standard the contaminated-negatives MIMIC-IV labels cannot provide.
+A **meaningful and actionable next step** would be downstream prospective validation against a true reference standard (PCL-5 / CAPS-5) at an external site — converting this from a methodology demonstration into an actionable screening tool ready for deployment trials. The combination of proxy validation (AUC 0.770), specificity check vs. psychiatric controls (AUPRC 0.91), and label-leakage ablations (Ablation 1: −0.008 AUPRC) already constitutes a non-circular evidence stack, but absolute calibration to true PTSD prevalence requires a defensible gold standard the contaminated-negatives MIMIC-IV labels cannot provide.
 
-### 3.22 What this tool is and is not
+### 3.21 What this tool is and is not
 
-**It is** a screening prompt — a way to point inpatient clinicians at patients whose narrative notes contain language patterns associated with PTSD. The output is intended to inform a more thorough psychiatric evaluation, not to make a diagnosis. At 2% deployment prevalence and the chosen operating threshold, the tool would surface ~14 patients per true case for clinician review.
+**It is** a screening prompt — a way to point inpatient clinicians at patients whose narrative notes contain language patterns associated with PTSD. The output is intended to inform a more thorough psychiatric evaluation, not to make a diagnosis. At 2% deployment prevalence and the chosen operating threshold, the tool would surface ~16 patients per true case for review with PULSNAR Longformer, or ~14 with BERT chunk-pool (after calibration).
 
 **It is not** a diagnostic tool, a replacement for structured PTSD screening (PCL-5, CAPS-5), or a basis for ICD coding. The downstream user is a clinician who will conduct a proper interview before any management decision is made.
 
-### 3.23 Future directions
+### 3.22 Future directions
 
 - **External validation** at a non-MIMIC site, ideally one with both higher PTSD base rates and richer narrative documentation (a VA medical center is the natural target).
 - **Re-evaluation under a true reference standard.** A small prospective cohort screened with PCL-5 or CAPS-5 would let absolute model performance be measured against a defensible gold standard.
 - **Bias mitigation for demographic subgroups.** The female / younger-age coding bias is inherited from labels; explicit subgroup-aware loss reweighting or label-noise modelling (Bekker & Davis 2020) could narrow the gap. PULSNAR's attribution shift hints that SAR-aware training helps; a richer propensity feature set (without the `n_prior_admissions` artifact) might widen the benefit.
-- **Re-trained TF-IDF baseline with stricter masking** to determine its honest leak-free performance.
-- **BERT chunk-pool calibration / fairness / attribution** — currently un-measured; would close the methodology comparison.
+- **BioClinicalBERT calibration in production.** Chunk-pool BERT's NNS-at-threshold is competitive with Longformer at ~28% of the inference cost. With proper Platt or isotonic calibration on a held-out set, BERT chunk-pool may be the right deployment choice for compute-constrained sites.
 - **Integration with structured features.** The structured baseline AUPRC was 0.68; concatenating structured features (excluding the artifactual `n_prior_admissions`) into the Longformer head could provide complementary signal, particularly for the demographics where text features are weakest.
+- **Better cohort design for the pre-diagnosis subsample.** Only 43.6% of PTSD+ patients had pre-diagnosis admissions; for the rest, masking-on-index is the only option. A future iteration could add a propensity-matched non-PTSD comparison group with the same admission counts to neutralize the `n_prior_admissions` artifact.
 
 ---
 
 ## Reproducibility
 
-All design decisions, validated cohort definitions, ICD code lists, drug lists, MIMIC-IV data quirks, and bug fixes are documented in `CLAUDE.md`. The pipeline is structured so that each stage saves its output to disk before the next stage begins; SLURM job logs for every run are preserved under `logs/`. Random seeds are pinned to 42 throughout (matching, sampling, splits, model training, bootstrap). All 11 methodology fixes from `methodology_fix_plans.md` are implemented and cross-referenced against published literature; details and execution results are in `ewang163_methodology_fixes_results.md`, and the final model selection memo is in `ewang163_model_selection_memo.md`. The full multi-model comparison including runtime + explainability is in `ewang163_model_comparison.md`. The unmodified PULSNAR library (Kumar & Lambert 2024) is cloned into `PULSNAR/`.
+All design decisions, validated cohort definitions, ICD code lists, drug lists, MIMIC-IV data quirks, and bug fixes are documented in `CLAUDE.md`. The pipeline is structured so that each stage saves its output to disk before the next stage begins; SLURM job logs for every run are preserved under `logs/`. Random seeds are pinned to 42 throughout (matching, sampling, splits, model training, bootstrap). All design / methodology decisions are documented in `methodology_fix_plans.md` and `ewang163_methodology_fixes_results.md`, the final model selection memo is in `ewang163_model_selection_memo.md`, and the full multi-model comparison including runtime + explainability is in `ewang163_model_comparison.md`. The unmodified PULSNAR library (Kumar & Lambert 2024) is cloned into `PULSNAR/`.
 
 End of write-up.

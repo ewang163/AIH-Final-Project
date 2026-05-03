@@ -195,13 +195,12 @@ def evaluate(model, loader, device):
 
 # ── Main ──────────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description='Train Clinical Longformer with PU loss')
-    parser.add_argument('--pi_p', type=float, default=None,
-                        help='Override class prior pi_p (default: compute from data)')
-    parser.add_argument('--output_suffix', type=str, default='',
-                        help='Suffix for output dirs (e.g., "_pip05" for sweep)')
+    parser = argparse.ArgumentParser(
+        description='Train Clinical Longformer with plain Kiryo nnPU loss '
+                    '(sensitivity baseline; PULSNAR is the primary model).')
     parser.add_argument('--splits_suffix', type=str, default='',
-                        help='Suffix for split files (e.g., "_temporal" for Fix 7)')
+                        help='Suffix for split files (e.g., "_temporal" for the '
+                             'temporal-generalization split).')
     args = parser.parse_args()
 
     print('=' * 65)
@@ -215,9 +214,11 @@ def main():
         print(f'  GPU: {torch.cuda.get_device_name(0)}')
         print(f'  Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB')
 
-    best_dir = BEST_DIR + args.output_suffix if args.output_suffix else BEST_DIR
-    log_csv = LOG_CSV.replace('.csv', f'{args.output_suffix}.csv') if args.output_suffix else LOG_CSV
-
+    best_dir = BEST_DIR
+    log_csv = LOG_CSV
+    if args.splits_suffix:
+        best_dir = BEST_DIR + args.splits_suffix
+        log_csv = LOG_CSV.replace('.csv', f'{args.splits_suffix}.csv')
     train_parquet = TRAIN_PARQUET.replace('.parquet', f'{args.splits_suffix}.parquet') if args.splits_suffix else TRAIN_PARQUET
     val_parquet = VAL_PARQUET.replace('.parquet', f'{args.splits_suffix}.parquet') if args.splits_suffix else VAL_PARQUET
 
@@ -229,13 +230,8 @@ def main():
 
     n_pos = (train_df['ptsd_label'] == 1).sum()
     n_unl = (train_df['ptsd_label'] == 0).sum()
-
-    if args.pi_p is not None:
-        pi_p = args.pi_p
-        print(f'  Using CLI-specified pi_p = {pi_p:.4f}')
-    else:
-        pi_p = n_pos / (n_pos + n_unl)
-        print(f'  Computed class prior pi_p = {pi_p:.4f} (from training data)')
+    pi_p = n_pos / (n_pos + n_unl)
+    print(f'  Computed class prior pi_p = {pi_p:.4f} (from training data)')
 
     print(f'  Train: {len(train_df):,} rows  (pos={n_pos:,}, unl={n_unl:,})')
     print(f'  Val:   {len(val_df):,} rows')

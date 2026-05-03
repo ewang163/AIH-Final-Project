@@ -1,0 +1,182 @@
+{
+  "trunc": {
+    "mode": "trunc",
+    "val_threshold": 0.976,
+    "val_metrics": {
+      "AUPRC": 0.8397,
+      "AUROC": 0.8719,
+      "threshold": 0.976,
+      "sensitivity": 0.8517,
+      "specificity": 0.7205,
+      "precision": 0.6649,
+      "F1": 0.7468,
+      "tp": 494,
+      "fp": 249,
+      "tn": 642,
+      "fn": 86,
+      "n_total": 1471,
+      "n_pos": 580
+    },
+    "test_metrics": {
+      "AUPRC": 0.8576,
+      "AUROC": 0.8656,
+      "threshold": 0.976,
+      "sensitivity": 0.8212,
+      "specificity": 0.7284,
+      "precision": 0.6913,
+      "F1": 0.7507,
+      "tp": 542,
+      "fp": 242,
+      "tn": 649,
+      "fn": 118,
+      "n_total": 1551,
+      "n_pos": 660
+    },
+    "utility": {
+      "LR_positive": 3.0236,
+      "LR_negative": 0.2455,
+      "DOR": 12.32,
+      "alert_rate": 0.5055,
+      "workup_reduction": 0.4945,
+      "by_prevalence": [
+        {
+          "prevalence": 0.01,
+          "PPV": 0.0296,
+          "NPV": 0.9975,
+          "NNS": 33.74
+        },
+        {
+          "prevalence": 0.02,
+          "PPV": 0.0581,
+          "NPV": 0.995,
+          "NNS": 17.21
+        },
+        {
+          "prevalence": 0.05,
+          "PPV": 0.1373,
+          "NPV": 0.9872,
+          "NNS": 7.28
+        },
+        {
+          "prevalence": 0.1,
+          "PPV": 0.2515,
+          "NPV": 0.9734,
+          "NNS": 3.98
+        },
+        {
+          "prevalence": 0.2,
+          "PPV": 0.4305,
+          "NPV": 0.9422,
+          "NNS": 2.32
+        }
+      ]
+    },
+    "calibration": {
+      "ece_raw": 0.4822,
+      "ece_platt": 0.1738,
+      "ece_elkan_noto": 0.1729,
+      "elkan_noto_c": 0.9826
+    },
+    "dca": {
+      "max_nb_2pct": 0.3951,
+      "max_nb_5pct": 0.4077
+    },
+    "ablation": {
+      "baseline_AUPRC": 0.8576,
+      "A1_PTSD_masking_AUPRC": 0.8447,
+      "A1_delta": -0.0129,
+      "A2_no_PMH_AUPRC_retuned": 0.7949,
+      "A2_delta": -0.0627
+    }
+  },
+  "chunkpool": {
+    "mode": "chunkpool",
+    "val_threshold": 0.993,
+    "val_metrics": {
+      "AUPRC": 0.8601,
+      "AUROC": 0.8871,
+      "threshold": 0.993,
+      "sensitivity": 0.8534,
+      "specificity": 0.7262,
+      "precision": 0.6698,
+      "F1": 0.7506,
+      "tp": 495,
+      "fp": 244,
+      "tn": 647,
+      "fn": 85,
+      "n_total": 1471,
+      "n_pos": 580
+    },
+    "test_metrics": {
+      "AUPRC": 0.8775,
+      "AUROC": 0.8853,
+      "threshold": 0.993,
+      "sensitivity": 0.8455,
+      "specificity": 0.7722,
+      "precision": 0.7332,
+      "F1": 0.7854,
+      "tp": 558,
+      "fp": 203,
+      "tn": 688,
+      "fn": 102,
+      "n_total": 1551,
+      "n_pos": 660
+    },
+    "utility": {
+      "LR_positive": 3.7116,
+      "LR_negative": 0.2001,
+      "DOR": 18.55,
+      "alert_rate": 0.4907,
+      "workup_reduction": 0.5093,
+      "by_prevalence": [
+        {
+          "prevalence": 0.01,
+          "PPV": 0.0361,
+          "NPV": 0.998,
+          "NNS": 27.67
+        },
+        {
+          "prevalence": 0.02,
+          "PPV": 0.0704,
+          "NPV": 0.9959,
+          "NNS": 14.2
+        },
+        {
+          "prevalence": 0.05,
+          "PPV": 0.1634,
+          "NPV": 0.9896,
+          "NNS": 6.12
+        },
+        {
+          "prevalence": 0.1,
+          "PPV": 0.292,
+          "NPV": 0.9783,
+          "NNS": 3.42
+        },
+        {
+          "prevalence": 0.2,
+          "PPV": 0.4813,
+          "NPV": 0.9524,
+          "NNS": 2.08
+        }
+      ]
+    },
+    "calibration": {
+      "ece_raw": 0.5068,
+      "ece_platt": 0.208,
+      "ece_elkan_noto": 0.2079,
+      "elkan_noto_c": 0.9907
+    },
+    "dca": {
+      "max_nb_2pct": 0.4037,
+      "max_nb_5pct": 0.4131
+    },
+    "ablation": {
+      "baseline_AUPRC": 0.8775,
+      "A1_PTSD_masking_AUPRC": 0.8653,
+      "A1_delta": -0.0122,
+      "A2_no_PMH_AUPRC_retuned": 0.8113,
+      "A2_delta": -0.0662
+    }
+  }
+}

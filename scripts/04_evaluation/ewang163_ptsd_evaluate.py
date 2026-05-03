@@ -1,16 +1,28 @@
 """
 ewang163_ptsd_evaluate.py
 =========================
-Evaluates all models on the held-out test set:
-  1. Clinical Longformer (PU-trained)
-  2. BioClinicalBERT (skipped if no checkpoint found)
-  3. TF-IDF + logistic regression
-  4. Structured features only
-  5. Keyword/phrase-lookup baseline (zero-training)
+LEGACY all-baselines evaluator. The canonical per-model evaluation flow now
+uses three dedicated scripts:
 
-Fix 4 applied: thresholds are derived from the VALIDATION set and frozen
-before any test-set metrics are computed.  This eliminates selection-on-test
-bias for sensitivity/specificity/F1/PPV.
+  - ewang163_ptsd_pulsnar_reeval.py   Clinical Longformer (PULSNAR) — primary
+  - ewang163_ptsd_bert_full_eval.py   BioClinicalBERT (truncated + chunk-pool)
+  - ewang163_ptsd_cross_model.py      cross-model comparisons
+
+This script is kept because it still produces the val-derived thresholds for
+the structured logistic and keyword baselines (read by cross_model.py from
+results/metrics/ewang163_evaluation_results.json::val_thresholds). Do not rely
+on its Longformer / BERT numbers — the dedicated scripts above are the ones
+referenced in writeups.
+
+Models still scored here (val + test):
+  1. Clinical Longformer (the symlinked best — currently PULSNAR)
+  2. BioClinicalBERT (truncated + chunk-pool variants)
+  3. Structured features only (logistic regression baseline)
+  4. Keyword/phrase-lookup baseline (zero-training)
+
+All thresholds are derived from the VALIDATION set and frozen before any
+test-set metrics are computed. This eliminates selection-on-test bias for
+sensitivity/specificity/F1/PPV.
 
 Reports per model:
   AUPRC, AUROC, precision/recall/F1/specificity at val-derived threshold
@@ -71,8 +83,6 @@ TEST_PARQUET      = f'{DATA_SPLITS}/ewang163_split_test.parquet'
 ADM_PARQUET       = f'{DATA_COHORT}/ewang163_ptsd_adm_extract.parquet'
 LONGFORMER_DIR    = f'{MODEL_DIR}/ewang163_longformer_best'
 BIOCLINBERT_DIR   = f'{MODEL_DIR}/ewang163_bioclinbert_best'   # may not exist
-TFIDF_VEC_PKL     = f'{MODEL_DIR}/ewang163_tfidf_vectorizer.pkl'
-TFIDF_LR_PKL      = f'{MODEL_DIR}/ewang163_tfidf_logreg.pkl'
 STRUCT_LR_PKL     = f'{MODEL_DIR}/ewang163_structured_logreg.pkl'
 STRUCT_FEAT_JSON  = f'{MODEL_DIR}/ewang163_structured_features.json'
 
@@ -628,16 +638,6 @@ def main():
         val_thresholds['bioclinbert'] = threshold_at_recall(val_probs_bert, val_labels, 0.85)
         print(f'    BioClinicalBERT val threshold: {val_thresholds["bioclinbert"]:.4f}')
 
-    # --- TF-IDF on val ---
-    with open(TFIDF_VEC_PKL, 'rb') as f:
-        tfidf_vec = pickle.load(f)
-    with open(TFIDF_LR_PKL, 'rb') as f:
-        tfidf_lr = pickle.load(f)
-    val_X_tfidf = tfidf_vec.transform(val_texts)
-    val_probs_tfidf = tfidf_lr.predict_proba(val_X_tfidf)[:, 1]
-    val_thresholds['tfidf'] = threshold_at_recall(val_probs_tfidf, val_labels, 0.85)
-    print(f'    TF-IDF val threshold: {val_thresholds["tfidf"]:.4f}')
-
     # --- Structured on val ---
     X_struct_val, feat_cols = build_structured_features(val_df, adm)
     with open(STRUCT_LR_PKL, 'rb') as f:
@@ -731,20 +731,7 @@ def main():
         all_results['bioclinbert'] = None
         all_results['bioclinbert_chunkpool'] = None
 
-    # ── Model 3: TF-IDF + Logistic Regression ────────────────────────────
-    print('\n[5/9] TF-IDF + Logistic Regression ...')
-    with bench.track('evaluate', stage='tfidf_test', device='cpu',
-                     n_samples=len(test_df)):
-        X_tfidf = tfidf_vec.transform(texts)
-        probs_tfidf = tfidf_lr.predict_proba(X_tfidf)[:, 1]
-
-    metrics_tfidf = compute_metrics(probs_tfidf, labels, 'TF-IDF + LogReg',
-                                    val_threshold=val_thresholds['tfidf'])
-    all_results['tfidf'] = metrics_tfidf
-    model_probs['tfidf'] = probs_tfidf
-    print(f'  AUPRC={metrics_tfidf["AUPRC"]:.4f}  AUROC={metrics_tfidf["AUROC"]:.4f}')
-
-    # ── Model 4: Structured Features ─────────────────────────────────────
+    # ── Model 3: Structured Features ─────────────────────────────────────
     print('\n[6/9] Structured Features + Logistic Regression ...')
     with bench.track('evaluate', stage='struct_test', device='cpu',
                      n_samples=len(test_df)):
@@ -774,8 +761,7 @@ def main():
     mcnemar_results = {}
     lf_thresh = val_thresholds['longformer']
 
-    for name, key in [('TF-IDF + LogReg', 'tfidf'),
-                      ('Structured + LogReg', 'structured'),
+    for name, key in [('Structured + LogReg', 'structured'),
                       ('Keyword (DSM-5/PCL-5)', 'keyword')]:
         if all_results.get(key) is None:
             continue
@@ -857,7 +843,7 @@ def main():
     pi_p_estimate = labels.sum() / len(labels)
     pu_corrections = {}
     for key in ['longformer', 'bioclinbert', 'bioclinbert_chunkpool',
-                'tfidf', 'structured', 'keyword']:
+                'structured', 'keyword']:
         m = all_results.get(key)
         if m is None:
             continue
@@ -951,7 +937,7 @@ def main():
 
     summary_rows = []
     for key in ['longformer', 'bioclinbert', 'bioclinbert_chunkpool',
-                'tfidf', 'structured', 'keyword']:
+                'structured', 'keyword']:
         m = all_results.get(key)
         if m is None:
             continue
@@ -988,7 +974,6 @@ def main():
     print(f'\n  {"Model":<30} {"AUPRC":>7} {"Training":>12} {"Inference":>10}')
     print(f'  {"-"*30} {"-"*7} {"-"*12} {"-"*10}')
     print(f'  {"Keyword (DSM-5/PCL-5)":<30} {metrics_keyword["AUPRC"]:>7.4f} {"0s":>12} {"~seconds":>10}')
-    print(f'  {"TF-IDF + LogReg":<30} {metrics_tfidf["AUPRC"]:>7.4f} {"~minutes":>12} {"~seconds":>10}')
     print(f'  {"Structured + LogReg":<30} {metrics_struct["AUPRC"]:>7.4f} {"~minutes":>12} {"~seconds":>10}')
     if all_results['bioclinbert'] is not None:
         print(f'  {"BioClinicalBERT (512)":<30} {all_results["bioclinbert"]["AUPRC"]:>7.4f} {"~12 min":>12} {"~minutes":>10}')

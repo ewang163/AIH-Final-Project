@@ -1,0 +1,4 @@
+group,mode,n,mean_predicted_prob,mean_note_len,pct_female,pct_age_20s,pct_age_other,pct_emergency,pct_white,pct_with_trauma_term
+false_positive,chunkpool,203,0.9983,3824.5,58.1,15.8,16.3,45.8,71.4,72.9
+false_negative,chunkpool,102,0.9173,2482.7,47.1,8.8,27.5,58.8,79.4,60.8
+overall,chunkpool,1551,0.9324,3108.6,60.6,18.9,20.2,55.1,69.8,69.9

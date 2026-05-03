@@ -1,0 +1,11 @@
+model_a,model_b,mcnemar_p,b_only_A_correct,c_only_B_correct,agreement_pct,cohens_kappa,pearson_r_on_probs
+longformer_pulsnar,bert_trunc,0.042640722640095774,125,94,85.88,0.7176,0.5749
+longformer_pulsnar,bert_chunkpool,0.10732755776161251,90,114,86.85,0.737,0.5265
+longformer_pulsnar,structured,0.0,560,122,56.03,0.1131,0.3526
+longformer_pulsnar,keyword,0.0,664,102,50.61,0.0,0.2227
+bert_trunc,bert_chunkpool,4.4646663003300446e-05,60,115,88.72,0.7744,0.8634
+bert_trunc,structured,0.0,550,143,55.32,0.0996,0.2519
+bert_trunc,keyword,0.0,649,118,50.55,0.0,0.1754
+bert_chunkpool,structured,0.0,582,120,54.74,0.1062,0.2222
+bert_chunkpool,keyword,0.0,688,102,49.07,0.0,0.1465
+structured,keyword,3.4416913763379853e-15,184,60,84.27,0.0,0.1399
